@@ -1,20 +1,33 @@
+//src/security/ProtectedRoute.jsx
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-// Este componente es un "guardián"
-// 'children' será la página que queremos proteger (ej. <Dashboard />)
 export default function ProtectedRoute({ children }) {
   
-  // 1. Revisa si tenemos un token en el localStorage
+  // 1. Revisa si tenemos un token
   const token = localStorage.getItem("authToken");
 
+  // 2. 🚨 ¡NUEVO! Revisa qué rol tenemos
+  const role = localStorage.getItem("userRole");
+
   if (!token) {
-    // 2. Si NO hay token, redirige (navega) al usuario a la página de inicio
-    // 'replace' es importante: borra la ruta /dashboard del historial,
-    // así el usuario no puede volver a quedar "atrapado"
+    // 3. Si NO hay token, te bota (Autenticación)
+    console.error("⛔ ACCESO DENEGADO: No se encontró token. Redirigiendo al inicio.");
     return <Navigate to="/" replace />;
   }
 
-  // 3. Si SÍ hay token, muestra la página protegida (el Dashboard)
+  // 4. 🚨 ¡NUEVO! Revisa si el rol es el correcto
+  if (role !== "ADMINISTRADOR") {
+    // 5. Si hay token, PERO el rol no es Admin, te bota (Autorización)
+    console.error(`⛔ AUTORIZACIÓN DENEGADA: El rol '${role}' no tiene permisos. Redirigiendo al inicio.`);
+    
+    // Opcional: Podríamos borrar el token aquí si quisiéramos ser más estrictos
+    // localStorage.clear(); 
+    
+    return <Navigate to="/" replace />;
+  }
+
+  // 6. Si SÍ hay token Y SÍ es Admin, muestra la página protegida
   return children;
 }
+
