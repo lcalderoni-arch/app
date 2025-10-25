@@ -1,0 +1,134 @@
+/* src/styles/login/LoginModal.css */
+
+/* overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* contenedor principal */
+.modal {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden; /* importante: evitar que children escapen */
+}
+
+/* FIXED size: ancho y alto fijos para BaseModal */
+.fixed-modal {
+  width: 640px;      /* más ancho */
+  height: 420px;     /* menos alto */
+  max-width: 95%;    /* para que no se pase en pantallas chicas */
+  max-height: 90vh;  /* seguridad en pantallas bajas */
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* modal-body: área scrollable donde se renderiza el contenido */
+.modal-body {
+  padding: 1.25rem 1.5rem;
+  box-sizing: border-box;
+  flex: 1 1 auto;       /* ocupa el espacio dentro de fixed-modal */
+  overflow-y: auto;     /* si contenido largo, aparece scrollbar aquí */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* close button */
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+/* normalizar título para no añadir margenes extra que cambian el alto */
+.modal-title {
+  margin: 0 0 0.6rem 0;
+  color: #1a64aa;
+  font-size: 1.25rem;
+}
+
+/* form layout */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.auth-form label {
+  display: block;
+  font-weight: 500;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+/* actions al final del form */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* botones */
+.btn-submit {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  border: none;
+  background: #1a64aa;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* link-like button */
+.link-button {
+  background: none;
+  border: none;
+  color: #1a64aa;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+
+/* pequeño texto de toggle */
+.toggle-line {
+  margin-top: auto; /* empuja al final del modal-body para consistencia */
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* responsive: reduce la caja en pantallas pequeñas */
+@media (max-width: 520px) {
+  .fixed-modal { width: 92%; height: auto; } /* en móvil permitimos height auto */
+  .modal-body { max-height: 80vh; }
+}

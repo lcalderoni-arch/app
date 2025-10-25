@@ -1,0 +1,54 @@
+.Encabezado {
+  padding: 0.5em 3em;
+  background-color: #f5f7fc;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.icon {
+  /* ... (puede que ya tengas otros estilos aquí) ... */
+
+  /* Añade esta línea para "estirar" la imagen.
+    - 1.0 es el tamaño normal.
+    - 1.2 la estira un 20% horizontalmente.
+    - 1.5 la estira un 50%.
+    Prueba cambiando el número hasta que te guste.
+  */
+  transform: scaleX(3); 
+}
+
+.Encabezado nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.Encabezado .logo-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.Encabezado .icon {
+  width: 40px;
+  height: 40px;
+}
+
+.Encabezado a {
+  margin-left: 1.5em;
+  text-decoration: none;
+  color: #000;
+  font-weight: 500;
+  letter-spacing: 1px;
+  transition: color 0.3s;
+}
+
+.Encabezado a:hover {
+  color: #1a64aa;
+}
+
+.nav-container { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.nav-links { display:flex; align-items:center; gap:1.5rem; }
+.nav-auth { margin-left: 1rem; }
+.btn-login { padding: 0.45rem 0.9rem; border-radius: 8px; border: none; background-color: #1a64aa; color:#fff; cursor:pointer; font-weight:500; }
