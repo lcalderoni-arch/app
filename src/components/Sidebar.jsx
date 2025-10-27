@@ -1,46 +1,55 @@
 //src/components/Sidebar.jsx
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './Sidebar.css'; // Asumiendo que este archivo SÍ existe ahora en /components/
+// Asegúrate de que este archivo CSS exista en la misma carpeta (src/components/)
+import './Sidebar.css';
 
+// Recibe 'isOpen' para saber si mostrarse y 'onClose' para cerrarse
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
 
+  // Función para manejar el cierre de sesión
   const handleLogout = () => {
-    
-    // 🚨 ¡AQUÍ ESTÁ TU MENSAJE!
-    // Usamos console.warn() para que se vea amarillo y destaque.
-    console.warn("🔒 SESIÓN CERRADA: Token de autenticación destruido.");
-    
-    // Borra TODO el localStorage (authToken, userName, userRole, etc.)
+    console.warn("🔒 SESIÓN CERRADA: Token borrado."); // Mensaje para depuración
+    // Borra TODO el localStorage para asegurar limpieza
     localStorage.clear();
-    
-    // Cierra el sidebar
-    onClose();
-    
-    // Envía al home
-    navigate('/'); 
+    onClose(); // Cierra el sidebar
+    navigate('/'); // Redirige al usuario a la página de inicio
   };
 
   return (
     <>
-      <div 
-        className={`sidebar-overlay ${isOpen ? 'open' : ''}`} 
+      {/* Capa oscura de fondo (Overlay) que cierra el menú al hacer clic */}
+      <div
+        className={`sidebar-overlay ${isOpen ? 'open' : ''}`}
         onClick={onClose}
-        aria-hidden={!isOpen}
+        aria-hidden={!isOpen} // Para accesibilidad
       />
-      
-      <nav 
+
+      {/* El Panel Lateral */}
+      <nav
         className={`sidebar ${isOpen ? 'open' : ''}`}
         aria-label="Menú principal"
       >
+        {/* Botón para cerrar el menú (la 'X') */}
         <button className="sidebar-close" onClick={onClose} aria-label="Cerrar menú">×</button>
-        
+
         <h2>Menú Principal</h2>
-        
+
+        {/* Enlaces de navegación usando <Link> de react-router-dom */}
+        {/* El onClick={onClose} cierra el menú después de hacer clic */}
+
+        {/* '/dashboard' apunta a la ruta 'index' (DashboardHome) */}
         <Link to="/dashboard" onClick={onClose}>Mi Perfil</Link>
-        <Link to="/dashboard" onClick={onClose}>Ajustes</Link>
-        
+
+        {/* '/dashboard/usuarios' apunta a la ruta de gestión */}
+        <Link to="/dashboard/usuarios" onClick={onClose}>Gestión de Usuarios</Link>
+
+        {/* Puedes agregar más enlaces aquí */}
+        {/* <Link to="/dashboard/cursos" onClick={onClose}>Mis Cursos</Link> */}
+        {/* <Link to="/dashboard/ajustes" onClick={onClose}>Ajustes</Link> */}
+
+        {/* Botón para cerrar sesión, alineado al fondo */}
         <button onClick={handleLogout} className="btn-logout">
           Cerrar sesión
         </button>

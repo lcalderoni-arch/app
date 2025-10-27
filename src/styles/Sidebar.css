@@ -1,0 +1,109 @@
+/* El panel lateral.
+  Está fijo en la pantalla, posicionado fuera de la vista a la derecha (translateX(100%)).
+  Tiene una transición suave para la propiedad 'transform'.
+*/
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px; /* Ancho del panel */
+  height: 100vh;
+  background-color: #ffffff;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estado abierto: Cuando el sidebar tiene la clase 'open',
+  se mueve a su posición original (translateX(0)).
+*/
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* La capa de fondo oscura (Overlay).
+  Oculta por defecto (opacity: 0, visibility: hidden).
+*/
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
+  z-index: 999;
+}
+
+/* Estado abierto del Overlay:
+  Se vuelve visible cuando el sidebar está abierto.
+*/
+.sidebar-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- Estilos internos del menú --- */
+
+.sidebar h2 {
+  margin-top: 30px;
+  color: #333;
+  border-bottom: 2px solid #3b5998; /* Color de la escuela */
+  padding-bottom: 10px;
+}
+
+/* Estilos de los enlaces de navegación */
+.sidebar a {
+  display: block;
+  padding: 15px 10px;
+  text-decoration: none;
+  color: #555;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.sidebar a:hover {
+  background-color: #f4f4f4;
+  color: #3b5998; /* Color de la escuela */
+}
+
+/* Botón de cerrar (X) */
+.sidebar-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2.2rem;
+  font-weight: 300;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.sidebar-close:hover {
+  color: #333;
+}
+
+/* Botón de Logout */
+.btn-logout {
+  margin-top: auto; /* Empuja el botón al fondo del flex container */
+  padding: 12px;
+  background-color: #f44336; /* Rojo para logout */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.btn-logout:hover {
+  background-color: #d32f2f;
+}

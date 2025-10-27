@@ -1,37 +1,16 @@
-//src/App.js
-import "./App.css";
-import { Routes, Route } from 'react-router-dom'; 
-
-// 1. 🚨 CORREGIMOS LAS RUTAS DE IMPORTACIÓN
-import HomePage from "./pages/HomePage"; 
-import Dashboard from "./pages/Dashboard"; 
-
-// 2. 🚨 IMPORTAMOS EL GUARDIÁN DESDE SU CARPETA
-import ProtectedRoute from "./security/ProtectedRoute"; 
+  //src/App.js
+import { useRoutes } from 'react-router-dom';
+// 1. Importa la configuración de rutas
+import routeConfig from './routeConfig.js'; 
+// 2. Importa tu CSS global
+import "./App.css"; 
 
 function App() {
-  return (
-    <Routes> 
-      
-      {/* RUTA PÚBLICA */}
-      <Route 
-        path="/" 
-        element={<HomePage />} 
-      />
+  // 3. useRoutes genera el elemento a renderizar
+  const element = useRoutes(routeConfig); 
 
-      {/* RUTA PROTEGIDA */}
-      <Route 
-        path="/dashboard" 
-        element={
-          // 3. 🚨 ENVOLVEMOS EL DASHBOARD CON EL GUARDIÁN
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } 
-      />
-      
-    </Routes>
-  );
+  // 4. Renderiza el resultado
+  return element; 
 }
 
 export default App;
