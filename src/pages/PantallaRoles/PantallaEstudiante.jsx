@@ -11,7 +11,6 @@ import { faBell } from '@fortawesome/free-solid-svg-icons';
 
 export default function PantallaEstudiante() {
     const userName = localStorage.getItem('userName');
-    const userRole = localStorage.getItem('userRole');
     const userGrado = localStorage.getItem('userGrado');
 
     return (
