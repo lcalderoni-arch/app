@@ -17,7 +17,7 @@ const routeConfig = [
   { 
     path: "/", 
     element: <HomePage /> 
-  },
+  },  
   { 
     path: "/nosotros", // ✅ URL más limpia (sin "Page")
     element: <NosotrosPage /> // ✅ Nombre claro

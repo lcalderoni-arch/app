@@ -2,9 +2,9 @@
 import React from 'react';
 import axios from 'axios';
 // 1. Importa AMBOS modales
+import { API_ENDPOINTS } from '../../config/api';
 import EditUserModal from '../../components/EditUserModal.jsx'; 
 import CreateUserModal from '../../components/CreateUserModal.jsx'; // 👈 NUEVO
-import { API_BASE_URL } from '../../config/api';
 // Importa los estilos CSS
 import '../../styles/GestionUsuarios.css'; 
 
