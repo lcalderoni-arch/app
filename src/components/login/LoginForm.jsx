@@ -7,6 +7,8 @@ export default function LoginForm() {
   const emailRef = useRef(null);
   const navigate = useNavigate();
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   const [email, setEmail] = useState(""); 
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,11 +32,11 @@ export default function LoginForm() {
     setError(null);    
     console.log("Enviando datos de login...");
 
-    const url = "http://localhost:8081/api/auth/login";
+    const url = `${API_BASE_URL}/auth/login`;
     const payload = { email, password };
 
     try {
-      const response = await axios.post(url, payload);
+      const response = await axios.post(url, payload, config);
       const { token, nombre, rol } = response.data;
       
       localStorage.setItem("authToken", token);

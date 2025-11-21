@@ -8,6 +8,8 @@ export default function EditUserModal({ isOpen, onClose, userToEdit, onUserUpdat
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   // NUEVOS ESTADOS
   const [dni, setDni] = useState('');
   const [grado, setGrado] = useState(''); // Reemplaza carrera
@@ -42,7 +44,7 @@ export default function EditUserModal({ isOpen, onClose, userToEdit, onUserUpdat
     setLoading(true);
     setError(null);
 
-    const API_URL = `http://localhost:8081/api/usuarios/editar/${userToEdit.id}`;
+    const url = `${API_BASE_URL}/usuarios/editar/${userToEdit.id}`;
     const token = localStorage.getItem('authToken');
 
     if (!token) {
@@ -75,7 +77,7 @@ export default function EditUserModal({ isOpen, onClose, userToEdit, onUserUpdat
 
     try {
       const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      const response = await axios.put(API_URL, payload, config);
+      const response = await axios.put(url, payload, config);
 
       onUserUpdated(response.data); 
       onClose(); 

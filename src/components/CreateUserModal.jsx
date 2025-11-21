@@ -11,6 +11,8 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }) {
   const [password, setPassword] = useState('');
   const [rol, setRol] = useState('ALUMNO'); // Valor por defecto
   
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   // NUEVOS ESTADOS para reemplazar carrera/departamento
   const [grado, setGrado] = useState(''); 
   const [dni, setDni] = useState(''); // DNI para Alumno y Profesor
@@ -42,7 +44,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }) {
     setLoading(true);
     setError(null);
 
-    const API_URL = `http://localhost:8081/api/usuarios/crear`;
+    const url = `${API_BASE_URL}/usuarios/crear`;
     const token = localStorage.getItem('authToken');
 
     if (!token) {
@@ -79,7 +81,7 @@ export default function CreateUserModal({ isOpen, onClose, onUserCreated }) {
 
     try {
       const config = { headers: { 'Authorization': `Bearer ${token}` } };
-      const response = await axios.post(API_URL, payload, config);
+      const response = await axios.post(url, payload, config);
       onUserCreated(response.data);
       onClose(); 
 

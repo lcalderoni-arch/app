@@ -5,6 +5,8 @@ import axios from 'axios';
 export default function RegisterForm({ openLogin }) {
   const nameRef = useRef(null);
   
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,7 +38,7 @@ export default function RegisterForm({ openLogin }) {
       return;
     }
 
-    const url = "http://localhost:8081/api/usuarios/crear";
+    const url = `${API_BASE_URL}/usuarios/crear`;
     
     // ✅ NUEVO: Payload con DNI, Grado y rol fijo ALUMNO
     const payload = {
@@ -51,7 +53,7 @@ export default function RegisterForm({ openLogin }) {
     localStorage.setItem("userGrado", grado);
     
     try {
-      await axios.post(url, payload); 
+      await axios.post(url, payload, config);
       
       alert("Registro exitoso. ¡Ahora puedes iniciar sesión!");
       
