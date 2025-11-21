@@ -110,7 +110,9 @@ export default function LoginForm() {
         <div className="form-group">
           <div className="password-header">
             <label htmlFor="input-password">Contraseña</label>
-            <a href="#">¿Olvidaste tu contraseña?</a>
+            <button type="button">
+              ¿Olvidaste tu contraseña?
+              </button> 
           </div>
           <div style={{ position: 'relative' }}> {/* ✅ NUEVO: Wrapper para el toggle */}
             <input
