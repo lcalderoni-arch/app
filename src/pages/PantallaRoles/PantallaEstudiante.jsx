@@ -66,28 +66,44 @@ export default function PantallaEstudiante() {
                 <main className='student-main'>
                     <section className='content-section'>
                         <h2>Mis Cursos</h2>
-                        <p>Visualiza tus cursos elegidos:</p>
+                        <p>Visualiza tus cursos elegidos</p>
                         
                         <div className='courses-grid'>
                             <div className='course-card'>
                                 <div className='header-card'>
                                     <h3>Matemáticas</h3>
-                                    <p></p>
+                                    <p className='text-grado'>Grado: {userGrado || "No asignado"}</p>
                                 </div>
-                                <p>Tareas pendientes: 2</p>
-                                <p>Próxima clase: Lunes 9:00 AM</p>
+                                <div className='line'></div>
+                                <div className='information-card'>
+                                    <p><strong>Profesor:</strong></p>
+                                    <p><strong>Horario:</strong> Lunes 9:00 AM - 10:00AM (SALON: 5TO-B)</p>
+                                </div>
+                                <div className='line'></div>
+                                <div className='footer-card'>
+                                    <div className='fecha-information'>
+                                        <p>Inicio: 10/10/2010</p>
+                                        <p>Fin: 10/12/2010</p>
+                                    </div>
                                 <button className='btn-course'>Ver curso</button>
+                                </div>
                             </div>
 
                             <div className='course-card'>
-                                <h3>Ciencias</h3>
+                                <div className='header-card'>
+                                    <h3>Ciencias</h3>
+                                    <p className='text-grado'>Grado: {userGrado || "No asignado"}</p>
+                                </div>
                                 <p>Tareas pendientes: 1</p>
                                 <p>Próxima clase: Martes 10:00 AM</p>
                                 <button className='btn-course'>Ver curso</button>
                             </div>
 
                             <div className='course-card'>
-                                <h3>Historia</h3>
+                                <div className='header-card'>
+                                    <h3>Historia</h3>
+                                    <p className='text-grado'>Grado: {userGrado || "No asignado"}</p>
+                                </div>
                                 <p>Tareas pendientes: 0</p>
                                 <p>Próxima clase: Miércoles 11:00 AM</p>
                                 <button className='btn-course'>Ver curso</button>
