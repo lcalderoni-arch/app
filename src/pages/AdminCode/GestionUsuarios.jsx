@@ -4,6 +4,7 @@ import axios from 'axios';
 // 1. Importa AMBOS modales
 import EditUserModal from '../../components/EditUserModal.jsx'; 
 import CreateUserModal from '../../components/CreateUserModal.jsx'; // 👈 NUEVO
+import { API_BASE_URL } from '../../config/api';
 // Importa los estilos CSS
 import '../../styles/GestionUsuarios.css'; 
 
@@ -20,7 +21,7 @@ function GestionUsuarios() {
   // --- ⭐ NUEVO ESTADO para modal de creación ---
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
-  const API_URL = 'http://localhost:8081/api/usuarios';
+  const API_URL = API_ENDPOINTS.usuarios;
 
   // --- fetchUsuarios (sin cambios) ---
   const fetchUsuarios = React.useCallback(async () => { 
