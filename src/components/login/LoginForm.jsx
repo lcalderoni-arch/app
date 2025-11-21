@@ -7,7 +7,7 @@ export default function LoginForm() {
   const emailRef = useRef(null);
   const navigate = useNavigate();
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const API_BASE_URL = "https://fundaciondeportiva-backend-api-2025-gveefdbmgvdggqa8.chilecentral-01.azurewebsites.net/api";
 
   const [email, setEmail] = useState(""); 
   const [password, setPassword] = useState("");
