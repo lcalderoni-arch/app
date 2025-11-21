@@ -1,0 +1,108 @@
+.title-nosotros {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+}
+
+.slider-box {
+    overflow: hidden;
+}
+
+/* Lista sin estilos */
+.slider-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    width: 100%;
+
+    animation: slide 20s infinite ease-in-out;
+}
+
+/* Items de la lista */
+.slider-box li {
+    width: 100%;
+    flex-shrink: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.slider-box img {
+    width: 100%;
+    height: 90vh;          /* ✅ 60% de la altura del viewport */
+    min-height: 400px;     /* ✅ Altura mínima */
+    max-height: 700px;     /* ✅ Altura máxima */
+    object-fit: cover;     /* ✅ Mantener proporción y cubrir */
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+@keyframes slide {
+    0% { 
+        margin-left: 0; 
+    }
+    33% { 
+        margin-left: 0; /* Muestra imagen 1 */
+    }
+    36% { 
+        margin-left: -100%; 
+    }
+    60% { 
+        margin-left: -100%; /* Muestra imagen 2 */
+    }
+    63% { 
+        margin-left: -200%; 
+    }
+    90% { 
+        margin-left: -200%; /* Muestra imagen 3 */
+    }
+    100% { 
+        margin-left: 0; /* ✅ Vuelve directamente a imagen 1 */
+    }
+}
+
+/* 
+||                                 ||
+||    AREA DE INFORMACION EXTRA    ||
+||                                 ||
+*/
+
+.title-nosotros .box-data {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to right, #62b3d8, #203476, #10065e);
+    padding: 15px 15rem;
+}
+
+.box-data .text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    position: relative;
+    font-size: 20px;
+    gap: 5px;
+}
+
+.box-data .value {
+    font-size: 35px;
+    font-weight: 500;
+}
+
+.box-data .text:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;  
+    transform: translateY(-50%);
+    height: 90%;
+    right: 0;  
+    width: 1px;
+    background-color: white;
+}

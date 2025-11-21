@@ -1,54 +1,105 @@
 .Encabezado {
-  padding: 0.5em 3em;
-  background-color: #f5f7fc;
-  position: sticky;
+  height: 68px;
+  width: 100%;
+  background: transparent;
+  box-shadow: 0 0 10px 0 #3e3e3e;
+  position: absolute;
   top: 0;
   z-index: 1000;
-}
-
-.icon {
-  /* ... (puede que ya tengas otros estilos aquí) ... */
-
-  /* Añade esta línea para "estirar" la imagen.
-    - 1.0 es el tamaño normal.
-    - 1.2 la estira un 20% horizontalmente.
-    - 1.5 la estira un 50%.
-    Prueba cambiando el número hasta que te guste.
-  */
-  transform: scaleX(3); 
 }
 
 .Encabezado nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.Encabezado .logo-name {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
+  height: 100%;
+  margin: 0 80px;
+  gap: 180px;
 }
 
 .Encabezado .icon {
-  width: 40px;
-  height: 40px;
+  height: 55px;
+  width: auto;
+  display: block;
 }
 
-.Encabezado a {
-  margin-left: 1.5em;
+.Encabezado .nav-links {
+    display: flex;
+    gap: 150px;
+}
+
+.Encabezado .other-page {
+  color: #efefef;
   text-decoration: none;
-  color: #000;
   font-weight: 500;
-  letter-spacing: 1px;
+  font-size: 18px;
   transition: color 0.3s;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 }
 
-.Encabezado a:hover {
+.Encabezado .other-page:hover {
   color: #1a64aa;
 }
 
-.nav-container { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
 .nav-links { display:flex; align-items:center; gap:1.5rem; }
-.nav-auth { margin-left: 1rem; }
-.btn-login { padding: 0.45rem 0.9rem; border-radius: 8px; border: none; background-color: #1a64aa; color:#fff; cursor:pointer; font-weight:500; }
+.nav-auth { margin-left: auto; }
+.btn-login { 
+  padding: 11px 22px;
+  border-radius: 6px; 
+  border: none; 
+  background-color: #1a64aa; 
+  color:#ffff; 
+  cursor:pointer; font-size: 15px; font-weight:500; 
+  letter-spacing: 1px;
+}
+
+/* ========================================
+  ESTILOS PARA SUBPÁGINAS (NOSOTROS, ETC)
+  - Fondo blanco/color
+  - Posición fijo al hacer scroll (fixed)
+  - Sombra más marcada
+======================================== */
+
+.Encabezado.subpage {
+  background: #ffffff; /* ✅ Fondo blanco sólido */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* ✅ Sombra más visible */
+  position: fixed; /* ✅ Se queda fijo al hacer scroll (opcional) */
+  top: 0;
+}
+
+.Encabezado.subpage nav {
+  gap: 140px;
+}
+
+.Encabezado.subpage .nav-links {
+  height: 100%;
+  background: #1a64aa;
+  border-radius: 0 0 15px 15px;
+  padding: 0 40px;
+}
+
+.Encabezado.subpage .other-page {
+  color: #ffffff; /* ✅ Texto oscuro para contraste */
+  position: relative;
+  display: inline-block;
+  transition: color 0.5s;
+  font-weight: 500;
+}
+
+.Encabezado.subpage .other-page::after {
+  content: "";
+  position: absolute;
+  left: 0px;
+  bottom: -5px;
+  height: 2px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 50px;
+  transform: scaleX(0);
+  transition: transform 0.2s linear;
+}
+
+.Encabezado .other-page:hover::after {
+  transform: scaleX(1);
+}

@@ -2,10 +2,10 @@
 import React from 'react';
 import axios from 'axios';
 // 1. Importa AMBOS modales
-import EditUserModal from '../components/EditUserModal.jsx'; 
-import CreateUserModal from '../components/CreateUserModal.jsx'; // 👈 NUEVO
+import EditUserModal from '../../components/EditUserModal.jsx'; 
+import CreateUserModal from '../../components/CreateUserModal.jsx'; // 👈 NUEVO
 // Importa los estilos CSS
-import '../styles/GestionUsuarios.css'; 
+import '../../styles/GestionUsuarios.css'; 
 
 function GestionUsuarios() {
   // Estados existentes

@@ -40,10 +40,14 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* El onClick={onClose} cierra el menú después de hacer clic */}
 
         {/* '/dashboard' apunta a la ruta 'index' (DashboardHome) */}
-        <Link to="/dashboard" onClick={onClose}>Mi Perfil</Link>
+        <Link to="/dashboard-admin" onClick={onClose}>
+          Mi Perfil
+        </Link>
 
         {/* '/dashboard/usuarios' apunta a la ruta de gestión */}
-        <Link to="/dashboard/usuarios" onClick={onClose}>Gestión de Usuarios</Link>
+        <Link to="/dashboard-admin/usuarios" onClick={onClose}>
+          Gestión de Usuarios
+        </Link>
 
         {/* Puedes agregar más enlaces aquí */}
         {/* <Link to="/dashboard/cursos" onClick={onClose}>Mis Cursos</Link> */}

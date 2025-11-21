@@ -1,11 +1,15 @@
 // src/index.js
 import React from 'react';
 
-// Importa tus componentes (¡Añade .jsx si es necesario!)
 import HomePage from "./pages/HomePage.jsx"; 
-import Dashboard from "./pages/Dashboard.jsx"; 
-import DashboardHome from "./pages/DashboardHome.jsx";
-import GestionUsuarios from "./pages/GestionUsuarios.jsx"; // Usa la versión simple o la completa
+import NosotrosPage from "./pages/NosotrosPage.jsx"; // ✅ Mejor nombre de importación
+
+import Dashboard from "./pages/AdminCode/Dashboard.jsx"; 
+import DashboardHome from "./pages/AdminCode/DashboardHome.jsx";
+import GestionUsuarios from "./pages/AdminCode/GestionUsuarios.jsx";
+import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante.jsx";
+import PantallaDocente from "./pages/PantallaRoles/PantallaDocente.jsx";
+
 import ProtectedRoute from "./security/ProtectedRoute.jsx"; 
 
 // Define la estructura de rutas como un ARRAY
@@ -14,10 +18,15 @@ const routeConfig = [
     path: "/", 
     element: <HomePage /> 
   },
+  { 
+    path: "/nosotros", // ✅ URL más limpia (sin "Page")
+    element: <NosotrosPage /> // ✅ Nombre claro
+  },
+
   {
-    path: "/dashboard", 
+    path: "/dashboard-admin", 
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
         <Dashboard /> 
       </ProtectedRoute>
     ),
@@ -32,6 +41,27 @@ const routeConfig = [
       },
     ]
   },
+
+  // ✅ NUEVA RUTA PARA ESTUDIANTE
+  {
+    path: "/pantalla-estudiante",
+    element: (
+      <ProtectedRoute allowedRoles={["ALUMNO"]}>
+        <PantallaEstudiante />
+      </ProtectedRoute>
+    )
+  },
+  
+  // ✅ NUEVA RUTA PARA DOCENTE
+  {
+    path: "/pantalla-docente",
+    element: (
+      <ProtectedRoute allowedRoles={["PROFESOR"]}>
+        <PantallaDocente />
+      </ProtectedRoute>
+    )
+  },
+
 ];
 
 // Exporta el ARRAY como default
