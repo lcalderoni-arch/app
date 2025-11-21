@@ -62,15 +62,10 @@ export default function LoginForm() {
           console.error(`⚠️ Rol desconocido: ${rol}`);
           setError("Rol de usuario no reconocido. Contacta al administrador.");
           setLoading(false);
-          return; // ✅ Detener la ejecución si el rol es inválido
+          return;
       }
       
       navigate(dashboardPath);
-      
-      // ✅ NUEVO: Recargar página para limpiar estado
-      setTimeout(() => {
-        window.location.reload();
-      }, 0);
 
     } catch (err) {
       console.error("Error en el login:", err);
