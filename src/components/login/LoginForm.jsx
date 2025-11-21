@@ -36,7 +36,7 @@ export default function LoginForm() {
     const payload = { email, password };
 
     try {
-      const response = await axios.post(url, payload, config);
+      const response = await axios.post(url, payload);
       const { token, nombre, rol } = response.data;
       
       localStorage.setItem("authToken", token);
