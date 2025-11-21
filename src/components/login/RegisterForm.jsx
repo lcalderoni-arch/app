@@ -2,10 +2,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from 'axios';
 
+import { API_BASE_URL } from '../../config/api';
+
 export default function RegisterForm({ openLogin }) {
   const nameRef = useRef(null);
-  
-  const API_BASE_URL = "https://fundaciondeportiva-backend-api-2025-gveefdbmgvdggqa8.chilecentral-01.azurewebsites.net/api";
 
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
@@ -13,7 +13,7 @@ export default function RegisterForm({ openLogin }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [dni, setDni] = useState(''); // ✅ NUEVO
   const [grado, setGrado] = useState(''); // ✅ NUEVO
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -25,7 +25,7 @@ export default function RegisterForm({ openLogin }) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     // ✅ NUEVO: Validaciones de Frontend
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.");
@@ -39,24 +39,24 @@ export default function RegisterForm({ openLogin }) {
     }
 
     const url = `${API_BASE_URL}/usuarios/crear`;
-    
+
     // ✅ NUEVO: Payload con DNI, Grado y rol fijo ALUMNO
     const payload = {
       nombre: nombre,
       email: email,
       password: password,
-      rol: "ALUMNO", 
+      rol: "ALUMNO",
       dni: dni,
       grado: grado
     };
 
     localStorage.setItem("userGrado", grado);
-    
+
     try {
       await axios.post(url, payload, config);
-      
+
       alert("Registro exitoso. ¡Ahora puedes iniciar sesión!");
-      
+
       // ✅ NUEVO: Cambiar a login después de registro exitoso
       if (openLogin) {
         setTimeout(openLogin, 300);
@@ -64,12 +64,12 @@ export default function RegisterForm({ openLogin }) {
 
     } catch (err) {
       console.error("Error en el registro:", err);
-      
+
       // ✅ NUEVO: Manejo de errores mejorado
       if (err.response) {
         if (err.response.data && typeof err.response.data === 'string' && err.response.data.includes("El correo electrónico ya está en uso")) {
           setError("El correo o DNI ya está registrado.");
-        } else if (err.response.data && err.response.data.message) { 
+        } else if (err.response.data && err.response.data.message) {
           setError(`Error: ${err.response.data.message}`);
         } else {
           setError(`Error del servidor: ${err.response.status}.`);
@@ -85,89 +85,89 @@ export default function RegisterForm({ openLogin }) {
   return (
     <div>
       <h2>Crear cuenta de Alumno</h2>
-      
-      <form onSubmit={handleSubmit} noValidate style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-        <label style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+
+      <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           Nombre completo*
-          <input 
+          <input
             ref={nameRef}
-            type="text" 
-            value={nombre} 
-            onChange={(e) => setNombre(e.target.value)} 
-            required 
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            required
             disabled={loading}
-            style={{padding: '10px', borderRadius: '6px', border: '1px solid #ddd'}}
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
           />
         </label>
 
-        <label style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           Correo electrónico*
-          <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
             disabled={loading}
-            style={{padding: '10px', borderRadius: '6px', border: '1px solid #ddd'}}
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
           />
         </label>
-        
+
         {/* ✅ NUEVO: Campo DNI */}
-        <label style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           DNI*
-          <input 
-            type="text" 
-            value={dni} 
-            onChange={(e) => setDni(e.target.value)} 
-            required 
+          <input
+            type="text"
+            value={dni}
+            onChange={(e) => setDni(e.target.value)}
+            required
             disabled={loading}
             placeholder="Ej: 12345678"
-            style={{padding: '10px', borderRadius: '6px', border: '1px solid #ddd'}}
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
           />
         </label>
 
         {/* ✅ NUEVO: Campo Grado */}
-        <label style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           Grado/Nivel*
-          <input 
-            type="text" 
-            value={grado} 
-            onChange={(e) => setGrado(e.target.value)} 
-            required 
+          <input
+            type="text"
+            value={grado}
+            onChange={(e) => setGrado(e.target.value)}
+            required
             disabled={loading}
             placeholder="Ej: 5to de primaria"
-            style={{padding: '10px', borderRadius: '6px', border: '1px solid #ddd'}}
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
           />
         </label>
 
-        <label style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           Contraseña*
-          <input 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
             disabled={loading}
-            style={{padding: '10px', borderRadius: '6px', border: '1px solid #ddd'}}
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
           />
         </label>
 
-        <label style={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           Confirmar contraseña*
-          <input 
-            type="password" 
-            value={confirmPassword} 
-            onChange={(e) => setConfirmPassword(e.target.value)} 
-            required 
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
             disabled={loading}
-            style={{padding: '10px', borderRadius: '6px', border: '1px solid #ddd'}}
+            style={{ padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
           />
         </label>
 
-        {error && <p style={{color: 'red', fontSize: '14px', margin: '0'}}>{error}</p>}
+        {error && <p style={{ color: 'red', fontSize: '14px', margin: '0' }}>{error}</p>}
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading}
           style={{
             padding: '12px',
@@ -184,10 +184,10 @@ export default function RegisterForm({ openLogin }) {
         </button>
 
         {openLogin && (
-          <p style={{textAlign: 'center', fontSize: '14px'}}>
+          <p style={{ textAlign: 'center', fontSize: '14px' }}>
             ¿Ya tienes cuenta?{" "}
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={openLogin}
               style={{
                 background: 'none',
