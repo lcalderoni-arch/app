@@ -5,7 +5,7 @@ import axios from 'axios';
 export default function RegisterForm({ openLogin }) {
   const nameRef = useRef(null);
   
-  const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const API_BASE_URL = "https://fundaciondeportiva-backend-api-2025-gveefdbmgvdggqa8.chilecentral-01.azurewebsites.net/api";
 
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
