@@ -1,6 +1,6 @@
 // src/components/Header.jsx
 import React from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom"; // ✅ AGREGAR
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ AGREGAR
 import icon from "../assets/logo.png";
 import "../styles/Header.css";
 
