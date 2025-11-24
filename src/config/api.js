@@ -14,5 +14,5 @@ export const API_ENDPOINTS = {
     usuarios: `${API_BASE_URL}/usuarios`,
     alumnos: `${API_BASE_URL}/alumnos`,
     profesores: `${API_BASE_URL}/profesores`,
-    // Agrega más endpoints según necesites
+    cursos: `${API_BASE_URL}/cursos`, // ⭐ AGREGADO
 };

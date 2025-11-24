@@ -19,7 +19,7 @@ function GestionCursos() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingCurso, setEditingCurso] = useState(null); // El curso a editar
 
-    const API_URL = `${API_ENDPOINTS.cursos || 'https://plataforma-edu-back-gpcsh9h7fddkfvfb.chilecentral-01.azurewebsites.net/api/cursos'}`;
+    const API_URL = API_ENDPOINTS.cursos;
 
     // --- 1. Fetch de Cursos ---
     const fetchCursos = useCallback(async () => { 

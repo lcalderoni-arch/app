@@ -47,7 +47,11 @@ const routeConfig = [
       },
       {
         path: "cursos",
-        element: <GestionCursos />
+        element: (
+          <ProtectedRoute roles={["ADMINISTRADOR"]}>
+            <GestionCursos />
+          </ProtectedRoute>
+        )
       },
     ]
   },
