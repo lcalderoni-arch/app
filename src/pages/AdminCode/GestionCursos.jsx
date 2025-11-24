@@ -1,7 +1,7 @@
 // src/pages/GestionCursos.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import CreateCursoModal from '../components/CreateCursoModal.jsx'; // (Lo crearemos abajo)
+import CreateCursoModal from '../../components/CreateCursoModal.jsx'; // (Lo crearemos abajo)
 import EditCursoModal from '../components/EditCursoModal.jsx'; // (Lo crearemos abajo)
 import '../styles/GestionUsuarios.css'; // (Reutilizamos los estilos de la tabla)
 
