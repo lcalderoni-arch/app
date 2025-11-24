@@ -67,21 +67,21 @@ function GestionCursos() {
             headers: { 'Authorization': `Bearer ${token}` } 
         };
 
-            // MODIFICADO: Con config
-            await axios.delete(`${API_URL}/${cursoId}`);
-            setCursos(current => current.filter(curso => curso.id !== cursoId));
-            alert(`Curso "${cursoTitulo}" eliminado.`);
-        } catch (err) {
-            console.error(`Error al eliminar ${cursoId}:`, err);
-            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                setError("No tienes permisos para eliminar cursos.");
-            } else if (err.response && err.response.data && err.response.data.message) {
-                setError(err.response.data.message); // Ej. "El curso tiene secciones"
-            } else {
-                setError(err.message || "Error al eliminar."); 
-            }
+        // MODIFICADO: Con config
+        await axios.delete(`${API_URL}/${cursoId}`, config);
+        setCursos(current => current.filter(curso => curso.id !== cursoId));
+        alert(`Curso "${cursoTitulo}" eliminado.`);
+    } catch (err) {
+        console.error(`Error al eliminar ${cursoId}:`, err);
+        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+            setError("No tienes permisos para eliminar cursos.");
+        } else if (err.response && err.response.data && err.response.data.message) {
+            setError(err.response.data.message);
+        } else {
+            setError(err.message || "Error al eliminar."); 
         }
-    };
+    }
+};
 
     // --- 3. Manejo de Modales (Callbacks) ---
     const handleEdit = (curso) => {
