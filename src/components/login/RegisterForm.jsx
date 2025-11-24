@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from 'axios';
 
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL } from '../../config/api.js';
 
 export default function RegisterForm({ openLogin }) {
   const nameRef = useRef(null);
