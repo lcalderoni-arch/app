@@ -1,64 +1,98 @@
 //src/components/Sidebar.jsx
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Asegúrate de que este archivo CSS exista en la misma carpeta (src/components/)
-import './Sidebar.css';
+import axios from 'axios';
+import '../styles/Sidebar.css';
 
-// Recibe 'isOpen' para saber si mostrarse y 'onClose' para cerrarse
 export default function Sidebar({ isOpen, onClose }) {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const userRole = localStorage.getItem('userRole');
+    const userName = localStorage.getItem('userName');
 
-  // Función para manejar el cierre de sesión
-  const handleLogout = () => {
-    console.warn("🔒 SESIÓN CERRADA: Token borrado."); // Mensaje para depuración
-    // Borra TODO el localStorage para asegurar limpieza
-    localStorage.clear();
-    onClose(); // Cierra el sidebar
-    navigate('/'); // Redirige al usuario a la página de inicio
-  };
+    const handleLogout = async () => {
+        console.warn("🔒 Cerrando sesión...");
 
-  return (
-    <>
-      {/* Capa oscura de fondo (Overlay) que cierra el menú al hacer clic */}
-      <div
-        className={`sidebar-overlay ${isOpen ? 'open' : ''}`}
-        onClick={onClose}
-        aria-hidden={!isOpen} // Para accesibilidad
-      />
+        try {
+            await axios.post('/api/auth/logout');
+            console.log("Cookie del backend destruida.");
+        } catch (error) {
+            console.error("Error al cerrar sesión en el backend:", error);
+        }
 
-      {/* El Panel Lateral */}
-      <nav
-        className={`sidebar ${isOpen ? 'open' : ''}`}
-        aria-label="Menú principal"
-      >
-        {/* Botón para cerrar el menú (la 'X') */}
-        <button className="sidebar-close" onClick={onClose} aria-label="Cerrar menú">×</button>
+        localStorage.clear();
+        onClose();
+        navigate('/');
+        window.location.reload();
+    };
 
-        <h2>Menú Principal</h2>
+    return (
+        <>
+            <div
+                className={`sidebar-overlay ${isOpen ? 'open' : ''}`}
+                onClick={onClose}
+                aria-hidden={!isOpen}
+            />
 
-        {/* Enlaces de navegación usando <Link> de react-router-dom */}
-        {/* El onClick={onClose} cierra el menú después de hacer clic */}
+            <nav
+                className={`sidebar ${isOpen ? 'open' : ''}`}
+                aria-label="Menú principal"
+            >
+                <button className="sidebar-close" onClick={onClose} aria-label="Cerrar menú">×</button>
 
-        {/* '/dashboard' apunta a la ruta 'index' (DashboardHome) */}
-        <Link to="/dashboard-admin" onClick={onClose}>
-          Mi Perfil
-        </Link>
+                <h2>Menú Principal</h2>
 
-        {/* '/dashboard/usuarios' apunta a la ruta de gestión */}
-        <Link to="/dashboard-admin/usuarios" onClick={onClose}>
-          Gestión de Usuarios
-        </Link>
+                {/* Mostrar nombre del usuario */}
+                {userName && (
+                    <div style={{ 
+                        padding: '10px', 
+                        backgroundColor: '#f5f5f5', 
+                        borderRadius: '4px', 
+                        marginBottom: '15px',
+                        fontSize: '0.9em',
+                        color: '#666'
+                    }}>
+                        👤 {userName}
+                    </div>
+                )}
 
-        {/* Puedes agregar más enlaces aquí */}
-        {/* <Link to="/dashboard/cursos" onClick={onClose}>Mis Cursos</Link> */}
-        {/* <Link to="/dashboard/ajustes" onClick={onClose}>Ajustes</Link> */}
+                {/* Enlaces comunes */}
+                <Link to="/dashboard" onClick={onClose}>🏠 Inicio</Link>
 
-        {/* Botón para cerrar sesión, alineado al fondo */}
-        <button onClick={handleLogout} className="btn-logout">
-          Cerrar sesión
-        </button>
-      </nav>
-    </>
-  );
+                {/* Enlaces de ADMINISTRADOR */}
+                {userRole === 'ADMINISTRADOR' && (
+                    <>
+                        <Link to="/dashboard/usuarios" onClick={onClose}>👥 Gestión de Usuarios</Link>
+                        <Link to="/dashboard/cursos" onClick={onClose}>📚 Gestión de Cursos</Link>
+                        <Link to="/dashboard/secciones" onClick={onClose}>🏫 Gestión de Secciones</Link>
+                        <Link to="/dashboard/matriculas" onClick={onClose}>📋 Gestión de Matrículas</Link>
+                    </>
+                )}
+
+                {/* Enlaces de PROFESOR */}
+                {userRole === 'PROFESOR' && (
+                    <>
+                        <Link to="/dashboard/mis-secciones" onClick={onClose}>
+                            📖 Mis Secciones
+                        </Link>
+                    </>
+                )}
+
+                {/* Enlaces de ALUMNO */}
+                {userRole === 'ALUMNO' && (
+                    <>
+                        <Link to="/dashboard/mis-matriculas" onClick={onClose}>
+                            📚 Mis Cursos
+                        </Link>
+                        <Link to="/dashboard/secciones-disponibles" onClick={onClose}>
+                            🔍 Buscar Secciones
+                        </Link>
+                    </>
+                )}
+
+                <button onClick={handleLogout} className="btn-logout">
+                    🚪 Cerrar sesión
+                </button>
+            </nav>
+        </>
+    );
 }
-
