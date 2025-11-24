@@ -56,15 +56,15 @@ export default function Sidebar({ isOpen, onClose }) {
                 )}
 
                 {/* Enlaces comunes */}
-                <Link to="/dashboard" onClick={onClose}>🏠 Inicio</Link>
+                <Link to="/dashboard-admin" onClick={onClose}>Inicio</Link>
 
                 {/* Enlaces de ADMINISTRADOR */}
                 {userRole === 'ADMINISTRADOR' && (
                     <>
-                        <Link to="/dashboard/usuarios" onClick={onClose}>👥 Gestión de Usuarios</Link>
-                        <Link to="/dashboard/cursos" onClick={onClose}>📚 Gestión de Cursos</Link>
-                        <Link to="/dashboard/secciones" onClick={onClose}>🏫 Gestión de Secciones</Link>
-                        <Link to="/dashboard/matriculas" onClick={onClose}>📋 Gestión de Matrículas</Link>
+                        <Link to="/dashboard-admin/usuarios" onClick={onClose}>👥 Gestión de Usuarios</Link>
+                        <Link to="/dashboard-admin/cursos" onClick={onClose}>📚 Gestión de Cursos</Link>
+                        <Link to="/dashboard-admin/secciones" onClick={onClose}>🏫 Gestión de Secciones</Link>
+                        <Link to="/dashboard-admin/matriculas" onClick={onClose}>📋 Gestión de Matrículas</Link>
                     </>
                 )}
 
