@@ -4,7 +4,7 @@ import axios from 'axios';
 
 
 // 1. Importa AMBOS modales
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS } from '../../config/api';
 
 
 import EditUserModal from '../components/EditUserModal.jsx';

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CreateCursoModal from '../../components/CreateCursoModal.jsx'; // (Lo crearemos abajo)
 import EditCursoModal from '../../components/EditCursoModal.jsx'; // (Lo crearemos abajo)
-import '../../styles/login/GestionUsuarios.css';; // (Reutilizamos los estilos de la tabla)
+import '../styles/login/GestionUsuarios.css'; // (Reutilizamos los estilos de la tabla)
 
 function GestionCursos() {
     // --- Estados ---
@@ -16,7 +16,7 @@ function GestionCursos() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingCurso, setEditingCurso] = useState(null); // El curso a editar
 
-    const API_URL = 'https://plataforma-edu-back-gpcsh9h7fddkfvfb.chilecentral-01.azurewebsites.net/api/cursos'; // API que ya creamos en el backend
+    const API_URL = `${API_ENDPOINTS.cursos || 'https://plataforma-edu-back-gpcsh9h7fddkfvfb.chilecentral-01.azurewebsites.net/api/cursos'}`;
 
     // --- 1. Fetch de Cursos ---
     const fetchCursos = useCallback(async () => { 
