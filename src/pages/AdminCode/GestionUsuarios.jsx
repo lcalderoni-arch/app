@@ -1,12 +1,18 @@
 //src/pages/GestionUsuarios.jsx
 import React from 'react';
 import axios from 'axios';
+
+
 // 1. Importa AMBOS modales
-import { API_ENDPOINTS } from '../../config/api';
-import EditUserModal from '../../components/EditUserModal.jsx';
-import CreateUserModal from '../../components/CreateUserModal.jsx'; // 👈 NUEVO
+import { API_ENDPOINTS } from '../config/api';
+
+
+import EditUserModal from '../components/EditUserModal.jsx';
+import CreateUserModal from '../components/CreateUserModal.jsx'; // 👈 NUEVO
+
+
 // Importa los estilos CSS
-import '../../styles/login/GestionUsuarios.css';;
+import '../styles/login/GestionUsuarios.css';
 
 function GestionUsuarios() {
   // Estados existentes
