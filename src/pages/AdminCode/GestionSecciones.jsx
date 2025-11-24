@@ -25,18 +25,12 @@ export default function GestionSecciones() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const API_URL = API_ENDPOINTS.secciones;
-    
+
     // Cargar secciones al montar el componente
-    useEffect(() => {
-        cargarSecciones();
-    }, []);
- 
-    
-    const cargarSecciones = async () => {
+    const cargarSecciones = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            // ⭐ AGREGAR TOKEN
             const token = localStorage.getItem('authToken');
             if (!token) throw new Error('No estás autenticado.');
             
@@ -53,15 +47,24 @@ export default function GestionSecciones() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_URL]); // Agregar API_URL como dependencia
+
+
+
+    // agregar cargarSecciones en las dependencias
+    useEffect(() => {
+        cargarSecciones();
+    }, [cargarSecciones]); // Agregar cargarSecciones
+
+
 
     // Filtrar secciones
     const seccionesFiltradas = secciones.filter((seccion) => {
         const coincideNivel = filtroNivel === 'TODOS' || seccion.nivelSeccion === filtroNivel;
         const coincideTurno = filtroTurno === 'TODOS' || seccion.turno === filtroTurno;
-        const coincideActiva = filtroActiva === 'TODOS' || 
+        const coincideActiva = filtroActiva === 'TODOS' ||
             (filtroActiva === 'ACTIVA' ? seccion.activa : !seccion.activa);
-        const coincideBusqueda = 
+        const coincideBusqueda =
             seccion.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
             seccion.codigo.toLowerCase().includes(searchTerm.toLowerCase()) ||
             seccion.tituloCurso.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,7 +79,7 @@ export default function GestionSecciones() {
     };
 
     const handleSeccionUpdated = (seccionActualizada) => {
-        setSecciones(secciones.map(s => 
+        setSecciones(secciones.map(s =>
             s.id === seccionActualizada.id ? seccionActualizada : s
         ));
     };
@@ -95,11 +98,11 @@ export default function GestionSecciones() {
             // ⭐ AGREGAR TOKEN
             const token = localStorage.getItem('authToken');
             if (!token) throw new Error('Sesión expirada.');
-            
+
             const config = {
                 headers: { 'Authorization': `Bearer ${token}` }
             };
-            
+
             await axios.delete(`${API_URL}/${id}`, config);
             setSecciones(secciones.filter(s => s.id !== id));
             alert('Sección eliminada exitosamente');
@@ -120,18 +123,18 @@ export default function GestionSecciones() {
             // ⭐ AGREGAR TOKEN
             const token = localStorage.getItem('authToken');
             if (!token) throw new Error('Sesión expirada.');
-            
+
             const config = {
                 headers: { 'Authorization': `Bearer ${token}` }
             };
-            
+
             const endpoint = seccion.activa ? 'desactivar' : 'activar';
             await axios.patch(`${API_URL}/${seccion.id}/${endpoint}`, {}, config);
-            
-            setSecciones(secciones.map(s => 
+
+            setSecciones(secciones.map(s =>
                 s.id === seccion.id ? { ...s, activa: !s.activa } : s
             ));
-            
+
             alert(`Sección ${accion}da exitosamente`);
         } catch (err) {
             console.error(`Error al ${accion} sección:`, err);
@@ -174,11 +177,11 @@ export default function GestionSecciones() {
             </div>
 
             {/* Filtros */}
-            <div className="filters-container" style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-                gap: '15px', 
-                marginBottom: '20px' 
+            <div className="filters-container" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '15px',
+                marginBottom: '20px'
             }}>
                 <div>
                     <label>Buscar:</label>
@@ -234,50 +237,50 @@ export default function GestionSecciones() {
             </div>
 
             {/* Estadísticas rápidas */}
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-                gap: '15px', 
-                marginBottom: '20px' 
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                gap: '15px',
+                marginBottom: '20px'
             }}>
-                <div style={{ 
-                    padding: '15px', 
-                    backgroundColor: '#e3f2fd', 
-                    borderRadius: '8px', 
-                    textAlign: 'center' 
+                <div style={{
+                    padding: '15px',
+                    backgroundColor: '#e3f2fd',
+                    borderRadius: '8px',
+                    textAlign: 'center'
                 }}>
                     <h3 style={{ margin: '0 0 5px 0', fontSize: '24px', color: '#1976d2' }}>
                         {secciones.length}
                     </h3>
                     <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>Total Secciones</p>
                 </div>
-                <div style={{ 
-                    padding: '15px', 
-                    backgroundColor: '#e8f5e9', 
-                    borderRadius: '8px', 
-                    textAlign: 'center' 
+                <div style={{
+                    padding: '15px',
+                    backgroundColor: '#e8f5e9',
+                    borderRadius: '8px',
+                    textAlign: 'center'
                 }}>
                     <h3 style={{ margin: '0 0 5px 0', fontSize: '24px', color: '#388e3c' }}>
                         {secciones.filter(s => s.activa).length}
                     </h3>
                     <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>Activas</p>
                 </div>
-                <div style={{ 
-                    padding: '15px', 
-                    backgroundColor: '#fff3e0', 
-                    borderRadius: '8px', 
-                    textAlign: 'center' 
+                <div style={{
+                    padding: '15px',
+                    backgroundColor: '#fff3e0',
+                    borderRadius: '8px',
+                    textAlign: 'center'
                 }}>
                     <h3 style={{ margin: '0 0 5px 0', fontSize: '24px', color: '#f57c00' }}>
                         {secciones.filter(s => s.tieneCupo).length}
                     </h3>
                     <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>Con Cupo</p>
                 </div>
-                <div style={{ 
-                    padding: '15px', 
-                    backgroundColor: '#fce4ec', 
-                    borderRadius: '8px', 
-                    textAlign: 'center' 
+                <div style={{
+                    padding: '15px',
+                    backgroundColor: '#fce4ec',
+                    borderRadius: '8px',
+                    textAlign: 'center'
                 }}>
                     <h3 style={{ margin: '0 0 5px 0', fontSize: '24px', color: '#c2185b' }}>
                         {secciones.reduce((acc, s) => acc + (s.estudiantesMatriculados || 0), 0)}
@@ -330,16 +333,16 @@ export default function GestionSecciones() {
                                         </div>
                                     </td>
                                     <td>
-                                        <span style={{ 
-                                            padding: '4px 8px', 
-                                            borderRadius: '4px', 
+                                        <span style={{
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
                                             fontSize: '0.85em',
-                                            backgroundColor: 
+                                            backgroundColor:
                                                 seccion.turno === 'MAÑANA' ? '#fff3e0' :
-                                                seccion.turno === 'TARDE' ? '#e3f2fd' : '#f3e5f5',
+                                                    seccion.turno === 'TARDE' ? '#e3f2fd' : '#f3e5f5',
                                             color:
                                                 seccion.turno === 'MAÑANA' ? '#e65100' :
-                                                seccion.turno === 'TARDE' ? '#0d47a1' : '#4a148c'
+                                                    seccion.turno === 'TARDE' ? '#0d47a1' : '#4a148c'
                                         }}>
                                             {seccion.turno}
                                         </span>
@@ -355,7 +358,7 @@ export default function GestionSecciones() {
                                         <div style={{ fontSize: '0.9em', textAlign: 'center' }}>
                                             <strong>{seccion.estudiantesMatriculados || 0}/{seccion.capacidad}</strong>
                                             <br />
-                                            <span style={{ 
+                                            <span style={{
                                                 color: seccion.tieneCupo ? '#388e3c' : '#d32f2f',
                                                 fontSize: '0.85em'
                                             }}>
@@ -369,9 +372,9 @@ export default function GestionSecciones() {
                                         {new Date(seccion.fechaFin).toLocaleDateString()}
                                     </td>
                                     <td>
-                                        <span style={{ 
-                                            padding: '4px 8px', 
-                                            borderRadius: '4px', 
+                                        <span style={{
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
                                             fontSize: '0.85em',
                                             backgroundColor: seccion.activa ? '#e8f5e9' : '#ffebee',
                                             color: seccion.activa ? '#2e7d32' : '#c62828'
