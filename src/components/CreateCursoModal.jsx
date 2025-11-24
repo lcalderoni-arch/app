@@ -36,7 +36,7 @@ export default function CreateCursoModal({ isOpen, onClose, onCursoCreated }) {
         setError(null);
 
         // 👇 URL ACTUALIZADA A PRODUCCIÓN
-        const url = `${API_BASE_URL}/usuarios/crear`;
+        const url = `${API_BASE_URL}/cursos/crear`;
         
         const payload = {
             titulo: titulo.trim(),
