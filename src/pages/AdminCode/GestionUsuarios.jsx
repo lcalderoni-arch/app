@@ -7,7 +7,7 @@ import axios from 'axios';
 import { API_ENDPOINTS } from '../../config/api.js';
 
 
-import EditUserModal from '../../components/EditUserModal.jsx';
+import EditUserModal from '../../components/EditUserModal.jsx'
 import CreateUserModal from '../../components/CreateUserModal.jsx'; // 👈 NUEVO
 
 
