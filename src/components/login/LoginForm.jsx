@@ -1,6 +1,6 @@
 // src/components/login/LoginForm.jsx
 import React, { useState, useRef, useEffect } from "react";
-import axios from 'axios'; 
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
@@ -9,11 +9,11 @@ export default function LoginForm() {
 
   const API_BASE_URL = "https://fundaciondeportiva-backend-api-2025-gveefdbmgvdggqa8.chilecentral-01.azurewebsites.net/api";
 
-  const [email, setEmail] = useState(""); 
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // ✅ NUEVO: Estado para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState(false);
 
@@ -28,8 +28,8 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); 
-    setError(null);    
+    setLoading(true);
+    setError(null);
     console.log("Enviando datos de login...");
 
     const url = `${API_BASE_URL}/auth/login`;
@@ -38,17 +38,17 @@ export default function LoginForm() {
     try {
       const response = await axios.post(url, payload);
       const { token, nombre, rol } = response.data;
-      
+
       localStorage.setItem("authToken", token);
       localStorage.setItem("userName", nombre);
       localStorage.setItem("userRole", rol);
 
-      console.log("Login exitoso:", response.data); 
+      console.log("Login exitoso:", response.data);
       setLoading(false);
 
       let dashboardPath = '/';
-      
-      switch(rol) {
+
+      switch (rol) {
         case 'ADMINISTRADOR':
           dashboardPath = '/dashboard-admin';
           break;
@@ -64,19 +64,42 @@ export default function LoginForm() {
           setLoading(false);
           return;
       }
-      
+
       navigate(dashboardPath);
 
     } catch (err) {
       console.error("Error en el login:", err);
       setLoading(false);
 
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-        setError("Email o contraseña incorrectos.");
+      if (err.response) {
+        const status = err.response.status;
+        const errorData = err.response.data;
+
+        if (status === 401) {
+          // Credenciales incorrectas (usuario no existe O contraseña incorrecta)
+          setError("❌ Email o contraseña incorrectos");
+        } else if (status === 400) {
+          // Errores de validación de campos (@NotBlank, @Email)
+          if (errorData.email) {
+            setError("❌ " + errorData.email);
+          } else if (errorData.password) {
+            setError("❌ " + errorData.password);
+          } else {
+            setError("❌ Por favor verifica los campos del formulario");
+          }
+        } else if (status === 403) {
+          setError("❌ Acceso denegado");
+        } else if (status === 500) {
+          setError("❌ Error del servidor. Intenta más tarde");
+        } else if (errorData?.message) {
+          setError("❌ " + errorData.message);
+        } else {
+          setError("❌ Error al iniciar sesión");
+        }
       } else if (err.code === "ERR_NETWORK") {
-        setError("Error de red o CORS. Revisa la consola (F12).");
+        setError("❌ No se pudo conectar con el servidor. Verifica tu conexión a internet");
       } else {
-        setError("Ocurrió un error. Intenta de nuevo.");
+        setError("❌ Ocurrió un error inesperado");
       }
     }
   };
@@ -107,7 +130,7 @@ export default function LoginForm() {
             <label htmlFor="input-password">Contraseña</label>
             <button type="button">
               ¿Olvidaste tu contraseña?
-              </button> 
+            </button>
           </div>
           <div style={{ position: 'relative' }}> {/* ✅ NUEVO: Wrapper para el toggle */}
             <input
@@ -145,13 +168,13 @@ export default function LoginForm() {
 
         {/* Mensaje de error */}
         {error && (
-          <div className="error-message" style={{color: 'red', marginTop: '10px', fontSize: '14px'}}>
+          <div className="error-message" style={{ color: 'red', marginTop: '10px', fontSize: '14px' }}>
             {error}
           </div>
         )}
 
-        <button 
-          className="login-button" 
+        <button
+          className="login-button"
           type="submit"
           disabled={loading}
         >
