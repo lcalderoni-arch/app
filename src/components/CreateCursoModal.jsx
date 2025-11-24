@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL } from '../../config/api.js';
 
 export default function CreateCursoModal({ isOpen, onClose, onCursoCreated }) {
     // --- Estados del Formulario ---
