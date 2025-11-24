@@ -12,7 +12,7 @@ import CreateUserModal from '../../components/CreateUserModal.jsx'; // 👈 NUEV
 
 
 // Importa los estilos CSS
-import '../styles/login/GestionUsuarios.css';
+import '../../styles/login/GestionUsuarios.css';
 
 function GestionUsuarios() {
   // Estados existentes
