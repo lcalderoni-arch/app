@@ -6,7 +6,7 @@ import { API_ENDPOINTS } from '../../config/api';
 import EditUserModal from '../../components/EditUserModal.jsx';
 import CreateUserModal from '../../components/CreateUserModal.jsx'; // 👈 NUEVO
 // Importa los estilos CSS
-import '../../styles/login/GestionUsuarios';
+import '../../styles/login/GestionUsuarios.css';;
 
 function GestionUsuarios() {
   // Estados existentes

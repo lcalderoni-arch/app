@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CreateCursoModal from '../../components/CreateCursoModal.jsx'; // (Lo crearemos abajo)
 import EditCursoModal from '../../components/EditCursoModal.jsx'; // (Lo crearemos abajo)
-import '../../styles/login/GestionUsuarios'; // (Reutilizamos los estilos de la tabla)
+import '../../styles/login/GestionUsuarios.css';; // (Reutilizamos los estilos de la tabla)
 
 function GestionCursos() {
     // --- Estados ---
