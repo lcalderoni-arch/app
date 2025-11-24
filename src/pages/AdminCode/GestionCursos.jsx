@@ -39,7 +39,7 @@ function GestionCursos() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [API_URL]);
 
     useEffect(() => {
         fetchCursos();
