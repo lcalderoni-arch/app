@@ -17,6 +17,7 @@ import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante.jsx";
 import PantallaDocente from "./pages/PantallaRoles/PantallaDocente.jsx";
 
 import ProtectedRoute from "./security/ProtectedRoute.jsx";
+import GestionSecciones from './pages/AdminCode/GestionSecciones.jsx';
 
 // Define la estructura de rutas como un ARRAY
 const routeConfig = [
@@ -50,6 +51,14 @@ const routeConfig = [
         element: (
           <ProtectedRoute roles={["ADMINISTRADOR"]}>
             <GestionCursos />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "secciones",
+        element: (
+          <ProtectedRoute roles={["ADMINISTRADOR"]}>
+            <GestionSecciones />
           </ProtectedRoute>
         )
       },
