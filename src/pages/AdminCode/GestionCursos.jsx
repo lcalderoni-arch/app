@@ -26,20 +26,29 @@ function GestionCursos() {
         setLoading(true);
         setError(null);
         try {
-            // (La cookie HttpOnly se envía automáticamente)
-            const response = await axios.get(API_URL); 
-            setCursos(response.data);
-        } catch (err) {
-            console.error("Error al obtener cursos:", err);
-            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                setError("No tienes permisos para ver los cursos.");
-            } else {
-                setError(err.message || "Error al cargar datos.");
-            }
-        } finally {
-            setLoading(false);
+        // AGREGADO: Obtener token
+        const token = localStorage.getItem('authToken');
+        if (!token) throw new Error('No estás autenticado.');
+        
+        // AGREGADO: Configurar headers con token
+        const config = { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        };
+        
+        // MODIFICADO: Enviar con config
+        const response = await axios.get(API_URL, config); 
+        setCursos(response.data);
+    } catch (err) {
+        console.error("Error al obtener cursos:", err);
+        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+            setError("No tienes permisos para ver los cursos.");
+        } else {
+            setError(err.message || "Error al cargar datos.");
         }
-    }, [API_URL]);
+    } finally {
+        setLoading(false);
+    }
+}, [API_URL]);
 
     useEffect(() => {
         fetchCursos();
@@ -50,7 +59,15 @@ function GestionCursos() {
         if (!window.confirm(`¿Eliminar el curso "${cursoTitulo}"?`)) return;
         setError(null);
         try {
-            // (La cookie HttpOnly se envía automáticamente)
+
+        // AGREGADO: Token
+        const token = localStorage.getItem('authToken');
+        if (!token) throw new Error('Sesión expirada.');
+        const config = { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+        };
+
+            // MODIFICADO: Con config
             await axios.delete(`${API_URL}/${cursoId}`);
             setCursos(current => current.filter(curso => curso.id !== cursoId));
             alert(`Curso "${cursoTitulo}" eliminado.`);
