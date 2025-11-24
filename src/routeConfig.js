@@ -7,7 +7,13 @@ import NosotrosPage from "./pages/NosotrosPage.jsx"; // ✅ Mejor nombre de impo
 import Dashboard from "./pages/AdminCode/Dashboard.jsx";
 import DashboardHome from "./pages/AdminCode/DashboardHome.jsx";
 import GestionUsuarios from "./pages/AdminCode/GestionUsuarios.jsx";
+import GestionCursos from "./pages/AdminCode/GestionCursos.jsx";
+
+
 import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante.jsx";
+
+
+
 import PantallaDocente from "./pages/PantallaRoles/PantallaDocente.jsx";
 
 import ProtectedRoute from "./security/ProtectedRoute.jsx";
