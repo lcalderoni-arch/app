@@ -58,15 +58,17 @@ export default function Header() {
 
         <div className="nav-links">
           {/* ✅ Usar onClick en lugar de href */}
-          <a onClick={() => handleNavigateToSection("nosotros")} style={{ cursor: "pointer" }}>
-          <FontAwesomeIcon icon={faPeopleGroup} className="icon-header"/>Nosotros
-          </a>
-          <a onClick={() => handleNavigateToSection("programas")} style={{ cursor: "pointer" }}>
-          <FontAwesomeIcon icon={faBookOpen} className="icon-header"/>Programas
-          </a>
-          <a onClick={() => handleNavigateToSection("contactanos")} style={{ cursor: "pointer" }}>
-          <FontAwesomeIcon icon={faPhone} className="icon-header"/>Contáctanos
-          </a>
+          <button 
+            className="other-page" onClick={() => handleNavigateToSection("nosotros")}><FontAwesomeIcon icon={faPeopleGroup} className="icon-header"/>
+            Nosotros
+          </button>
+          <button className="other-page" onClick={() => handleNavigateToSection("programas")}><FontAwesomeIcon icon={faBookOpen} className="icon-header"/>
+            Programas
+          </button>
+          <button 
+            className="other-page" onClick={() => handleNavigateToSection("contactanos")}><FontAwesomeIcon icon={faPhone} className="icon-header"/>
+            Contáctanos
+          </button>
         </div>
 
         <div className="nav-auth">
