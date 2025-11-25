@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import CreateSeccionModal from '../../components/CreateSeccionModal';
 import EditSeccionModal from '../../components/EditSeccionModal';
-import '../../styles/login/GestionUsuarios.css'; // Reutilizamos los mismos estilos
+//import '../../styles/login/GestionUsuarios.css'; // Reutilizamos los mismos estilos
 
 import { API_ENDPOINTS } from '../../config/api.js';
 

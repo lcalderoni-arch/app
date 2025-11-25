@@ -5,17 +5,24 @@
 
   // Estilos para el botón hamburguesa
   const hamburgerStyle = {
-    fontSize: '2rem',
-    background: 'none',
-    border: 'none',
-    color: '#1a64aa', // Color primario de la escuela
-    cursor: 'pointer',
-    padding: '10px',
-    position: 'fixed',
-    top: '2px',
-    right: '20px',
-    zIndex: 998,
-  };
+    fontSize: '20px',
+  background: 'none',
+  border: '3px solid #1a64aa',
+  borderRadius: '50%', // Esto hace que el borde sea circular
+  color: '#1a64aa', // Color primario de la escuela
+  fontWeight: '800',
+  cursor: 'pointer',
+  padding: '15px',  // Usa un padding uniforme para que sea simétrico
+  position: 'fixed',
+  top: '12px',
+  right: '20px',
+  zIndex: 998,
+  width: '45px',  // Establece un ancho fijo
+  height: '45px', // Establece una altura fija igual al ancho
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center', // Asegura que el icono esté centrado
+};
 
   // Este componente ahora actúa como un contenedor para las sub-páginas del dashboard
   export default function Dashboard() {
@@ -34,6 +41,7 @@
         >
           ☰
         </button>
+
 
         {/* Componente Sidebar */}
         <Sidebar

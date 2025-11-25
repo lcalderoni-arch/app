@@ -22,65 +22,65 @@ export default function RegisterForm({ openLogin }) {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
 
-    // ✅ NUEVO: Validaciones de Frontend
-    if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
-      setLoading(false);
-      return;
-    }
-    if (!dni || !grado) {
-      setError("DNI y Grado son obligatorios para el registro de alumnos.");
-      setLoading(false);
-      return;
-    }
+  // Validaciones...
+  if (password !== confirmPassword) {
+    setError("Las contraseñas no coinciden.");
+    setLoading(false);
+    return;
+  }
+  if (!dni || !grado) {
+    setError("DNI y Grado son obligatorios para el registro de alumnos.");
+    setLoading(false);
+    return;
+  }
 
-    const url = `${API_BASE_URL}/usuarios/crear`;
+  const url = `${API_BASE_URL}/usuarios/crear`;
 
-    // ✅ NUEVO: Payload con DNI, Grado y rol fijo ALUMNO
-    const payload = {
-      nombre: nombre,
-      email: email,
-      password: password,
-      rol: "ALUMNO",
-      dni: dni,
-      grado: grado
-    };
-
-    localStorage.setItem("userGrado", grado);
-
-    try {
-      await axios.post(url, payload, config);
-
-      alert("Registro exitoso. ¡Ahora puedes iniciar sesión!");
-
-      // ✅ NUEVO: Cambiar a login después de registro exitoso
-      if (openLogin) {
-        setTimeout(openLogin, 300);
-      }
-
-    } catch (err) {
-      console.error("Error en el registro:", err);
-
-      // ✅ NUEVO: Manejo de errores mejorado
-      if (err.response) {
-        if (err.response.data && typeof err.response.data === 'string' && err.response.data.includes("El correo electrónico ya está en uso")) {
-          setError("El correo o DNI ya está registrado.");
-        } else if (err.response.data && err.response.data.message) {
-          setError(`Error: ${err.response.data.message}`);
-        } else {
-          setError(`Error del servidor: ${err.response.status}.`);
-        }
-      } else {
-        setError("Error de conexión al servidor.");
-      }
-    } finally {
-      setLoading(false);
-    }
+  const payload = {
+    nombre: nombre,
+    email: email,
+    password: password,
+    rol: "ALUMNO",
+    dni: dni,
+    grado: grado
   };
+
+  localStorage.setItem("userGrado", grado);
+
+  try {
+    // ✅ CORRECCIÓN: Eliminar "config" porque no está definido
+    // Este endpoint debe ser público (sin autenticación)
+    await axios.post(url, payload);  // ← SIN "config"
+
+    alert("Registro exitoso. ¡Ahora puedes iniciar sesión!");
+
+    if (openLogin) {
+      setTimeout(openLogin, 300);
+    }
+
+  } catch (err) {
+    console.error("Error en el registro:", err);
+
+    if (err.response) {
+      if (err.response.data && typeof err.response.data === 'string' && 
+          err.response.data.includes("El correo electrónico ya está en uso")) {
+        setError("El correo o DNI ya está registrado.");
+      } else if (err.response.data && err.response.data.message) {
+        setError(`Error: ${err.response.data.message}`);
+      } else {
+        setError(`Error del servidor: ${err.response.status}.`);
+      }
+    } else {
+      setError("Error de conexión al servidor.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>

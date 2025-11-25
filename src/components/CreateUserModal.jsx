@@ -1,7 +1,9 @@
 //src/components/CreateUserModal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+
 import { API_BASE_URL } from '../config/api.js';
+
 // Reutiliza los estilos del modal de login
 import '../styles/CreateUserModal.css';
 
