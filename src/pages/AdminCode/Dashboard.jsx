@@ -8,11 +8,11 @@
     fontSize: '2rem',
     background: 'none',
     border: 'none',
-    color: '#3b5998', // Color primario de la escuela
+    color: '#1a64aa', // Color primario de la escuela
     cursor: 'pointer',
     padding: '10px',
     position: 'fixed',
-    top: '15px',
+    top: '2px',
     right: '20px',
     zIndex: 998,
   };
@@ -41,13 +41,8 @@
           onClose={closeSidebar}
         />
 
-        {/* Contenido Principal del Dashboard */}
-        <main style={{ padding: '20px', paddingTop: '80px', minHeight: '100vh', marginLeft: '0' /* Ajusta si el sidebar es permanente */ }}>
-
           {/* 🚨 2. AQUÍ SE RENDERIZARÁN LAS SUB-RUTAS (DashboardHome o GestionUsuarios) */}
           <Outlet />
-
-        </main>
       </div>
     );
   }

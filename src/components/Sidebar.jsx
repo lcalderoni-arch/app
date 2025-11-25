@@ -2,7 +2,14 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/Sidebar.css';
+import './Sidebar.css';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faBook } from '@fortawesome/free-solid-svg-icons';
+import { faChalkboard } from '@fortawesome/free-solid-svg-icons';
+import { faClipboard } from '@fortawesome/free-solid-svg-icons';
 
 export default function Sidebar({ isOpen, onClose }) {
     const navigate = useNavigate();
@@ -43,28 +50,28 @@ export default function Sidebar({ isOpen, onClose }) {
 
                 {/* Mostrar nombre del usuario */}
                 {userName && (
-                    <div style={{ 
-                        padding: '10px', 
-                        backgroundColor: '#f5f5f5', 
-                        borderRadius: '4px', 
+                    <div style={{
+                        padding: '10px',
+                        borderRadius: '4px',
                         marginBottom: '15px',
+                        marginLeft: '5px',
                         fontSize: '0.9em',
-                        color: '#666'
+                        color: '#8f8f8fff'
                     }}>
-                        👤 {userName}
+                        {userName}
                     </div>
                 )}
 
                 {/* Enlaces comunes */}
-                <Link to="/dashboard-admin" onClick={onClose}>Inicio</Link>
+                <Link to="/dashboard-admin" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faHouse} />Inicio</Link>
 
                 {/* Enlaces de ADMINISTRADOR */}
                 {userRole === 'ADMINISTRADOR' && (
                     <>
-                        <Link to="/dashboard-admin/usuarios" onClick={onClose}>👥 Gestión de Usuarios</Link>
-                        <Link to="/dashboard-admin/cursos" onClick={onClose}>📚 Gestión de Cursos</Link>
-                        <Link to="/dashboard-admin/secciones" onClick={onClose}>🏫 Gestión de Secciones</Link>
-                        <Link to="/dashboard-admin/matriculas" onClick={onClose}>📋 Gestión de Matrículas</Link>
+                        <Link to="/dashboard-admin/usuarios" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faUsers} />Gestión de Usuarios</Link>
+                        <Link to="/dashboard-admin/cursos" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faBook} />Gestión de Cursos</Link>
+                        <Link to="/dashboard-admin/secciones" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faChalkboard} />Gestión de Secciones</Link>
+                        <Link to="/dashboard-admin/matriculas" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faClipboard} />Gestión de Matrículas</Link>
                     </>
                 )}
 
@@ -90,7 +97,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 )}
 
                 <button onClick={handleLogout} className="btn-logout">
-                    🚪 Cerrar sesión
+                    Cerrar sesión
                 </button>
             </nav>
         </>
