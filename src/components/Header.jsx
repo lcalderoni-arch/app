@@ -4,6 +4,11 @@ import { useNavigate, useLocation } from "react-router-dom"; // ✅ AGREGAR
 import icon from "../assets/logo.png";
 import "../styles/Header.css";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPeopleGroup } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { faPhone } from '@fortawesome/free-solid-svg-icons';
+
 export default function Header() {
   const navigate = useNavigate(); // ✅ AGREGAR
   const location = useLocation(); // DETECTAR PAGINA IMPORTANTE (PARA DISEÑO TRANSPARENTE)
@@ -53,17 +58,15 @@ export default function Header() {
 
         <div className="nav-links">
           {/* ✅ Usar onClick en lugar de href */}
-          <button 
-            className="other-page" onClick={() => handleNavigateToSection("nosotros")}>
-            Nosotros
-          </button>
-          <button className="other-page" onClick={() => handleNavigateToSection("programas")}>
-            Programas
-          </button>
-          <button 
-            className="other-page" onClick={() => handleNavigateToSection("contactanos")}>
-            Contáctanos
-          </button>
+          <a onClick={() => handleNavigateToSection("nosotros")} style={{ cursor: "pointer" }}>
+          <FontAwesomeIcon icon={faPeopleGroup} className="icon-header"/>Nosotros
+          </a>
+          <a onClick={() => handleNavigateToSection("programas")} style={{ cursor: "pointer" }}>
+          <FontAwesomeIcon icon={faBookOpen} className="icon-header"/>Programas
+          </a>
+          <a onClick={() => handleNavigateToSection("contactanos")} style={{ cursor: "pointer" }}>
+          <FontAwesomeIcon icon={faPhone} className="icon-header"/>Contáctanos
+          </a>
         </div>
 
         <div className="nav-auth">

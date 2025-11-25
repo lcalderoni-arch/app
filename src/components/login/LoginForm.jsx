@@ -3,6 +3,9 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+
 export default function LoginForm() {
   const emailRef = useRef(null);
   const navigate = useNavigate();
@@ -161,7 +164,10 @@ export default function LoginForm() {
                 padding: '5px'
               }}
             >
-              {showPassword ? '🙈' : '👁️'}
+              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="icon-see" style={{
+                fontSize: '15px',
+                color: '#3E6FA3'
+              }}/>
             </button>
           </div>
         </div>
