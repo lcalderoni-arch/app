@@ -5,7 +5,7 @@
 .box-firstpage-admin {
     margin: 0;
 }
-
+ 
 .header-firstpage-admin {
     display: flex;
 
@@ -93,7 +93,7 @@
 }
 
 /*-------------------------------------*/
-/*            BODY:GESTIÓN            */
+/*              BODY:ROL              */
 /*-----------------------------------*/
 
 .main-gestion-firstpage-admin {
@@ -131,7 +131,7 @@
 }
 
 .card-tutorial-admin img {
-    height: 150px;
+    height: 170px;
     width: 100%;
     border-right: 0.5px solid #e1b91b;
     border-left: 0.5px solid #e1b91b;
@@ -159,8 +159,8 @@
 .card-tutorial-admin button {
     padding: 10px 25px;
     background: transparent;
-    border: 2px solid #2164d8;
-    color: #2164d8;
+    border: 2px solid #398ddb;
+    color: #398ddb;
     border-radius: 10px;
 
     font-size: 14px;
@@ -173,3 +173,4 @@
     background: #2164d8;
     color: #ffffff;
 }
+

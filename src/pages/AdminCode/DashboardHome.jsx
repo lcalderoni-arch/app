@@ -21,6 +21,18 @@ export default function DashboardHome() {
         navigate('/dashboard-admin/usuarios');
     };
 
+    const handleNavigateToCursos = () => {
+        // Aquí puedes agregar lógica adicional
+        console.log('Navegando a Gestión de Cursos...');
+        navigate('/dashboard-admin/cursos');
+    };
+
+    const handleNavigateToSecciones = () => {
+        // Aquí puedes agregar lógica adicional
+        console.log('Navegando a Gestión de Secciones...');
+        navigate('/dashboard-admin/secciones');
+    };
+
     const userName = localStorage.getItem('userName');
 
     return (
@@ -47,7 +59,7 @@ export default function DashboardHome() {
                 <div className='box-card-tutorial-admin'>
                     <div className='card-tutorial-admin'>
                         <img className='img-tutorial-admin' src={image1} alt="" />
-                        <h3 className='card-tutorial-title-gestion'>Gestión de Usuarios</h3>
+                        <h3 className='card-tutorial-title-gestion'>Usuarios</h3>
                         <p>Administra tu comunidad educativa completa. Crea usuarios, asigna roles y
                             permisos, y mantén el control total sobre quién accede a tu plataforma.
                             Todo desde un solo lugar.</p>
@@ -55,19 +67,19 @@ export default function DashboardHome() {
                     </div>
                     <div className='card-tutorial-admin'>
                         <img className='img-tutorial-admin' src={image2} alt="" />
-                        <h3 className='card-tutorial-title-gestion'>Gestión de Cursos</h3>
+                        <h3 className='card-tutorial-title-gestion'>Cursos</h3>
                         <p>Crea y organiza el catálogo completo de cursos. Define materias,
                             establece objetivos y estructura el contenido que transformará a
                             tus alumnos en campeones.</p>
-                        <button to="/dashboard-admin/cursos" onClick={handleNavigateToUsuarios}>Ir</button>
+                        <button to="/dashboard-admin/cursos" onClick={handleNavigateToCursos}>Ir</button>
                     </div>
                     <div className='card-tutorial-admin'>
                         <img className='img-tutorial-admin' src={image3} alt="" />
-                        <h3 className='card-tutorial-title-gestion'>Gestión de Secciones</h3>
+                        <h3 className='card-tutorial-title-gestion'>Secciones</h3>
                         <p>Organiza grupos, horarios y asignaciones de manera inteligente.
                             Conecta profesores con alumnos, establece capacidades y optimiza
                             la distribución de tu talento educativo.</p>
-                        <button to="/dashboard-admin/secciones" onClick={handleNavigateToUsuarios}>Ir</button>
+                        <button to="/dashboard-admin/secciones" onClick={handleNavigateToSecciones}>Ir</button>
                     </div>
                 </div>
             </div>
