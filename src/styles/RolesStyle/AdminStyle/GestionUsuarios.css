@@ -67,7 +67,7 @@
 /*             BODY:FORM              */
 /*-----------------------------------*/
 
-.box-formulario-gestionusuarios {
+.box-formulario-gestionsecciones {
   margin: 25px 4%;
   margin-bottom: 50px;
   border: 2px solid #d2d2d2;
@@ -75,7 +75,7 @@
 
 }
 
-.box-formulario-gestionusuarios .centrar-tercer-titulo {
+.box-formulario-gestionsecciones .centrar-tercer-titulo {
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -723,18 +723,6 @@
 }
 
 /* FILAS DEL CUERPO */
-.styled-table tbody tr {
-  border-bottom: 1px solid #e8e8e8;
-  transition: background-color 0.2s ease;
-}
-
-.styled-table tbody tr:hover {
-  background-color: #f8f9fa;
-}
-
-.styled-table tbody tr:last-child {
-  border-bottom: none;
-}
 
 /* CELDAS GENERALES */
 .styled-table tbody td {
@@ -764,6 +752,8 @@
 
 /* COLUMNA 3: Nombre */
 .styled-table tbody td:nth-child(3) {
+  display: flex;
+  justify-content: center;
   text-align: left;
   font-weight: 500;
   color: #2d2d2d;

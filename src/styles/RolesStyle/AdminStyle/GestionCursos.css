@@ -95,15 +95,6 @@
     letter-spacing: 1px;
 }
 
-.auth-form-gestioncursos-area-rol {
-    margin: 20px 65px;
-}
-
-.auth-form-gestioncursos-area-rol .rol-text {
-    font-size: 15px;
-    letter-spacing: 1px;
-}
-
 /*-------------------------------------*/
 /*             BODY:FORM              */
 /*-----------------------------------*/
@@ -236,6 +227,11 @@
     border-left: 2px solid #1a64aa;
 }
 
+.form-area-datos-cursos .codigo-preview {
+    margin-left: 10px;
+    font-size: 12px;
+}
+
 .form-area-description {
     display: flex;
     justify-content: center;
@@ -312,6 +308,9 @@
 
 /* COLUMNA 3: Código (Badge) */
 .table-users-gestioncursos .styled-table tbody td:nth-child(3) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #2d2d2d;
     font-size: 14px;
     font-weight: 600;
@@ -394,169 +393,4 @@
     letter-spacing: 0.8px;
     text-transform: uppercase;
     box-shadow: 0 2px 4px rgba(21, 87, 36, 0.2);
-}
-
-/* ===== NOTA INFORMATIVA ===== */
-.info-note {
-    font-size: 0.9em;
-    color: #666;
-    margin-top: 20px;
-    padding: 12px;
-    background-color: #f5f5f5;
-    border-radius: 6px;
-    border-left: 4px solid #2196F3;
-    grid-column: 1 / -1;
-}
-
-.info-note p {
-    margin: 0;
-}
-
-/* ===== CÓDIGO PREVIEW ===== */
-.codigo-preview {
-    display: block;
-    margin-top: 5px;
-    color: #666;
-    font-size: 0.85em;
-}
-
-/* ===== ÁREA DE DESCRIPCIÓN ===== */
-.form-area-description {
-    grid-column: 1 / -1;
-    margin-bottom: 20px;
-}
-
-.form-area-description label {
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.form-area-description textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #d7d7d7;
-    font-size: 0.95rem;
-    resize: vertical;
-    font-family: inherit;
-    transition: border 0.2s ease;
-}
-
-.form-area-description textarea:focus {
-    border: 1px solid #1a64aa;
-    outline: none;
-}
-
-/* ===== ÁREA DE DATOS CURSOS ===== */
-.form-area-datos-cursos {
-    display: flex;
-    justify-content: center;
-    box-sizing: border-box;
-    overflow: hidden;
-    margin-bottom: 20px;
-    gap: 20px;
-}
-
-.form-area-datos-cursos label {
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-}
-
-.form-area-datos-cursos input {
-    font-size: 15px;
-    padding: 10px;
-    border: 1px solid #d7d7d7;
-    border-radius: 6px;
-    transition: border 0.2s ease;
-}
-
-.form-area-datos-cursos input::placeholder {
-    outline: none;
-    color: #a9a9a9;
-}
-
-.form-area-datos-cursos input:focus {
-    border: 1px solid #1a64aa;
-    outline: none;
-}
-
-/* ===== DROPDOWN NIVEL CURSOS ===== */
-.nivel-select-container {
-    position: relative;
-    width: 100%;
-}
-
-.nivel-select-trigger {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    border: 1px solid #d7d7d7;
-    border-radius: 6px;
-    background-color: white;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.95rem;
-}
-
-.nivel-select-trigger:hover {
-    border-color: #1a64aa;
-    box-shadow: 0 0 0 2px rgba(26, 100, 170, 0.1);
-}
-
-.nivel-select-trigger.selected {
-    border-color: #1a64aa;
-    background-color: #f0f7ff;
-}
-
-.nivel-select-trigger span {
-    color: #a9a9a9;
-}
-
-.nivel-select-trigger.selected span {
-    color: #2d2d2d;
-}
-
-.nivel-select-trigger .icon-increment {
-    font-size: 14px;
-    color: #666;
-    transition: transform 0.2s ease;
-}
-
-.nivel-select-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: 4px;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    overflow: hidden;
-}
-
-.nivel-select-option {
-    padding: 10px 14px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-size: 0.95rem;
-}
-
-.nivel-select-option:hover {
-    background-color: #f5f5f5;
-}
-
-.nivel-select-option.active {
-    background-color: #e3f2fd;
-    color: #1a64aa;
-    font-weight: 500;
 }

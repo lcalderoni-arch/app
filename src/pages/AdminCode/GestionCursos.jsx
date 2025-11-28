@@ -255,7 +255,7 @@ function GestionCursos() {
             </div>
 
             {/* FORMULARIO DE CREACIÓN */}
-            <div className="box-formulario-gestionusuarios">
+            <div className="box-formulario-gestioncursos">
                 <div className="centrar-tercer-titulo">
                     <h3>
                         <FontAwesomeIcon className="icon" icon={faSquarePlus} />
@@ -336,10 +336,10 @@ function GestionCursos() {
                                         )}
                                     </div>
                                     <small className="codigo-preview">
-                                        {nivelDestino === 'INICIAL' && '📚 El código será: INI-XXX'}
-                                        {nivelDestino === 'PRIMARIA' && '📚 El código será: PRI-XXX'}
-                                        {nivelDestino === 'SECUNDARIA' && '📚 El código será: SEC-XXX'}
-                                        {nivelDestino === '' && '📚 Selecciona un nivel para ver el código'}
+                                        {nivelDestino === 'INICIAL' && 'El código será: INI-XXX'}
+                                        {nivelDestino === 'PRIMARIA' && 'El código será: PRI-XXX'}
+                                        {nivelDestino === 'SECUNDARIA' && 'El código será: SEC-XXX'}
+                                        {nivelDestino === '' && 'Selecciona un nivel para ver el código'}
                                     </small>
                                 </label>
                             </div>
