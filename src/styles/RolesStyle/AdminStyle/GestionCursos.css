@@ -1,0 +1,562 @@
+/*-------------------------------------*/
+/*                HEADER              */
+/*-----------------------------------*/
+
+.box-firstpage-admin {
+    margin: 0;
+}
+
+.header-firstpage-admin {
+    display: flex;
+
+    align-items: center;
+
+    background: white;
+    padding: 8px 50px;
+    color: #3e3e3e;
+    font-size: 10px;
+
+    border-bottom: 1px solid #5296d6;
+    gap: 30px;
+}
+
+.header-firstpage-admin .icon {
+    width: 180px;
+}
+
+/*-------------------------------------*/
+/*            BODY:TITULO             */
+/*-----------------------------------*/
+
+.div-box-header-text-gestionusuarios {
+    padding: 25px 6%;
+    background: #1a64aa;
+    border-bottom: 1px solid #1a64aa;
+}
+
+.alinear-al-centro {
+    display: flex;
+    align-items: center;
+}
+
+.alinear-al-centro h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.div-box-header-text-gestionusuarios p {
+    color: #e4e4e4;
+    line-height: 22px;
+    letter-spacing: 1px;
+}
+
+.alinear-al-centro .icon {
+    font-size: 18px;
+    margin-right: 6px;
+    padding-bottom: 1px;
+}
+
+.icon {
+    font-size: 18px;
+    margin-right: 6px;
+}
+
+/*-------------------------------------*/
+/*             BODY:FORM              */
+/*-----------------------------------*/
+
+.box-formulario-gestioncursos {
+    margin: 25px 4%;
+    margin-bottom: 50px;
+    border: 2px solid #d2d2d2;
+    border-radius: 10px;
+}
+
+.box-formulario-gestioncursos .centrar-tercer-titulo {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    margin: 25px 0 0 0;
+    gap: 5px;
+}
+
+.centrar-tercer-titulo h3 {
+    font-size: 18px;
+    color: #353535;
+    letter-spacing: 1px;
+}
+
+.centrar-tercer-titulo p {
+    font-size: 14px;
+    color: #636363;
+    letter-spacing: 1px;
+}
+
+.auth-form-gestioncursos-area-rol {
+    margin: 20px 65px;
+}
+
+.auth-form-gestioncursos-area-rol .rol-text {
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+/*-------------------------------------*/
+/*             BODY:FORM              */
+/*-----------------------------------*/
+
+.auth-form-area-form {
+    margin: 15px 50px 25px 50px;
+    padding: 30px 30px;
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+}
+
+.form-area-datos-cursos {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: visible;
+
+    margin: 0 10px;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.form-area-datos-cursos label {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.form-area-datos-cursos input {
+    font-size: 15px;
+    padding: 10px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    transition: border 0.2s ease;
+}
+
+.form-area-datos-cursos input::placeholder {
+    outline: none;
+    color: #a9a9a9;
+}
+
+.form-area-datos-cursos input:focus {
+    border: 1px solid #1a64aa;
+    outline: none;
+}
+
+/* SELECT */
+
+.nivel-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.nivel-select-trigger {
+    font-size: 15px;
+    padding: 10px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border 0.2s ease;
+}
+
+
+.nivel-select-trigger:hover {
+    border: 1px solid #1a64aa;
+}
+
+.nivel-select-trigger span {
+    color: #a9a9a9;
+    /* Color gris suave por defecto */
+}
+
+.nivel-select-trigger.selected span {
+    color: #2d2d2d;
+    /* Gris más fuerte */
+}
+
+.nivel-select-trigger .icon-increment {
+    color: #666;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.nivel-select-container:has(.student-select-dropdown) .icon-increment {
+    transform: rotate(180deg);
+}
+
+.nivel-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 50px;
+    /* Para que coincida con el margin-right */
+    background: white;
+    border: 1px solid #d7d7d7;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    margin-top: -2px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.nivel-select-option {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    color: #666;
+}
+
+.nivel-select-option:hover {
+    background-color: #f0f5fa;
+    color: #1a64aa;
+}
+
+.nivel-select-option.active {
+    font-weight: 600;
+    background-color: #ebf1f4;
+    color: #1a64aa;
+    border-left: 2px solid #1a64aa;
+}
+
+.form-area-description {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    margin: 0 10px;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.form-area-description label {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.form-area-description textarea {
+    font-size: 15px;
+    padding: 10px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+
+    transition: border 0.2s ease;
+}
+
+.form-area-description textarea:focus {
+    border: 1px solid #1a64aa;
+    outline: none;
+}
+
+.info-note {
+    margin: 0 25px;
+    margin-top: 25px;
+}
+
+.info-note p {
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+/*-------------------------------------*/
+/*            BODY:TABLA              */
+/*-----------------------------------*/
+
+.table-users-gestioncursos {
+    margin: 25px 2%;
+    border: 2px solid #e2e2e2;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ===== ESTILOS POR COLUMNA (CURSOS) ===== */
+
+/* COLUMNA 1: N° (Numeración) */
+.table-users-gestioncursos .styled-table tbody td:nth-child(1) {
+    font-weight: 600;
+    color: #1a64aa;
+    font-size: 14px;
+    width: 50px;
+}
+
+/* COLUMNA 2: ID Sistema */
+.table-users-gestioncursos .styled-table tbody td:nth-child(2) {
+    font-family: 'Courier New', monospace;
+    color: #666;
+    font-size: 13px;
+    width: 80px;
+}
+
+/* COLUMNA 3: Código (Badge) */
+.table-users-gestioncursos .styled-table tbody td:nth-child(3) {
+    color: #2d2d2d;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.codigo-badge {
+    display: inline-block;
+    font-family: monospace;
+    background-color: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d2d2d;
+    border: 1px solid #d0d0d0;
+}
+
+
+/* COLUMNA 4: Título (CON BORDE NEGRO) */
+.table-users-gestioncursos .styled-table tbody td:nth-child(4) {
+    color: #2d2d2d;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.titulo-badge {
+    display: inline-block;
+    font-family: monospace;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d2d2d;
+    border: 1px solid #000000;
+}
+
+/* COLUMNA 5: Nivel (Badge) - Usa los mismos badges de rol */
+
+/* COLUMNA 6: Acciones (Botones) */
+.table-users-gestioncursos .styled-table tbody td:nth-child(6) {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 12px;
+}
+
+/* ===== BADGES DE NIVEL ===== */
+.badge-inicial {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(133, 100, 4, 0.2);
+}
+
+.badge-primaria {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(12, 84, 96, 0.2);
+}
+
+.badge-secundaria {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(21, 87, 36, 0.2);
+}
+
+/* ===== NOTA INFORMATIVA ===== */
+.info-note {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #f5f5f5;
+    border-radius: 6px;
+    border-left: 4px solid #2196F3;
+    grid-column: 1 / -1;
+}
+
+.info-note p {
+    margin: 0;
+}
+
+/* ===== CÓDIGO PREVIEW ===== */
+.codigo-preview {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 0.85em;
+}
+
+/* ===== ÁREA DE DESCRIPCIÓN ===== */
+.form-area-description {
+    grid-column: 1 / -1;
+    margin-bottom: 20px;
+}
+
+.form-area-description label {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-area-description textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d7d7d7;
+    font-size: 0.95rem;
+    resize: vertical;
+    font-family: inherit;
+    transition: border 0.2s ease;
+}
+
+.form-area-description textarea:focus {
+    border: 1px solid #1a64aa;
+    outline: none;
+}
+
+/* ===== ÁREA DE DATOS CURSOS ===== */
+.form-area-datos-cursos {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.form-area-datos-cursos label {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.form-area-datos-cursos input {
+    font-size: 15px;
+    padding: 10px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    transition: border 0.2s ease;
+}
+
+.form-area-datos-cursos input::placeholder {
+    outline: none;
+    color: #a9a9a9;
+}
+
+.form-area-datos-cursos input:focus {
+    border: 1px solid #1a64aa;
+    outline: none;
+}
+
+/* ===== DROPDOWN NIVEL CURSOS ===== */
+.nivel-select-container {
+    position: relative;
+    width: 100%;
+}
+
+.nivel-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.nivel-select-trigger:hover {
+    border-color: #1a64aa;
+    box-shadow: 0 0 0 2px rgba(26, 100, 170, 0.1);
+}
+
+.nivel-select-trigger.selected {
+    border-color: #1a64aa;
+    background-color: #f0f7ff;
+}
+
+.nivel-select-trigger span {
+    color: #a9a9a9;
+}
+
+.nivel-select-trigger.selected span {
+    color: #2d2d2d;
+}
+
+.nivel-select-trigger .icon-increment {
+    font-size: 14px;
+    color: #666;
+    transition: transform 0.2s ease;
+}
+
+.nivel-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.nivel-select-option {
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.nivel-select-option:hover {
+    background-color: #f5f5f5;
+}
+
+.nivel-select-option.active {
+    background-color: #e3f2fd;
+    color: #1a64aa;
+    font-weight: 500;
+}

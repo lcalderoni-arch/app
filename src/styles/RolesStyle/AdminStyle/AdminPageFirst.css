@@ -5,7 +5,7 @@
 .box-firstpage-admin {
     margin: 0;
 }
- 
+
 .header-firstpage-admin {
     display: flex;
 
@@ -100,7 +100,7 @@
     padding: 35px 60px;
 }
 
-.main-gestion-firstpage-admin h3{
+.main-gestion-firstpage-admin h3 {
     font-size: 24px;
     font-weight: 600;
 }
@@ -144,7 +144,7 @@
     font-size: 16px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #353535  ;
+    color: #353535;
 }
 
 .card-tutorial-admin p {
@@ -173,4 +173,3 @@
     background: #2164d8;
     color: #ffffff;
 }
-

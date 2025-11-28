@@ -13,7 +13,7 @@
   fontWeight: '800',
   cursor: 'pointer',
   padding: '15px',  // Usa un padding uniforme para que sea simétrico
-  position: 'fixed',
+  position: 'absolute',
   top: '12px',
   right: '20px',
   zIndex: 998,

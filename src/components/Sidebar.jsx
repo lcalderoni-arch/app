@@ -7,7 +7,7 @@ import './Sidebar.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
-import { faBook } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import { faChalkboard } from '@fortawesome/free-solid-svg-icons';
 import { faClipboard } from '@fortawesome/free-solid-svg-icons';
 
@@ -69,7 +69,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 {userRole === 'ADMINISTRADOR' && (
                     <>
                         <Link to="/dashboard-admin/usuarios" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faUsers} />Gestión de Usuarios</Link>
-                        <Link to="/dashboard-admin/cursos" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faBook} />Gestión de Cursos</Link>
+                        <Link to="/dashboard-admin/cursos" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faBookOpen} />Gestión de Cursos</Link>
                         <Link to="/dashboard-admin/secciones" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faChalkboard} />Gestión de Secciones</Link>
                         <Link to="/dashboard-admin/matriculas" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faClipboard} />Gestión de Matrículas</Link>
                     </>
