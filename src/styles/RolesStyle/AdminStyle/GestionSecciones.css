@@ -42,7 +42,7 @@
     letter-spacing: 1px;
 }
 
-.div-box-header-text-gestionsecciones .div-box-header-text-gestionsecciones p {
+.div-box-header-text-gestionsecciones p {
     color: #e4e4e4;
     line-height: 22px;
     letter-spacing: 1px;
@@ -95,6 +95,8 @@
 /*             BODY:FORM              */
 /*-----------------------------------*/
 
+/*             DESCRIPTION              */
+
 .auth-form-area-form {
     margin: 15px 50px 25px 50px;
     padding: 30px 30px;
@@ -103,7 +105,7 @@
 }
 
 /* ÁREAS DE DATOS */
-.form-area-datos-full {
+.form-area-datos-description {
     display: flex;
     justify-content: center;
     box-sizing: border-box;
@@ -114,7 +116,7 @@
     gap: 20px;
 }
 
-.form-area-datos-full label {
+.form-area-datos-description label {
     font-size: 15px;
     letter-spacing: 0.5px;
 
@@ -124,7 +126,7 @@
     flex: 1;
 }
 
-.form-area-datos-full input {
+.form-area-datos-description input {
     font-size: 15px;
     padding: 10px;
     border: 1px solid #d7d7d7;
@@ -132,34 +134,179 @@
     transition: border 0.2s ease;
 }
 
+.form-area-datos-description input::placeholder {
+    outline: none;
+    color: #a9a9a9;
+}
+
+.form-area-datos-description input:focus {
+    border: 1px solid #1a64aa;
+    outline: none;
+}
+
+/*             GRADO Y TURNO              */
+
+.form-area-datos-secciones {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: visible;
+
+    margin: 0 10px;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.form-area-datos-secciones label {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.nivel-select-container-curso {
+    position: relative;
+    width: 100%;
+}
+
+.nivel-select-trigger {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 1px;
+    transition: border 0.2s ease;
+}
+
+
+.nivel-select-trigger:hover {
+    border: 1px solid #1a64aa;
+}
+
+.nivel-select-trigger span {
+    color: #a9a9a9;
+    /* Color gris suave por defecto */
+}
+
+.nivel-select-trigger.selected span {
+    color: #2d2d2d;
+    /* Gris más fuerte */
+}
+
+.nivel-select-trigger .icon-increment {
+    color: #666;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.nivel-select-container:has(.student-select-dropdown) .icon-increment {
+    transform: rotate(180deg);
+}
+
+.nivel-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    /* Para que coincida con el margin-right */
+    background: white;
+    border: 1px solid #d7d7d7;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    margin-top: -2px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.nivel-select-option {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    color: #666;
+}
+
+.nivel-select-option:hover {
+    background-color: #f0f5fa;
+    color: #1a64aa;
+}
+
+.nivel-select-option.active {
+    font-weight: 500;
+    background-color: #ebf1f4;
+    color: #1a64aa;
+    border-left: 2px solid #1a64aa;
+}
+
+.form-area-datos-secciones input {
+    font-size: 15px;
+    padding: 10px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    transition: border 0.2s ease;
+}
+
+.form-area-datos-secciones input::placeholder {
+    outline: none;
+    color: #a9a9a9;
+}
+
+.form-area-datos-secciones input:focus {
+    border: 1px solid #1a64aa;
+    outline: none;
+}
+
+/*             FECHA Y DNI              */
+
 /*-------------------------------------*/
 /*        FILTROS Y ESTADÍSTICAS      */
 /*-----------------------------------*/
 
-.filtros-container {
-    margin: 30px 6%;
+.filtros-container-seccion {
+    margin: 25px 4%;
+    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #d2d2d2;
+    border-radius: 10px;
 }
 
-.filtros-header {
-    margin-bottom: 20px;
-}
-
-.filtros-header h4 {
-    font-size: 18px;
-    color: #1a64aa;
+.filtros-container-seccion .filtros-header-seccion {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
 }
 
-.filters-grid {
+.filtros-container-seccion .filtros-header-seccion h4 {
+    font-size: 16px;
+    color: #2d2d2d;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.filtros-container-seccion .filters-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px;
-    margin-bottom: 25px;
+    margin: 25px 2%;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.filters-grid label {
+.filtros-container-seccion .filters-grid label {
     display: block;
     font-size: 14px;
     font-weight: 500;
@@ -167,8 +314,8 @@
     color: #2d2d2d;
 }
 
-.filter-input,
-.filter-select {
+.filtros-container-seccion .filter-input,
+.filtros-container-seccion .filter-select {
     width: 100%;
     padding: 8px 12px;
     border-radius: 6px;
@@ -177,66 +324,67 @@
     transition: border 0.2s ease;
 }
 
-.filter-input:focus,
-.filter-select:focus {
+.filtros-container-seccion .filter-input:focus,
+.filtros-container-seccion .filter-select:focus {
     border-color: #1a64aa;
     outline: none;
 }
 
 /* ESTADÍSTICAS */
-.stats-grid {
+.filtros-container-seccion .stats-grid {
     display: grid;
+    margin: 25px 2%;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     margin-bottom: 25px;
 }
 
-.stat-card {
+.filtros-container-seccion .stat-card {
     padding: 20px;
     border-radius: 8px;
     text-align: center;
 }
 
-.stat-card h3 {
+.filtros-container-seccion .stat-card h3 {
     margin: 0 0 5px 0;
     font-size: 28px;
 }
 
-.stat-card p {
+.filtros-container-seccion .stat-card p {
     margin: 0;
     font-size: 14px;
     color: #666;
 }
 
-.stat-total {
+.filtros-container-seccion .stat-total {
     background-color: #e3f2fd;
 }
 
-.stat-total h3 {
+.filtros-container-seccion .stat-total h3 {
     color: #1976d2;
 }
 
-.stat-active {
+.filtros-container-seccion .stat-active {
     background-color: #e8f5e9;
 }
 
-.stat-active h3 {
+.filtros-container-seccion .stat-active h3 {
     color: #388e3c;
 }
 
-.stat-available {
+.filtros-container-seccion .stat-available {
     background-color: #fff3e0;
 }
 
-.stat-available h3 {
+.filtros-container-seccion .stat-available h3 {
     color: #f57c00;
 }
 
-.stat-students {
+.filtros-container-seccion .stat-students {
     background-color: #fce4ec;
 }
 
-.stat-students h3 {
+.filtros-container-seccion .stat-students h3 {
     color: #c2185b;
 }
 
@@ -245,19 +393,36 @@
 /*-----------------------------------*/
 
 .table-secciones-gestionsecciones {
-    margin-top: 20px;
+    margin: 25px 2%;
     border: 2px solid #e2e2e2;
     border-radius: 10px;
     overflow: hidden;
 }
 
-.styled-table {
+.table-secciones-gestionsecciones .styled-table-seccion {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    letter-spacing: 0.5px;
+    margin: 0;
 }
 
-.styled-table tbody td {
+.table-secciones-gestionsecciones .styled-table-seccion thead {
+    background: #f0f0f0;
+    color: #444;
+}
+
+.table-secciones-gestionsecciones .styled-table-seccion thead tr th {
+    padding: 16px 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e2e2e2;
+}
+
+.table-secciones-gestionsecciones .styled-table-seccion tbody td {
     padding: 14px 12px;
     text-align: center;
     color: #3e3e3e;
@@ -265,43 +430,60 @@
 }
 
 /* ESTILOS ESPECÍFICOS DE CELDAS */
-.curso-info,
-.nivel-grado-info,
-.profesor-info,
-.cupo-info {
+
+.styled-table-seccion tbody td:nth-child(1) {
+    font-weight: 600;
+    color: #1a64aa;
+    font-size: 14px;
+    width: 100px;
+}
+
+.styled-table-seccion tbody td:nth-child(2) {
+    font-family: monospace;
+    color: #444;
+    font-size: 13px;
+    font-weight: 600;
+    width: 150px;
+}
+
+.styled-table-seccion .curso-info,
+.styled-table-seccion .nivel-grado-info,
+.styled-table-seccion .profesor-info,
+.styled-table-seccion .cupo-info {
     display: flex;
+    align-items: center;
     flex-direction: column;
     gap: 4px;
     font-size: 0.9em;
 }
 
-.curso-info span,
-.profesor-info span {
+.styled-table-seccion .curso-info span,
+.styled-table-seccion .profesor-info span {
     color: #666;
-    font-size: 0.9em;
+    font-size: 1em;
 }
 
-.cupo-info strong {
+.styled-table-seccion .cupo-info strong {
     font-size: 1.1em;
 }
 
-.cupo-info .disponible {
-    color: #388e3c;
-    font-size: 0.85em;
+.styled-table-seccion .cupo-info .disponible {
+    color: #5ec125;
+    font-size: 0.90em;
 }
 
-.cupo-info .completo {
+.styled-table-seccion .cupo-info .completo {
     color: #d32f2f;
     font-size: 0.85em;
 }
 
-.fecha-info {
+.styled-table-seccion .fecha-info {
     font-size: 0.85em;
     color: #666;
 }
 
 /* BADGES */
-.badge-turno {
+.styled-table-seccion .badge-turno {
     display: inline-block;
     padding: 6px 12px;
     border-radius: 20px;
@@ -311,52 +493,58 @@
     text-transform: uppercase;
 }
 
-.badge-turno-mañana {
+.styled-table-seccion .badge-turno-mañana {
     background: #fff3e0;
     color: #e65100;
 }
 
-.badge-turno-tarde {
+.styled-table-seccion .badge-turno-tarde {
     background: #e3f2fd;
     color: #0d47a1;
 }
 
-.badge-turno-noche {
+.styled-table-seccion .badge-turno-noche {
     background: #f3e5f5;
     color: #4a148c;
 }
 
-.badge-estado {
+.styled-table-seccion .estado-table {
+    align-items: center;
+    flex-direction: column;
+}
+
+.styled-table-seccion .badge-estado {
     display: inline-block;
-    padding: 6px 12px;
+    padding: 8px 18px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
 }
 
-.badge-activa {
+.styled-table-seccion .badge-activa {
+    display: inline-block;
     background: #e8f5e9;
     color: #2e7d32;
 }
 
-.badge-inactiva {
+.styled-table-seccion .badge-inactiva {
     background: #ffebee;
     color: #c62828;
 }
 
 /* BOTONES DE ACCIÓN */
-.action-buttons {
+.styled-table-seccion .action-buttons {
     display: flex;
     gap: 8px;
     justify-content: center;
     flex-wrap: wrap;
 }
 
-.btn-edit,
-.btn-delete,
-.btn-warning,
-.btn-success {
+.styled-table-seccion .btn-edit,
+.styled-table-seccion .btn-delete,
+.styled-table-seccion .btn-warning,
+.styled-table-seccion .btn-success {
     padding: 6px 12px;
     border: none;
     border-radius: 6px;
@@ -366,57 +554,60 @@
     transition: all 0.3s ease;
 }
 
-.btn-edit {
+.styled-table-seccion .btn-edit {
     background: transparent;
     color: #222;
     border: 1px solid #4498b7;
 }
 
-.btn-edit:hover {
+.styled-table-seccion .btn-edit:hover {
     background-color: #4498b7;
     color: #fff;
     transform: translateY(-2px);
 }
 
-.btn-delete {
+.styled-table-seccion .btn-delete {
     background: transparent;
     color: #222;
     border: 1px solid #e64f4f;
 }
 
-.btn-delete:hover:not(:disabled) {
+.styled-table-seccion .btn-delete:hover:not(:disabled) {
     background-color: #da3535;
     color: #fff;
     transform: translateY(-2px);
 }
 
-.btn-delete:disabled {
+.styled-table-seccion .btn-delete:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.btn-warning {
-    background: #ff9800;
-    color: white;
+.styled-table-seccion .btn-warning {
+    background: transparent;
+    color: #000;
+    border: 1px solid #ff9800;
+    text-transform: uppercase;
 }
 
-.btn-warning:hover {
+.styled-table-seccion .btn-warning:hover {
     background: #f57c00;
+    color: #fff;
     transform: translateY(-2px);
 }
 
-.btn-success {
+.styled-table-seccion .btn-success {
     background: #4caf50;
     color: white;
 }
 
-.btn-success:hover {
+.styled-table-seccion .btn-success:hover {
     background: #388e3c;
     transform: translateY(-2px);
 }
 
 /* SIN RESULTADOS */
-.no-results {
+.styled-table-seccion .no-results {
     text-align: center;
     padding: 40px 20px;
     color: #999;

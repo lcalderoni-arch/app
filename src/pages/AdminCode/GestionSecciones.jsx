@@ -1,5 +1,5 @@
 // src/pages/GestionSecciones.jsx
-import React, { useRef, useState, useEffect, useCallback } from "react";    
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import axios from 'axios';
 
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api.js";
@@ -10,7 +10,7 @@ import "../../styles/RolesStyle/AdminStyle/GestionSecciones.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faAngleDown,
-    faBookOpen,
+    faChalkboard,
     faMagnifyingGlass,
     faSquarePlus,
 } from "@fortawesome/free-solid-svg-icons";
@@ -33,7 +33,7 @@ function GestionSecciones() {
     const [filtroActiva, setFiltroActiva] = useState("TODOS");
     const [searchTerm, setSearchTerm] = useState("");
 
-    // --- ⭐ ESTADOS DEL FORMULARIO DE CREACIÓN ---
+    // --- ESTADOS DEL FORMULARIO DE CREACIÓN ---
     const [nombre, setNombre] = useState("");
     const [nivelSeccion, setNivelSeccion] = useState("");
     const [gradoSeccion, setGradoSeccion] = useState("");
@@ -42,6 +42,12 @@ function GestionSecciones() {
     const [capacidad, setCapacidad] = useState(30);
     const [fechaInicio, setFechaInicio] = useState("");
     const [fechaFin, setFechaFin] = useState("");
+
+    // --- SEMANAS DE CLASES ---
+    const [numeroSemanas, setNumeroSemanas] = useState(0);
+    const [semanasCalculadas, setSemanasCalculadas] = useState(0);
+    const [showPreview, setShowPreview] = useState(false);
+
     const [cursoId, setCursoId] = useState("");
     const [profesorDni, setProfesorDni] = useState("");
 
@@ -53,8 +59,10 @@ function GestionSecciones() {
     // --- Refs para dropdowns ---
     const [isNivelOpen, setIsNivelOpen] = useState(false);
     const [isTurnoOpen, setIsTurnoOpen] = useState(false);
+    const [isCursoOpen, setIsCursoOpen] = useState(false);
     const nivelSelectRef = useRef(null);
     const turnoSelectRef = useRef(null);
+    const cursoSelectRef = useRef(null);
 
     const API_URL = API_ENDPOINTS.secciones;
 
@@ -66,6 +74,10 @@ function GestionSecciones() {
             }
             if (turnoSelectRef.current && !turnoSelectRef.current.contains(event.target)) {
                 setIsTurnoOpen(false);
+            }
+            // ⭐ AGREGAR ESTO:
+            if (cursoSelectRef.current && !cursoSelectRef.current.contains(event.target)) {
+                setIsCursoOpen(false);
             }
         };
 
@@ -181,7 +193,7 @@ function GestionSecciones() {
             profesorDni: profesorDni.trim(),
         };
 
-        console.log("📤 Enviando payload de sección:", payload);
+        console.log("Enviando payload de sección:", payload);
 
         try {
             const token = localStorage.getItem("authToken");
@@ -190,7 +202,6 @@ function GestionSecciones() {
             const url = `${API_BASE_URL}/secciones`;
 
             const response = await axios.post(url, payload, {
-                withCredentials: true,
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",
@@ -230,6 +241,24 @@ function GestionSecciones() {
             setCreatingSeccion(false);
         }
     };
+
+    // FUNCIÓN PARA CALCULAR SEMANAS AUTOMÁTICAMENTE:
+    const calcularSemanas = useCallback(() => {
+        if (fechaInicio && fechaFin) {
+            const inicio = new Date(fechaInicio);
+            const fin = new Date(fechaFin);
+            const diffTime = Math.abs(fin - inicio);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const weeks = Math.floor(diffDays / 7);
+            setSemanasCalculadas(weeks);
+            setNumeroSemanas(weeks); // Auto-rellenar
+        }
+    }, [fechaInicio, fechaFin]);
+
+    // LLAMAR AL CALCULAR CUANDO CAMBIEN LAS FECHAS:
+    useEffect(() => {
+        calcularSemanas();
+    }, [calcularSemanas]);
 
     // --- Filtrar secciones ---
     const seccionesFiltradas = secciones.filter((seccion) => {
@@ -321,7 +350,7 @@ function GestionSecciones() {
             <div className="div-box-header-text-gestionsecciones">
                 <div className="alinear-al-centro">
                     <h2>
-                        <FontAwesomeIcon className="icon" icon={faBookOpen} />
+                        <FontAwesomeIcon className='icon' icon={faChalkboard} />
                         Gestión de Secciones
                     </h2>
                 </div>
@@ -345,25 +374,68 @@ function GestionSecciones() {
                     <div className="auth-form-gestionsecciones-area-form">
                         <div className="auth-form-area-form">
                             {/* FILA 1: Nombre */}
-                            <div className="form-area-datos-full">
+                            <div className="form-area-datos-description">
                                 {/* CURSO - SELECT NORMAL */}
                                 <label>
                                     Curso *
-                                    <select
-                                        value={cursoId}
-                                        onChange={(e) => setCursoId(e.target.value)}
-                                        required
-                                        disabled={loadingCursos}
-                                    >
-                                        <option value="">
-                                            {loadingCursos ? "Cargando cursos..." : "Selecciona un curso"}
-                                        </option>
-                                        {cursos.map((curso) => (
-                                            <option key={curso.id} value={curso.id}>
-                                                {curso.codigo} - {curso.titulo} ({curso.nivelDestino})
-                                            </option>
-                                        ))}
-                                    </select>
+                                    <div className="nivel-select-container-curso" ref={cursoSelectRef}>
+                                        <div
+                                            className={`nivel-select-trigger ${cursoId !== "" ? "selected" : ""} ${loadingCursos ? "disabled" : ""}`}
+                                            onClick={(e) => {
+                                                if (!loadingCursos) {
+                                                    e.stopPropagation();
+                                                    setIsCursoOpen(!isCursoOpen);
+                                                }
+                                            }}
+                                        >
+                                            <span>
+                                                {loadingCursos
+                                                    ? "Cargando cursos..."
+                                                    : cursoId === ""
+                                                        ? "Selecciona un curso..."
+                                                        : (() => {
+                                                            const cursoSeleccionado = cursos.find(
+                                                                (c) => c.id === parseInt(cursoId)
+                                                            );
+                                                            return cursoSeleccionado
+                                                                ? `${cursoSeleccionado.codigo} - ${cursoSeleccionado.titulo} (${cursoSeleccionado.nivelDestino})`
+                                                                : "Selecciona un curso...";
+                                                        })()}
+                                            </span>
+                                            <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
+                                        </div>
+
+                                        {isCursoOpen && !loadingCursos && (
+                                            <div className="nivel-select-dropdown curso-dropdown">
+                                                {cursos.length === 0 ? (
+                                                    <div className="nivel-select-option no-options">
+                                                        No hay cursos disponibles
+                                                    </div>
+                                                ) : (
+                                                    cursos.map((curso) => (
+                                                        <div
+                                                            key={curso.id}
+                                                            className={`nivel-select-option ${cursoId === curso.id.toString() ? "active" : ""
+                                                                }`}
+                                                            onClick={() => {
+                                                                setCursoId(curso.id.toString());
+                                                                setIsCursoOpen(false);
+                                                            }}
+                                                        >
+                                                            <div className="curso-option-content">
+                                                                <strong>{curso.codigo}</strong>
+                                                                <span className="separador"> - </span>
+                                                                <span className="curso-titulo">{curso.titulo}</span>
+                                                                <span className="separador-parentesis"> (</span>
+                                                                <span className="curso-nivel">{curso.nivelDestino}</span>
+                                                                <span className="separador-parentesis">)</span>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </label>
                                 <label>
                                     Nombre de la Sección *
@@ -390,10 +462,10 @@ function GestionSecciones() {
                                                 {nivelSeccion === ""
                                                     ? "Selecciona un nivel..."
                                                     : nivelSeccion === "INICIAL"
-                                                    ? "Inicial"
-                                                    : nivelSeccion === "PRIMARIA"
-                                                    ? "Primaria"
-                                                    : "Secundaria"}
+                                                        ? "Inicial"
+                                                        : nivelSeccion === "PRIMARIA"
+                                                            ? "Primaria"
+                                                            : "Secundaria"}
                                             </span>
                                             <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                                         </div>
@@ -446,10 +518,7 @@ function GestionSecciones() {
                                         required
                                     />
                                 </label>
-                            </div>
 
-                            {/* FILA 3: Turno y Aula */}
-                            <div className="form-area-datos-secciones">
                                 {/* TURNO - DROPDOWN PERSONALIZADO */}
                                 <label>
                                     Turno *
@@ -465,10 +534,10 @@ function GestionSecciones() {
                                                 {turno === ""
                                                     ? "Selecciona un turno..."
                                                     : turno === "MAÑANA"
-                                                    ? "Mañana"
-                                                    : turno === "TARDE"
-                                                    ? "Tarde"
-                                                    : "Noche"}
+                                                        ? "Mañana"
+                                                        : turno === "TARDE"
+                                                            ? "Tarde"
+                                                            : "Noche"}
                                             </span>
                                             <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                                         </div>
@@ -507,7 +576,6 @@ function GestionSecciones() {
                                     </div>
                                 </label>
 
-                                {/* AULA */}
                                 <label>
                                     Aula (Opcional)
                                     <input
@@ -517,10 +585,7 @@ function GestionSecciones() {
                                         placeholder="Ej: Aula 101"
                                     />
                                 </label>
-                            </div>
 
-                            {/* FILA 4: Capacidad, Fecha Inicio, Fecha Fin */}
-                            <div className="form-area-datos-triple">
                                 <label>
                                     Capacidad Máxima *
                                     <input
@@ -532,6 +597,12 @@ function GestionSecciones() {
                                         required
                                     />
                                 </label>
+
+                            </div>
+
+
+                            {/* FILA 3: Fecha y Dni */}
+                            <div className="form-area-datos-secciones">
 
                                 <label>
                                     Fecha de Inicio *
@@ -552,11 +623,7 @@ function GestionSecciones() {
                                         required
                                     />
                                 </label>
-                            </div>
 
-                            {/* FILA 5: Curso y DNI Profesor */}
-                            <div className="form-area-datos-secciones">
-                                {/* DNI PROFESOR */}
                                 <label>
                                     DNI del Profesor *
                                     <input
@@ -603,11 +670,11 @@ function GestionSecciones() {
             </div>
 
             {/* FILTROS Y ESTADÍSTICAS */}
-            <div className="filtros-container">
-                <div className="filtros-header">
+            <div className="filtros-container-seccion">
+                <div className="filtros-header-seccion">
                     <h4>
                         <FontAwesomeIcon className="icon" icon={faMagnifyingGlass} />
-                        Lista de Secciones Registradas
+                        Filtros de Secciones
                     </h4>
                 </div>
 
@@ -693,7 +760,7 @@ function GestionSecciones() {
                     {seccionesFiltradas.length === 0 ? (
                         <p className="no-results">No se encontraron secciones con los filtros aplicados</p>
                     ) : (
-                        <table className="styled-table">
+                        <table className="styled-table-seccion">
                             <thead>
                                 <tr>
                                     <th>Código</th>
@@ -712,7 +779,7 @@ function GestionSecciones() {
                                 {seccionesFiltradas.map((seccion) => (
                                     <tr key={seccion.id}>
                                         <td>
-                                            <strong>{seccion.codigo}</strong>
+                                            {seccion.codigo}
                                         </td>
                                         <td>{seccion.nombre}</td>
                                         <td>
@@ -756,9 +823,11 @@ function GestionSecciones() {
                                             {new Date(seccion.fechaFin).toLocaleDateString()}
                                         </td>
                                         <td>
-                                            <span className={`badge-estado badge-${seccion.activa ? "activa" : "inactiva"}`}>
-                                                {seccion.activa ? "Activa" : "Inactiva"}
-                                            </span>
+                                            <div className="estado-table">
+                                                <span className={`badge-estado badge-${seccion.activa ? "activa" : "inactiva"}`}>
+                                                    {seccion.activa ? "Activa" : "Inactiva"}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td>
                                             <div className="action-buttons">

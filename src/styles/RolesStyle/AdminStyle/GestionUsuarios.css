@@ -713,10 +713,10 @@
 }
 
 .styled-table thead tr th {
-  padding: 16px 12px;
+  padding: 14px 12px;
   text-align: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: 1px;
   text-transform: uppercase;
   border-bottom: 2px solid #e2e2e2;
@@ -745,9 +745,10 @@
 /* COLUMNA 2: ID Sistema */
 .styled-table tbody td:nth-child(2) {
   font-family: 'Courier New', monospace;
-  color: #666;
-  font-size: 13px;
-  width: 80px;
+    color: #666;
+    font-size: 15px;
+    font-weight: 900;
+    width: 80px;
 }
 
 /* COLUMNA 3: Nombre */

@@ -194,7 +194,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    right: 50px;
+    right: 0;
     /* Para que coincida con el margin-right */
     background: white;
     border: 1px solid #d7d7d7;
@@ -288,6 +288,36 @@
     overflow: hidden;
 }
 
+.table-users-gestioncursos .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.table-users-gestioncursos .styled-table thead {
+    background: #f0f0f0;
+    color: #444;
+}
+
+.table-users-gestioncursos .styled-table thead tr th {
+    padding: 10px 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e2e2e2;
+}
+
+.table-users-gestioncursos .styled-table tbody td {
+    padding: 14px 12px;
+    text-align: center;
+    color: #3e3e3e;
+    vertical-align: middle;
+}
+
 /* ===== ESTILOS POR COLUMNA (CURSOS) ===== */
 
 /* COLUMNA 1: N° (Numeración) */
@@ -295,14 +325,15 @@
     font-weight: 600;
     color: #1a64aa;
     font-size: 14px;
-    width: 50px;
+    width: 80px;
 }
 
 /* COLUMNA 2: ID Sistema */
 .table-users-gestioncursos .styled-table tbody td:nth-child(2) {
     font-family: 'Courier New', monospace;
     color: #666;
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 900;
     width: 80px;
 }
 
@@ -313,26 +344,26 @@
     align-items: center;
     color: #2d2d2d;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .codigo-badge {
     display: inline-block;
     font-family: monospace;
-    background-color: #f0f0f0;
+    background-color: transparent;
     padding: 6px 12px;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
     color: #2d2d2d;
-    border: 1px solid #d0d0d0;
+    border: 1px solid #999;
 }
 
 
 /* COLUMNA 4: Título (CON BORDE NEGRO) */
 .table-users-gestioncursos .styled-table tbody td:nth-child(4) {
     color: #2d2d2d;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
 }
 
@@ -341,10 +372,9 @@
     font-family: monospace;
     padding: 6px 12px;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #2d2d2d;
-    border: 1px solid #000000;
 }
 
 /* COLUMNA 5: Nivel (Badge) - Usa los mismos badges de rol */
@@ -372,8 +402,8 @@
 }
 
 .badge-primaria {
-    background-color: #d1ecf1;
-    color: #0c5460;
+    background-color: #d4f1d1;
+    color: #10600c;
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 12px;
@@ -384,13 +414,13 @@
 }
 
 .badge-secundaria {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #d4e2ed;
+    color: #153857;
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    box-shadow: 0 2px 4px rgba(21, 87, 36, 0.2);
+    box-shadow: 0 2px 4px rgba(21, 66, 87, 0.2);
 }

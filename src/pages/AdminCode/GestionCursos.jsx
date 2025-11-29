@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faAngleDown,
     faBookOpen,
-    faMagnifyingGlass,
+    faTable,
     faSquarePlus,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -396,8 +396,8 @@ function GestionCursos() {
             <div className="filtros-container">
                 <div className="filtros-header">
                     <h4>
-                        <FontAwesomeIcon className="icon" icon={faMagnifyingGlass} />
-                        Filtro de Busqueda
+                        <FontAwesomeIcon className="icon" icon={faTable} />
+                        Tabla de Cursos
                     </h4>
                 </div>
 
