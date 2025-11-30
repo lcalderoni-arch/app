@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-import icon from "../../assets/logo.png";
+import icon from "../../../assets/logo.png";
 
-import { API_BASE_URL } from "../../config/api.js";
+import { API_BASE_URL } from "../../../config/api.js";
 
-import LogoutButton from '../../components/login/LogoutButton';
-import "./../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css"
-import { formatDateLocal, getDayOfWeek } from '../../utils/dateUtils';
+import LogoutButton from '../../../components/login/LogoutButton.jsx';
+import "../../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css"
+import { formatDateLocal, getDayOfWeek } from '../../../utils/dateUtils.js';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook, faCalendar, faChartLine, faBell, faSpinner } from '@fortawesome/free-solid-svg-icons';

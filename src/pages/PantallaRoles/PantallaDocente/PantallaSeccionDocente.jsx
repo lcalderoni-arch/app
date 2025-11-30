@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-import { API_BASE_URL } from '../../config/api';
-import LogoutButton from '../../components/login/LogoutButton';
-import { formatDateLocal } from '../../utils/dateUtils';
+import { API_BASE_URL } from '../../../config/api';
+import LogoutButton from '../../../components/login/LogoutButton';
+import { formatDateLocal } from '../../../utils/dateUtils';
 
-import "../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
+import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
 export default function PantallaSeccionDocente() {
     const { seccionId } = useParams();

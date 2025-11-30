@@ -39,21 +39,33 @@ export default function LoginForm() {
 
     try {
       const response = await axios.post(url, payload);
-      
+
       // ⭐ CORREGIDO: Renombrar variables para evitar conflicto
-      const { token, nombre, rol, email: userEmail, dni: userDni } = response.data;
+      const {
+        token,
+        nombre,
+        rol,
+        email: userEmail,
+        dni: userDni,
+        nivelAlumno,
+        gradoAlumno,
+      } = response.data;
 
       localStorage.setItem("authToken", token);
       localStorage.setItem("userName", nombre);
       localStorage.setItem("userRole", rol);
-      localStorage.setItem("userEmail", userEmail || ""); // ⭐ Usar userEmail
-      localStorage.setItem("userDni", userDni || ""); // ⭐ Usar userDni
+      localStorage.setItem("userEmail", userEmail || "");
+      localStorage.setItem("userDni", userDni || "");
 
-      console.log("✅ Datos guardados en localStorage:", { 
-        nombre, 
-        rol, 
-        email: userEmail, 
-        dni: userDni 
+      // ⭐ NUEVO:
+      localStorage.setItem("userNivel", nivelAlumno || "");
+      localStorage.setItem("userGrado", gradoAlumno || "");
+
+      console.log("✅ Datos guardados en localStorage:", {
+        nombre,
+        rol,
+        email: userEmail,
+        dni: userDni
       });
 
       console.log("Login exitoso:", response.data);

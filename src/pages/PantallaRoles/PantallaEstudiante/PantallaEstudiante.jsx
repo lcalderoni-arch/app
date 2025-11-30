@@ -1,13 +1,15 @@
 import React from 'react';
-import LogoutButton from '../../components/login/LogoutButton';
-import icon from "../../assets/logo.png";
-import "./../../styles/RolesStyle/StudentStyle/StudentPageFirst.css"
+import { Link } from "react-router-dom";
+import LogoutButton from '../../../components/login/LogoutButton';
+import icon from "../../../assets/logo.png";
+import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css"
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook } from '@fortawesome/free-solid-svg-icons';
 import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 export default function PantallaEstudiante() {
     const userName = localStorage.getItem('userName');
@@ -21,29 +23,35 @@ export default function PantallaEstudiante() {
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
                     <span className='sidebar-role'>Estudiante</span>
                 </div>
-                
+
                 <nav className='sidebar-menu'>
                     <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <a href="#cursos" className='active'><FontAwesomeIcon icon={faBook} className='icon-text'/>
+                            <a href="#cursos" className='active'><FontAwesomeIcon icon={faBook} className='icon-text' />
                                 Mis Cursos
                             </a>
                         </li>
                         <li>
-                            <a href="#horario"><FontAwesomeIcon icon={faCalendar} className='icon-text'/>
+                            <a href="#horario"><FontAwesomeIcon icon={faCalendar} className='icon-text' />
                                 Horario
                             </a>
                         </li>
                         <li>
-                            <a href="#progreso"><FontAwesomeIcon icon={faChartLine} className='icon-text'/>
+                            <a href="#progreso"><FontAwesomeIcon icon={faChartLine} className='icon-text' />
                                 Progreso
                             </a>
                         </li>
                         <li>
-                            <a href="#notificaciones"><FontAwesomeIcon icon={faBell} className='icon-text'/>
+                            <a href="#notificaciones"><FontAwesomeIcon icon={faBell} className='icon-text' />
                                 Notificaciones
                             </a>
+                        </li>
+                        <li>
+                            <Link to="/pantalla-alumno/matricula">
+                                <FontAwesomeIcon icon={faPenToSquare} className='icon-text' />
+                                Matricúlate Aquí
+                            </Link>
                         </li>
                     </ul>
                 </nav>
@@ -67,7 +75,7 @@ export default function PantallaEstudiante() {
                     <section className='content-section'>
                         <h2>Mis Cursos</h2>
                         <p>Visualiza tus cursos elegidos</p>
-                        
+
                         <div className='courses-grid'>
                             <div className='course-card'>
                                 <div className='header-card'>
@@ -85,7 +93,7 @@ export default function PantallaEstudiante() {
                                         <p>Inicio: 10/10/2010</p>
                                         <p>Fin: 10/12/2010</p>
                                     </div>
-                                <button className='btn-course'>Ver curso</button>
+                                    <button className='btn-course'>Ver curso</button>
                                 </div>
                             </div>
 

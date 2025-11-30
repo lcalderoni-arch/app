@@ -10,12 +10,13 @@ import GestionUsuarios from "./pages/AdminCode/GestionUsuarios.jsx";
 import GestionCursos from "./pages/AdminCode/GestionCursos.jsx";
 
 
-import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante.jsx";
+import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante/PantallaEstudiante.jsx";
+import PantallaMatriculaAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaMatriculaAlumno.jsx";
 
 
 
-import PantallaDocente from "./pages/PantallaRoles/PantallaDocente.jsx";
-import PantallaSeccionDocente from "./pages/PantallaRoles/PantallaSeccionDocente.jsx";
+import PantallaDocente from "./pages/PantallaRoles/PantallaDocente/PantallaDocente.jsx";
+import PantallaSeccionDocente from "./pages/PantallaRoles/PantallaDocente/PantallaSeccionDocente.jsx";
 
 
 import ProtectedRoute from "./security/ProtectedRoute.jsx";
@@ -73,6 +74,15 @@ const routeConfig = [
     element: (
       <ProtectedRoute allowedRoles={["ALUMNO"]}>
         <PantallaEstudiante />
+      </ProtectedRoute>
+    )
+  },
+
+  {
+    path: "/pantalla-alumno/matricula",
+    element: (
+      <ProtectedRoute allowedRoles={["ALUMNO"]}>
+        <PantallaMatriculaAlumno/>
       </ProtectedRoute>
     )
   },
