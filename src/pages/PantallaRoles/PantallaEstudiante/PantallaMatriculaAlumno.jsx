@@ -196,7 +196,7 @@ export default function PantallaMatriculaAlumno() {
                             <p>
                                 Alumno: <strong>{userName}</strong>
                             </p>
-                            <Link to="/alumno" className="btn-back">
+                            <Link to="/pantalla-estudiante" className="btn-back">
                                 <FontAwesomeIcon icon={faArrowLeft} /> Volver al inicio
                             </Link>
                         </div>
