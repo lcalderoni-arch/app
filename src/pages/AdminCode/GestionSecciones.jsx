@@ -6,6 +6,7 @@ import { API_ENDPOINTS, API_BASE_URL } from "../../config/api.js";
 import icon from "../../assets/logo.png";
 
 import "../../styles/RolesStyle/AdminStyle/GestionSecciones.css";
+import { formatDateLocal } from '../../utils/dateUtils';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -883,9 +884,9 @@ function GestionSecciones() {
                                             </div>
                                         </td>
                                         <td className="fecha-info">
-                                            {new Date(seccion.fechaInicio).toLocaleDateString()}
+                                            {formatDateLocal(seccion.fechaInicio)}
                                             <br />
-                                            {new Date(seccion.fechaFin).toLocaleDateString()}
+                                            {formatDateLocal(seccion.fechaFin)}
                                             <br />
                                             <span className="semanas-badge">
                                                 ({seccion.numeroSemanas} {seccion.numeroSemanas === 1 ? 'semana' : 'semanas'})

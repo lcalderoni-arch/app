@@ -97,7 +97,7 @@
 /* Botón de Logout */
 .btn-logout {
   margin-top: auto; /* Empuja el botón al fondo del flex container */
-  margin-bottom: 25px;
+  margin-bottom: 0;
   padding: 12px;
   background-color: #2d6bc9; /* Rojo para logout */
   color: white;

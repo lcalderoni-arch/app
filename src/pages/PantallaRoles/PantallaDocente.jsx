@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import LogoutButton from '../../components/login/LogoutButton';
+
 import icon from "../../assets/logo.png";
+
 import { API_BASE_URL } from "../../config/api.js";
+
+import LogoutButton from '../../components/login/LogoutButton';
 import "./../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css"
+import { formatDateLocal, getDayOfWeek } from '../../utils/dateUtils';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook, faCalendar, faChartLine, faBell, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -83,20 +87,11 @@ export default function PantallaDocente() {
         }
     };
 
-    // --- Función para formatear fecha ---
-    const formatearFecha = (fechaString) => {
-        const fecha = new Date(fechaString);
-        return fecha.toLocaleDateString('es-PE', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        });
-    };
-
     // --- Función para manejar ingreso a sección ---
     const handleIngresarSeccion = (seccion) => {
-        // ⭐ NAVEGACIÓN A LA PANTALLA DE SEMANAS (implementar más adelante)
-        navigate(`/docente/seccion/${seccion.id}`);
+        navigate(`/docente/seccion/${seccion.id}`, {
+            state: { seccion }, // enviamos el objeto completo
+        });
     };
 
     return (
@@ -187,12 +182,12 @@ export default function PantallaDocente() {
                             <div className='courses-grid'>
                                 {secciones.map((seccion) => {
                                     const estado = obtenerEstadoSeccion(seccion);
-                                    
+
                                     return (
                                         <div key={seccion.id} className='course-card'>
                                             {/* HEADER */}
                                             <div className='header-card'>
-                                                <h3>{seccion.tituloCurso}</h3>
+                                                <h3>{seccion.nombre}</h3>
                                                 <div className='content-grado'>
                                                     <p className='text-nivel'>
                                                         Nivel: <strong>{seccion.nivelSeccion}</strong>
@@ -201,39 +196,24 @@ export default function PantallaDocente() {
                                                         Grado: <strong>{seccion.gradoSeccion}</strong>
                                                     </p>
                                                 </div>
-                                            </div>
-
-                                            <div className='line'></div>
-
-                                            {/* INFORMACIÓN */}
-                                            <div className='information-card'>
-                                                <p><strong>Profesor: {userName}</strong></p>
-                                                <p>Email: {userEmail}</p>
-                                                <div className='content-hora-salon'>
-                                                    <p>
-                                                        <strong>Turno {seccion.turno}:</strong>{' '}
-                                                        {obtenerHorario(seccion.turno)}
-                                                    </p>
-                                                    <p>
-                                                        Salón: <strong>{seccion.aula || 'No asignado'}</strong>
-                                                    </p>
-                                                </div>
-                                                <div className='cupo-information'>
-                                                    <p>
-                                                        Estudiantes: <strong>{seccion.estudiantesMatriculados || 0}</strong> / {seccion.capacidad}
-                                                    </p>
-                                                    <p>
-                                                        Semanas: <strong>{seccion.numeroSemanas}</strong>
-                                                        {seccion.semanaActual > 0 && (
-                                                            <span className='semana-actual-badge'>
-                                                                📍 Semana {seccion.semanaActual}
-                                                            </span>
-                                                        )}
-                                                    </p>
+                                                {/* INFORMACIÓN */}
+                                                <div className='information-card'>
+                                                    <span>Nombre: <strong>{userName}</strong></span>
+                                                    <span>Email: <strong>{userEmail}</strong></span>
+                                                    <span className='datos-fecha'><strong>{getDayOfWeek(seccion.fechaInicio)}</strong><strong> - {seccion.turno}:</strong>{' '}
+                                                        {obtenerHorario(seccion.turno)} - <strong>  ({seccion.aula || 'No asignado'})</strong></span>
                                                 </div>
                                             </div>
 
-                                            <div className='line'></div>
+
+                                            <div className='cupo-information'>
+                                                <span>
+                                                    Estudiantes: <strong>{seccion.estudiantesMatriculados || 0}</strong> / {seccion.capacidad}
+                                                </span>
+                                                <span>
+                                                    Semanas: <strong>{seccion.numeroSemanas}</strong>
+                                                </span>
+                                            </div>
 
                                             {/* FOOTER */}
                                             <div className='footer-card'>
@@ -243,17 +223,22 @@ export default function PantallaDocente() {
                                                     </span>
                                                 </div>
                                                 <div className='fecha-information'>
-                                                    <p>Inicio: <strong>{formatearFecha(seccion.fechaInicio)}</strong></p>
-                                                    <p>Fin: <strong>{formatearFecha(seccion.fechaFin)}</strong></p>
+                                                    <span>Inicio: <strong>{formatDateLocal(seccion.fechaInicio)}</strong></span>
+                                                    <span>Fin: <strong>{formatDateLocal(seccion.fechaFin)}</strong></span>
+                                                    {seccion.semanaActual > 0 && (
+                                                        <span className='semana-actual-badge'>
+                                                            Semana {seccion.semanaActual}
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                <button 
-                                                    className='btn-course' 
-                                                    onClick={() => handleIngresarSeccion(seccion)}
-                                                    disabled={!seccion.activa}
-                                                >
-                                                    Ingresar
-                                                </button>
                                             </div>
+                                            <button
+                                                className='btn-course'
+                                                onClick={() => handleIngresarSeccion(seccion)}
+                                                disabled={!seccion.activa}
+                                            >
+                                                Ingresar
+                                            </button>
                                         </div>
                                     );
                                 })}

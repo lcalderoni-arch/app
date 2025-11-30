@@ -93,7 +93,8 @@
 
 /* Botón de Logout */
 .btn-logout {
-  margin-top: auto; /* Empuja el botón al fondo del flex container */
+  margin-top: 0; /* Empuja el botón al fondo del flex container */
+  margin-bottom: 0;
   padding: 12px;
   background-color: #f44336; /* Rojo para logout */
   color: white;

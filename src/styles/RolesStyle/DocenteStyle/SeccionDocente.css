@@ -1,0 +1,70 @@
+.semanas-section {
+    margin-bottom: 1.5rem;
+}
+
+.semanas-section h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.semanas-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    background-color: #222;
+    border-radius: 8px;
+}
+
+.semana-item {
+    min-width: 40px;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border: none;
+    background-color: #444;
+    color: #f5f5f5;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.semana-item:hover {
+    transform: translateY(-1px);
+    background-color: #555;
+}
+
+.semana-activa {
+    background-color: #fff;
+    color: #000;
+}
+
+.semana-actual {
+    box-shadow: 0 2px 0 #ffa500;
+    font-weight: 600;
+}
+
+.semana-bloqueada {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.contenido-semana-section h3 {
+    margin-bottom: 0.75rem;
+}
+
+.contenido-semana-card {
+    background-color: #222;
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 120px;
+}
+
+/* botón volver simple */
+.btn-volver {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}

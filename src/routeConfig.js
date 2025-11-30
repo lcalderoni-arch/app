@@ -15,6 +15,8 @@ import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante.jsx";
 
 
 import PantallaDocente from "./pages/PantallaRoles/PantallaDocente.jsx";
+import PantallaSeccionDocente from "./pages/PantallaRoles/PantallaSeccionDocente.jsx";
+
 
 import ProtectedRoute from "./security/ProtectedRoute.jsx";
 import GestionSecciones from './pages/AdminCode/GestionSecciones.jsx';
@@ -81,6 +83,15 @@ const routeConfig = [
     element: (
       <ProtectedRoute allowedRoles={["PROFESOR"]}>
         <PantallaDocente />
+      </ProtectedRoute>
+    )
+  },
+
+  {
+    path: "/docente/seccion/:seccionId",
+    element: (
+      <ProtectedRoute allowedRoles={["PROFESOR"]}>
+        <PantallaSeccionDocente />
       </ProtectedRoute>
     )
   },
