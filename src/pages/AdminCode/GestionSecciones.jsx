@@ -46,7 +46,6 @@ function GestionSecciones() {
     // --- SEMANAS DE CLASES ---
     const [numeroSemanas, setNumeroSemanas] = useState(0);
     const [semanasCalculadas, setSemanasCalculadas] = useState(0);
-    const [showPreview, setShowPreview] = useState(false);
 
     const [cursoId, setCursoId] = useState("");
     const [profesorDni, setProfesorDni] = useState("");
