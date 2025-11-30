@@ -1,4 +1,3 @@
-// src/components/login/LoginForm.jsx
 import React, { useState, useRef, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -40,11 +39,22 @@ export default function LoginForm() {
 
     try {
       const response = await axios.post(url, payload);
-      const { token, nombre, rol } = response.data;
+      
+      // ⭐ CORREGIDO: Renombrar variables para evitar conflicto
+      const { token, nombre, rol, email: userEmail, dni: userDni } = response.data;
 
       localStorage.setItem("authToken", token);
       localStorage.setItem("userName", nombre);
       localStorage.setItem("userRole", rol);
+      localStorage.setItem("userEmail", userEmail || ""); // ⭐ Usar userEmail
+      localStorage.setItem("userDni", userDni || ""); // ⭐ Usar userDni
+
+      console.log("✅ Datos guardados en localStorage:", { 
+        nombre, 
+        rol, 
+        email: userEmail, 
+        dni: userDni 
+      });
 
       console.log("Login exitoso:", response.data);
       setLoading(false);
@@ -167,7 +177,7 @@ export default function LoginForm() {
               <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="icon-see" style={{
                 fontSize: '15px',
                 color: '#3E6FA3'
-              }}/>
+              }} />
             </button>
           </div>
         </div>

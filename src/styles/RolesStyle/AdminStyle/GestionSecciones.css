@@ -269,6 +269,44 @@
 
 /*             FECHA Y DNI              */
 
+.readonly-input {
+    background-color: #f5f5f5 !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
+    border: 1px solid #ddd !important;
+    font-weight: 600;
+}
+
+.readonly-input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.codigo-preview  {
+    font-size: 12px;
+}
+
+/* Resaltar el preview de semanas */
+.codigo-preview strong {
+    font-size: 12px;
+    color: #1a64aa;
+    font-weight: 600;
+}
+
+.codigo-preview .text-warning {
+    margin-top: 5px;
+}
+
+.codigo-preview .text-warning p{
+    font-size: 12px;
+}
+
+.codigo-preview .text-warning p strong {
+    font-size: 12px;
+    color: #1a64aa;
+    font-weight: 600;
+}
+
 /*-------------------------------------*/
 /*        FILTROS Y ESTADÍSTICAS      */
 /*-----------------------------------*/
@@ -480,6 +518,14 @@
 .styled-table-seccion .fecha-info {
     font-size: 0.85em;
     color: #666;
+}
+
+.styled-table-seccion .fecha-info span{
+    color: #666;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
 }
 
 /* BADGES */

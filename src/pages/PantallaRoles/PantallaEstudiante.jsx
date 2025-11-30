@@ -1,7 +1,7 @@
 import React from 'react';
 import LogoutButton from '../../components/login/LogoutButton';
 import icon from "../../assets/logo.png";
-import "../../styles/RolesStyle/EstudianteStyle.css";
+import "./../../styles/RolesStyle/StudentStyle/StudentPageFirst.css"
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook } from '@fortawesome/free-solid-svg-icons';

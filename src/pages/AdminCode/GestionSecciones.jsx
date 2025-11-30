@@ -146,6 +146,8 @@ function GestionSecciones() {
         setCapacidad(30);
         setFechaInicio("");
         setFechaFin("");
+        setNumeroSemanas(0);
+        setSemanasCalculadas(0);
         setCursoId("");
         setProfesorDni("");
         setFormError(null);
@@ -165,6 +167,7 @@ function GestionSecciones() {
             !turno ||
             !fechaInicio ||
             !fechaFin ||
+            !numeroSemanas ||
             !cursoId ||
             !profesorDni.trim()
         ) {
@@ -180,6 +183,13 @@ function GestionSecciones() {
             return;
         }
 
+        // ⭐ VALIDAR SEMANAS
+        if (numeroSemanas < 1 || numeroSemanas > 52) {
+            setFormError("El número de semanas debe estar entre 1 y 52");
+            setCreatingSeccion(false);
+            return;
+        }
+
         const payload = {
             nombre: nombre.trim(),
             nivelSeccion: nivelSeccion,
@@ -189,6 +199,7 @@ function GestionSecciones() {
             capacidad: capacidadNum,
             fechaInicio: fechaInicio,
             fechaFin: fechaFin,
+            numeroSemanas: numeroSemanas,
             cursoId: parseInt(cursoId),
             profesorDni: profesorDni.trim(),
         };
@@ -245,13 +256,19 @@ function GestionSecciones() {
     // FUNCIÓN PARA CALCULAR SEMANAS AUTOMÁTICAMENTE:
     const calcularSemanas = useCallback(() => {
         if (fechaInicio && fechaFin) {
-            const inicio = new Date(fechaInicio);
-            const fin = new Date(fechaFin);
+            const inicio = new Date(fechaInicio + 'T00:00:00');
+            const fin = new Date(fechaFin + 'T00:00:00');
+
             const diffTime = Math.abs(fin - inicio);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const weeks = Math.floor(diffDays / 7);
+
+            const weeks = Math.floor(diffDays / 7) + 1;
+
             setSemanasCalculadas(weeks);
             setNumeroSemanas(weeks); // Auto-rellenar
+        } else {
+            setSemanasCalculadas(0);
+            setNumeroSemanas(0);
         }
     }, [fechaInicio, fechaFin]);
 
@@ -259,6 +276,25 @@ function GestionSecciones() {
     useEffect(() => {
         calcularSemanas();
     }, [calcularSemanas]);
+
+    // --- Función auxiliar para obtener día de la semana ---
+    const obtenerDiaSemana = (fechaString) => {
+        if (!fechaString) return "";
+
+        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+        // Parsear fecha correctamente (evitar problemas de timezone)
+        const [year, month, day] = fechaString.split('-');
+        const fecha = new Date(year, month - 1, day);
+
+        const diaSemana = diasSemana[fecha.getDay()];
+        const diaNumero = fecha.getDate();
+        const mesNombre = meses[fecha.getMonth()];
+        const año = fecha.getFullYear();
+
+        return `${diaSemana} ${diaNumero} de ${mesNombre} ${año}`;
+    };
 
     // --- Filtrar secciones ---
     const seccionesFiltradas = secciones.filter((seccion) => {
@@ -624,6 +660,36 @@ function GestionSecciones() {
                                     />
                                 </label>
 
+                                {/* NUEVO CAMPO: Número de Semanas */}
+                                <label>
+                                    Semanas de Clase *
+                                    <input
+                                        type="number"
+                                        value={numeroSemanas}
+                                        readOnly // ⭐ BLOQUEADO - Solo lectura
+                                        className="readonly-input"
+                                        placeholder="Se calcula automáticamente"
+                                    />
+                                    <small className="codigo-preview">
+                                        {semanasCalculadas > 0 ? (
+                                            <>
+                                                Se calcularon <strong>{semanasCalculadas} semanas</strong> entre las fechas seleccionadas <br></br>
+                                                {fechaInicio && (
+                                                    <>
+                                                        {" "}(Inicio: <strong>{obtenerDiaSemana(fechaInicio)}</strong>)
+                                                    </>
+                                                )}
+                                            </>
+
+                                        ) : (
+                                            "Selecciona las fechas de inicio y fin"
+                                        )}
+                                        <div className="text-warning">
+                                            <p>Las semanas se calculan con la fecha <strong>Inicio</strong> y <strong>Fin</strong></p>
+                                        </div>
+                                    </small>
+                                </label>
+
                                 <label>
                                     DNI del Profesor *
                                     <input
@@ -821,6 +887,10 @@ function GestionSecciones() {
                                             {new Date(seccion.fechaInicio).toLocaleDateString()}
                                             <br />
                                             {new Date(seccion.fechaFin).toLocaleDateString()}
+                                            <br />
+                                            <span className="semanas-badge">
+                                                ({seccion.numeroSemanas} {seccion.numeroSemanas === 1 ? 'semana' : 'semanas'})
+                                            </span>
                                         </td>
                                         <td>
                                             <div className="estado-table">
