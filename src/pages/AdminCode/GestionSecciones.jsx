@@ -98,10 +98,23 @@ function GestionSecciones() {
             };
 
             const response = await axios.get(API_URL, config);
+            console.log("Secciones recibidas:", response.data);
             setSecciones(response.data);
         } catch (err) {
             console.error("Error al cargar secciones:", err);
-            setError("No se pudieron cargar las secciones");
+
+            if (err.response) {
+                // El backend respondió con código de error
+                console.log("Respuesta backend /secciones:", err.response.status, err.response.data);
+                const msgBackend = err.response.data?.message || "Error en el servidor";
+                setError(`Error ${err.response.status}: ${msgBackend}`);
+            } else if (err.request) {
+                // No hubo respuesta del servidor
+                setError("No se pudo conectar al servidor.");
+            } else {
+                // Error de JS
+                setError("Error: " + err.message);
+            }
         } finally {
             setLoading(false);
         }
@@ -823,7 +836,9 @@ function GestionSecciones() {
 
                 {/* TABLA */}
                 <div className="table-secciones-gestionsecciones">
-                    {seccionesFiltradas.length === 0 ? (
+                    {error ? (
+                        <p className="no-results" style={{ color: "red" }}>{error}</p>
+                    ) : seccionesFiltradas.length === 0 ? (
                         <p className="no-results">No se encontraron secciones con los filtros aplicados</p>
                     ) : (
                         <table className="styled-table-seccion">
