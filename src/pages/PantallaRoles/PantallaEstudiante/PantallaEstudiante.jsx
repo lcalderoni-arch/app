@@ -1,23 +1,77 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
+import axios from 'axios';
+
+// Importaciones de tu proyecto (Las mantenemos tal cual)
 import LogoutButton from '../../../components/login/LogoutButton';
 import icon from "../../../assets/logo.png";
-import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css"
+import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
+import { API_BASE_URL } from "../../../config/api"; 
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook } from '@fortawesome/free-solid-svg-icons';
-import { faCalendar } from '@fortawesome/free-solid-svg-icons';
-import { faChartLine } from '@fortawesome/free-solid-svg-icons';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { 
+    faBook, 
+    faCalendar, 
+    faChartLine, 
+    faBell, 
+    faPenToSquare,
+    faSpinner, 
+    faChalkboardTeacher
+} from '@fortawesome/free-solid-svg-icons';
+
+// Función de utilidad para fechas (puedes moverla a utils si prefieres)
+const formatDateLocal = (dateString) => {
+    if (!dateString) return "Sin fecha";
+    // Aseguramos formato correcto añadiendo hora para evitar desfase de zona horaria
+    const date = new Date(dateString + 'T00:00:00'); 
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
 
 export default function PantallaEstudiante() {
     const userName = localStorage.getItem('userName');
-    const userGrado = localStorage.getItem('userGrado');
+    //const userGrado = localStorage.getItem('userGrado');
+    const token = localStorage.getItem('authToken');
+
+    // --- Estados para datos dinámicos ---
+    const [cursos, setCursos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // --- Cargar Cursos Activos ---
+    useEffect(() => {
+        const cargarMisCursos = async () => {
+            if (!token) return;
+
+            setLoading(true);
+            setError(null);
+
+            try {
+                const config = {
+                    headers: { Authorization: `Bearer ${token}` },
+                };
+
+                // Usamos el endpoint de matrículas activas que ya probamos
+                const url = `${API_BASE_URL}/matriculas/mis-matriculas/activas`;
+                const response = await axios.get(url, config);
+                
+                setCursos(response.data || []);
+            } catch (err) {
+                console.error("Error al cargar cursos en dashboard:", err);
+                // Si es un error 404 a veces es que no hay datos, manejamos array vacío
+                if (err.response && err.response.status !== 404) {
+                    setError("No se pudieron cargar tus cursos.");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        cargarMisCursos();
+    }, [token]);
 
     return (
         <div className='student-layout'>
-            {/* ========== SIDEBAR IZQUIERDO (ALTURA COMPLETA) ========== */}
+            {/* ========== SIDEBAR IZQUIERDO ========== */}
             <aside className='student-sidebar'>
                 <div className='sidebar-header'>
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
@@ -28,22 +82,26 @@ export default function PantallaEstudiante() {
                     <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <a href="#cursos" className='active'><FontAwesomeIcon icon={faBook} className='icon-text' />
+                            <a href="#cursos" className='active'>
+                                <FontAwesomeIcon icon={faBook} className='icon-text' />
                                 Mis Cursos
                             </a>
                         </li>
                         <li>
-                            <a href="#horario"><FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                            <a href="#horario">
+                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
                                 Horario
                             </a>
                         </li>
                         <li>
-                            <a href="#progreso"><FontAwesomeIcon icon={faChartLine} className='icon-text' />
+                            <a href="#progreso">
+                                <FontAwesomeIcon icon={faChartLine} className='icon-text' />
                                 Progreso
                             </a>
                         </li>
                         <li>
-                            <a href="#notificaciones"><FontAwesomeIcon icon={faBell} className='icon-text' />
+                            <a href="#notificaciones">
+                                <FontAwesomeIcon icon={faBell} className='icon-text' />
                                 Notificaciones
                             </a>
                         </li>
@@ -57,7 +115,7 @@ export default function PantallaEstudiante() {
                 </nav>
             </aside>
 
-            {/* ========== ÁREA DERECHA (HEADER + MAIN) ========== */}
+            {/* ========== ÁREA DERECHA ========== */}
             <div className='student-right-area'>
                 {/* HEADER */}
                 <header className='student-header'>
@@ -76,47 +134,93 @@ export default function PantallaEstudiante() {
                         <h2>Mis Cursos</h2>
                         <p>Visualiza tus cursos elegidos</p>
 
-                        <div className='courses-grid'>
-                            <div className='course-card'>
-                                <div className='header-card'>
-                                    <h3>Matemáticas</h3>
-                                    <p className='text-grado'>Grado: {userGrado || "No asignado"}</p>
-                                </div>
-                                <div className='line'></div>
-                                <div className='information-card'>
-                                    <p><strong>Profesor:</strong></p>
-                                    <p><strong>Horario:</strong> Lunes 9:00 AM - 10:00AM (SALON: 5TO-B)</p>
-                                </div>
-                                <div className='line'></div>
-                                <div className='footer-card'>
-                                    <div className='fecha-information'>
-                                        <p>Inicio: 10/10/2010</p>
-                                        <p>Fin: 10/12/2010</p>
+                        {/* --- LOADING --- */}
+                        {loading && (
+                            <div style={{ textAlign: "center", padding: "3rem", color: "#666" }}>
+                                <FontAwesomeIcon icon={faSpinner} spin size="2x" />
+                                <p style={{ marginTop: "10px" }}>Cargando tus cursos...</p>
+                            </div>
+                        )}
+
+                        {/* --- ERROR --- */}
+                        {error && (
+                            <div style={{ color: "red", background: "#ffebee", padding: "1rem", borderRadius: "5px", marginBottom: "1rem" }}>
+                                <p>❌ {error}</p>
+                            </div>
+                        )}
+
+                        {/* --- SIN CURSOS --- */}
+                        {!loading && !error && cursos.length === 0 && (
+                            <div style={{ textAlign: "center", padding: "3rem", background: "#f9f9f9", borderRadius: "8px", border: "1px dashed #ccc" }}>
+                                <FontAwesomeIcon icon={faBook} size="3x" style={{ color: "#ccc", marginBottom: "1rem" }} />
+                                <h3>No tienes cursos inscritos actualmente</h3>
+                                <p>Dirígete a la sección de "Matricúlate Aquí" para inscribir tus asignaturas.</p>
+                            </div>
+                        )}
+
+                        {/* --- GRID DE CURSOS DINÁMICO --- */}
+                        {!loading && !error && cursos.length > 0 && (
+                            <div className='courses-grid'>
+                                {cursos.map((matricula) => (
+                                    <div key={matricula.id} className='course-card'>
+                                        
+                                        {/* CABECERA: TÍTULO Y SECCIÓN */}
+                                        <div className='header-card' style={{ alignItems: 'flex-start' }}>
+                                            <div>
+                                                <h3>{matricula.tituloCurso}</h3>
+                                                <p style={{fontSize: '0.8rem', color: '#888', margin: 0}}>
+                                                    Cód: {matricula.codigoCurso}
+                                                </p>
+                                            </div>
+                                            <span style={{
+                                                background: '#e3f2fd',
+                                                color: '#1565c0',
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 'bold',
+                                                whiteSpace: 'nowrap'
+                                            }}>
+                                                {matricula.nombreSeccion}
+                                            </span>
+                                        </div>
+
+                                        <div className='line'></div>
+
+                                        {/* INFO DEL CURSO */}
+                                        <div className='information-card'>
+                                            <p style={{marginBottom: '8px'}}>
+                                                <FontAwesomeIcon icon={faChalkboardTeacher} style={{marginRight: '8px', color: '#555'}}/>
+                                                Prof. <strong>{matricula.nombreProfesor}</strong>
+                                            </p>
+                                            
+                                            <div style={{background: '#f8f9fa', padding: '8px', borderRadius: '4px'}}>
+                                                <p style={{margin: '4px 0'}}>
+                                                    <strong>Turno:</strong> {matricula.turnoSeccion}
+                                                </p>
+                                                <p style={{margin: '4px 0'}}>
+                                                    <strong>Aula:</strong> {matricula.aulaSeccion || 'Virtual'}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className='line'></div>
+
+                                        {/* FOOTER: FECHAS Y BOTÓN */}
+                                        <div className='footer-card' style={{flexDirection: 'column', gap: '10px', alignItems: 'stretch'}}>
+                                            <div className='fecha-information' style={{display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#666'}}>
+                                                <span>Del: {formatDateLocal(matricula.fechaInicioSeccion)}</span>
+                                                <span>Al: {formatDateLocal(matricula.fechaFinSeccion)}</span>
+                                            </div>
+                                            
+                                            <button className='btn-course' style={{justifyContent: 'center', width: '100%'}}>
+                                                Ver contenido
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button className='btn-course'>Ver curso</button>
-                                </div>
+                                ))}
                             </div>
-
-                            <div className='course-card'>
-                                <div className='header-card'>
-                                    <h3>Ciencias</h3>
-                                    <p className='text-grado'>Grado: {userGrado || "No asignado"}</p>
-                                </div>
-                                <p>Tareas pendientes: 1</p>
-                                <p>Próxima clase: Martes 10:00 AM</p>
-                                <button className='btn-course'>Ver curso</button>
-                            </div>
-
-                            <div className='course-card'>
-                                <div className='header-card'>
-                                    <h3>Historia</h3>
-                                    <p className='text-grado'>Grado: {userGrado || "No asignado"}</p>
-                                </div>
-                                <p>Tareas pendientes: 0</p>
-                                <p>Próxima clase: Miércoles 11:00 AM</p>
-                                <button className='btn-course'>Ver curso</button>
-                            </div>
-                        </div>
+                        )}
                     </section>
                 </main>
             </div>
