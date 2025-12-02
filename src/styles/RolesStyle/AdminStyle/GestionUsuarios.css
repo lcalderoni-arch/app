@@ -194,6 +194,12 @@
 /*             BODY:FORM              */
 /*-----------------------------------*/
 
+.auth-form-gestionusuarios p {
+  margin-left: 60px;
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
 .auth-form-area-form {
   padding: 30px 30px;
   border: 1px solid #e2e2e2;

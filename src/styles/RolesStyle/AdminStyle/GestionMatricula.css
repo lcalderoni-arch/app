@@ -96,13 +96,12 @@
 /*-----------------------------------*/
 
 .auth-form-area-form {
-    margin: 15px 50px 25px 50px;
     padding: 30px 30px;
     border: 1px solid #e2e2e2;
     border-radius: 10px;
 }
 
-.form-area-datos-matricula {
+.form-area-datos-description {
     display: flex;
     justify-content: center;
     box-sizing: border-box;
@@ -113,7 +112,7 @@
     gap: 20px;
 }
 
-.form-area-datos-matricula label {
+.form-area-datos-description label {
     font-size: 15px;
     letter-spacing: 0.5px;
 
@@ -123,7 +122,7 @@
     flex: 1;
 }
 
-.form-area-datos-matricula input {
+.form-area-datos-description input {
     font-size: 15px;
     padding: 10px;
     border: 1px solid #d7d7d7;
@@ -131,12 +130,43 @@
     transition: border 0.2s ease;
 }
 
-.form-area-datos-matricula input::placeholder {
+.form-area-datos-description input::placeholder {
     outline: none;
     color: #a9a9a9;
 }
 
-.form-area-datos-matricula input:focus {
+.form-area-datos-description input:focus {
     border: 1px solid #1a64aa;
     outline: none;
+}
+
+.form-area-datos-description .btn-create {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap
+}
+
+.auth-form-gestionmatricula-area-form .btn-create button {
+    width: 100%;
+    max-width: 700px;
+    padding: 15px 0;
+    background: transparent;
+    border: 2px solid #737373;
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    color: #242424;
+    cursor: pointer;
+
+    transition: background-color 0.5s ease;
+}
+
+.auth-form-gestionmatricula-area-form .btn-create button:hover {
+    background-color: #737373;
+    color: #fff;
 }

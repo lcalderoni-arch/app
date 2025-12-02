@@ -684,6 +684,10 @@ function GestionUsuarios() {
               </>
             )}
           </div>
+          <p>Datos Deportivos</p>
+          <div className='auth-form-area-form'>
+            <p>EN CURSO</p>
+          </div>
         </form>
       </div>
 

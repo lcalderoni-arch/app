@@ -321,54 +321,47 @@ function GestionMatricula() {
                 <div className="centrar-tercer-titulo">
                     <h3>
                         <FontAwesomeIcon className="icon" icon={faCalendarDays} /> Periodo
-                        de Inscripción
+                        de Matricula
                     </h3>
+                    <p>Administra la fecha de la matricula y a los estudiantes de la plataforma.</p>
                 </div>
 
                 <form className="auth-form-gestionmatricula" onSubmit={handleGuardarFechas}>
-                    <div
-                        className="auth-form-gestionmatricula-area-form"
-                        style={{
-                            display: "flex",
-                            gap: "20px",
-                            alignItems: "flex-end",
-                            justifyContent: "center",
-                            flexWrap: "wrap",
-                        }}
-                    >
-                        <div>
-                            <label style={{ display: "block", marginBottom: "5px" }}>
-                                Fecha Inicio:
-                            </label>
-                            <input
-                                className="form-control"
-                                type="date"
-                                value={fechaInicio}
-                                onChange={(e) => setFechaInicio(e.target.value)}
-                                required
-                            />
+                    <div className="auth-form-gestionmatricula-area-form">
+                        <div className="auth-form-area-form">
+                            <div className="form-area-datos-description">
+                                <label>
+                                    Fecha Inicio:
+                                    <input
+                                        type="date"
+                                        value={fechaInicio}
+                                        onChange={(e) => setFechaInicio(e.target.value)}
+                                        required
+                                    />
+                                </label>
+
+                                <label>
+                                    Fecha Cierre:
+                                    <input
+                                        type="date"
+                                        value={fechaFin}
+                                        onChange={(e) => setFechaFin(e.target.value)}
+                                        required
+                                    />
+                                </label>
+                            </div>
+                            <div className="form-buttons">
+                                <button
+                                    type="submit"
+                                    className="btn-create"
+                                    disabled={loadingConfig}
+                                    style={{ marginBottom: "2px" }}
+                                >
+                                    <FontAwesomeIcon icon={faSave} />{" "}
+                                    {loadingConfig ? "Guardando..." : "Guardar"}
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <label style={{ display: "block", marginBottom: "5px" }}>
-                                Fecha Cierre:
-                            </label>
-                            <input
-                                className="form-control"
-                                type="date"
-                                value={fechaFin}
-                                onChange={(e) => setFechaFin(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="btn-create"
-                            disabled={loadingConfig}
-                            style={{ marginBottom: "2px" }}
-                        >
-                            <FontAwesomeIcon icon={faSave} />{" "}
-                            {loadingConfig ? "Guardando..." : "Guardar"}
-                        </button>
                     </div>
                 </form>
 
