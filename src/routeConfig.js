@@ -2,35 +2,34 @@
 import React from 'react';
 
 import HomePage from "./pages/HomePage.jsx";
-import NosotrosPage from "./pages/NosotrosPage.jsx"; // ✅ Mejor nombre de importación
+import NosotrosPage from "./pages/NosotrosPage.jsx";
 
 import Dashboard from "./pages/AdminCode/Dashboard.jsx";
 import DashboardHome from "./pages/AdminCode/DashboardHome.jsx";
 import GestionUsuarios from "./pages/AdminCode/GestionUsuarios.jsx";
 import GestionCursos from "./pages/AdminCode/GestionCursos.jsx";
-
+import GestionSecciones from './pages/AdminCode/GestionSecciones.jsx';
+import GestionMatricula from './pages/AdminCode/GestionMatricula.jsx';
 
 import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante/PantallaEstudiante.jsx";
 import PantallaMatriculaAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaMatriculaAlumno.jsx";
 
-
+// IMPORTAMOS LA NUEVA VISTA
+import PantallaSeccionEstudiante from "./pages/PantallaRoles/PantallaEstudiante/PantallaSeccionEstudiante.jsx"; 
 
 import PantallaDocente from "./pages/PantallaRoles/PantallaDocente/PantallaDocente.jsx";
 import PantallaSeccionDocente from "./pages/PantallaRoles/PantallaDocente/PantallaSeccionDocente.jsx";
 
-
 import ProtectedRoute from "./security/ProtectedRoute.jsx";
-import GestionSecciones from './pages/AdminCode/GestionSecciones.jsx';
 
-// Define la estructura de rutas como un ARRAY
 const routeConfig = [
   {
     path: "/",
     element: <HomePage />
   },
   {
-    path: "/nosotros", // ✅ URL más limpia (sin "Page")
-    element: <NosotrosPage /> // ✅ Nombre claro
+    path: "/nosotros", 
+    element: <NosotrosPage /> 
   },
 
   {
@@ -65,10 +64,18 @@ const routeConfig = [
           </ProtectedRoute>
         )
       },
+      {
+        path: "matriculas",
+        element: (
+          <ProtectedRoute roles={["ADMINISTRADOR"]}>
+            <GestionMatricula />
+          </ProtectedRoute>
+        )
+      },
     ]
   },
 
-  // ✅ NUEVA RUTA PARA ESTUDIANTE
+  // --- RUTAS ESTUDIANTE ---
   {
     path: "/pantalla-estudiante",
     element: (
@@ -77,7 +84,6 @@ const routeConfig = [
       </ProtectedRoute>
     )
   },
-
   {
     path: "/pantalla-alumno/matricula",
     element: (
@@ -86,8 +92,17 @@ const routeConfig = [
       </ProtectedRoute>
     )
   },
+  // ⭐ NUEVA RUTA PARA VER EL CONTENIDO DE LA SECCIÓN
+  {
+    path: "/pantalla-estudiante/seccion/:seccionId",
+    element: (
+      <ProtectedRoute allowedRoles={["ALUMNO"]}>
+        <PantallaSeccionEstudiante />
+      </ProtectedRoute>
+    )
+  },
 
-  // ✅ NUEVA RUTA PARA DOCENTE
+  // --- RUTAS DOCENTE ---
   {
     path: "/pantalla-docente",
     element: (
@@ -96,7 +111,6 @@ const routeConfig = [
       </ProtectedRoute>
     )
   },
-
   {
     path: "/docente/seccion/:seccionId",
     element: (
@@ -108,6 +122,4 @@ const routeConfig = [
 
 ];
 
-// Exporta el ARRAY como default
 export default routeConfig;
-

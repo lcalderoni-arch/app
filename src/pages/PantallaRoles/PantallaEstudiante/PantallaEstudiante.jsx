@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 // Importaciones de tu proyecto (Las mantenemos tal cual)
@@ -19,25 +19,22 @@ import {
     faChalkboardTeacher
 } from '@fortawesome/free-solid-svg-icons';
 
-// Función de utilidad para fechas (puedes moverla a utils si prefieres)
 const formatDateLocal = (dateString) => {
     if (!dateString) return "Sin fecha";
-    // Aseguramos formato correcto añadiendo hora para evitar desfase de zona horaria
     const date = new Date(dateString + 'T00:00:00'); 
     return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
 export default function PantallaEstudiante() {
     const userName = localStorage.getItem('userName');
-    //const userGrado = localStorage.getItem('userGrado');
+    const userGrado = localStorage.getItem('userGrado');
     const token = localStorage.getItem('authToken');
+    const navigate = useNavigate(); // Hook para navegación
 
-    // --- Estados para datos dinámicos ---
     const [cursos, setCursos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- Cargar Cursos Activos ---
     useEffect(() => {
         const cargarMisCursos = async () => {
             if (!token) return;
@@ -50,14 +47,13 @@ export default function PantallaEstudiante() {
                     headers: { Authorization: `Bearer ${token}` },
                 };
 
-                // Usamos el endpoint de matrículas activas que ya probamos
+                // Endpoint de matrículas activas
                 const url = `${API_BASE_URL}/matriculas/mis-matriculas/activas`;
                 const response = await axios.get(url, config);
                 
                 setCursos(response.data || []);
             } catch (err) {
                 console.error("Error al cargar cursos en dashboard:", err);
-                // Si es un error 404 a veces es que no hay datos, manejamos array vacío
                 if (err.response && err.response.status !== 404) {
                     setError("No se pudieron cargar tus cursos.");
                 }
@@ -117,7 +113,6 @@ export default function PantallaEstudiante() {
 
             {/* ========== ÁREA DERECHA ========== */}
             <div className='student-right-area'>
-                {/* HEADER */}
                 <header className='student-header'>
                     <div className='header-content'>
                         <h1>Campus Virtual</h1>
@@ -128,11 +123,18 @@ export default function PantallaEstudiante() {
                     </div>
                 </header>
 
-                {/* CONTENIDO PRINCIPAL */}
                 <main className='student-main'>
                     <section className='content-section'>
-                        <h2>Mis Cursos</h2>
-                        <p>Visualiza tus cursos elegidos</p>
+                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
+                            <div>
+                                <h2>Mis Cursos Activos</h2>
+                                <p style={{color: '#666', marginTop: '5px'}}>Visualiza tus asignaturas del grado: <strong>{userGrado}</strong></p>
+                            </div>
+                            {/* Botón rápido para ir a matrícula */}
+                            <Link to="/pantalla-alumno/matricula" className="btn-course" style={{textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px'}}>
+                                <FontAwesomeIcon icon={faPenToSquare} /> Inscribir materias
+                            </Link>
+                        </div>
 
                         {/* --- LOADING --- */}
                         {loading && (
@@ -164,7 +166,6 @@ export default function PantallaEstudiante() {
                                 {cursos.map((matricula) => (
                                     <div key={matricula.id} className='course-card'>
                                         
-                                        {/* CABECERA: TÍTULO Y SECCIÓN */}
                                         <div className='header-card' style={{ alignItems: 'flex-start' }}>
                                             <div>
                                                 <h3>{matricula.tituloCurso}</h3>
@@ -187,7 +188,6 @@ export default function PantallaEstudiante() {
 
                                         <div className='line'></div>
 
-                                        {/* INFO DEL CURSO */}
                                         <div className='information-card'>
                                             <p style={{marginBottom: '8px'}}>
                                                 <FontAwesomeIcon icon={faChalkboardTeacher} style={{marginRight: '8px', color: '#555'}}/>
@@ -206,14 +206,19 @@ export default function PantallaEstudiante() {
 
                                         <div className='line'></div>
 
-                                        {/* FOOTER: FECHAS Y BOTÓN */}
                                         <div className='footer-card' style={{flexDirection: 'column', gap: '10px', alignItems: 'stretch'}}>
                                             <div className='fecha-information' style={{display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#666'}}>
                                                 <span>Del: {formatDateLocal(matricula.fechaInicioSeccion)}</span>
                                                 <span>Al: {formatDateLocal(matricula.fechaFinSeccion)}</span>
                                             </div>
                                             
-                                            <button className='btn-course' style={{justifyContent: 'center', width: '100%'}}>
+                                            {/* ⭐ BOTÓN ACTIVO PARA IR A LA SECCIÓN */}
+                                            <button 
+                                                className='btn-course' 
+                                                style={{justifyContent: 'center', width: '100%', cursor: 'pointer'}}
+                                                // Usamos el ID de la SECCIÓN para navegar
+                                                onClick={() => navigate(`/pantalla-estudiante/seccion/${matricula.seccionId}`)}
+                                            >
                                                 Ver contenido
                                             </button>
                                         </div>

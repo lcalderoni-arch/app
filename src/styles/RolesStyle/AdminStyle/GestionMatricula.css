@@ -1,0 +1,142 @@
+/*-------------------------------------*/
+/*                HEADER              */
+/*-----------------------------------*/
+
+.general-box-gestionmatricula .header-firstpage-admin {
+    display: flex;
+
+    align-items: center;
+
+    background: white;
+    padding: 8px 50px;
+    color: #3e3e3e;
+    font-size: 10px;
+
+    border-bottom: 1px solid #5296d6;
+    gap: 30px;
+}
+
+.general-box-gestionmatricula .header-firstpage-admin .icon {
+    width: 180px;
+}
+
+/*-------------------------------------*/
+/*            BODY:TITULO             */
+/*-----------------------------------*/
+
+.div-box-header-text-gestionmatricula {
+    padding: 25px 6%;
+    background: #1a64aa;
+    border-bottom: 1px solid #1a64aa;
+}
+
+.div-box-header-text-gestionmatricula .alinear-al-centro {
+    display: flex;
+    align-items: center;
+}
+
+.div-box-header-text-gestionmatricula .alinear-al-centro h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.div-box-header-text-gestionmatricula p {
+    color: #e4e4e4;
+    line-height: 22px;
+    letter-spacing: 1px;
+}
+
+.alinear-al-centro .icon {
+    font-size: 18px;
+    margin-right: 6px;
+    padding-bottom: 1px;
+}
+
+.icon {
+    font-size: 18px;
+    margin-right: 6px;
+}
+
+/*-------------------------------------*/
+/*             BODY:FORM              */
+/*-----------------------------------*/
+
+.box-formulario-gestionmatricula {
+    margin: 25px 4%;
+    margin-bottom: 50px;
+    border: 2px solid #d2d2d2;
+    border-radius: 10px;
+}
+
+.box-formulario-gestionmatricula .centrar-tercer-titulo {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    margin: 25px 0 0 0;
+    gap: 5px;
+}
+
+.centrar-tercer-titulo h3 {
+    font-size: 18px;
+    color: #353535;
+    letter-spacing: 1px;
+}
+
+.centrar-tercer-titulo p {
+    font-size: 14px;
+    color: #636363;
+    letter-spacing: 1px;
+}
+
+/*-------------------------------------*/
+/*             BODY:FORM              */
+/*-----------------------------------*/
+
+.auth-form-area-form {
+    margin: 15px 50px 25px 50px;
+    padding: 30px 30px;
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+}
+
+.form-area-datos-matricula {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: visible;
+
+    margin: 0 10px;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.form-area-datos-matricula label {
+    font-size: 15px;
+    letter-spacing: 0.5px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.form-area-datos-matricula input {
+    font-size: 15px;
+    padding: 10px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    transition: border 0.2s ease;
+}
+
+.form-area-datos-matricula input::placeholder {
+    outline: none;
+    color: #a9a9a9;
+}
+
+.form-area-datos-matricula input:focus {
+    border: 1px solid #1a64aa;
+    outline: none;
+}
