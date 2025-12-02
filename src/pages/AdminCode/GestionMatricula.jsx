@@ -29,7 +29,7 @@ function GestionMatricula() {
     const [loadingConfig, setLoadingConfig] = useState(false);
     const [errorConfig, setErrorConfig] = useState(null);
 
-    // 👉 NUEVO: estado global de "matrícula habilitada / bloqueada"
+    // 👉 Estado global de "matrícula habilitada / bloqueada"
     const [matriculaHabilitada, setMatriculaHabilitada] = useState(null);
     const [cambiandoPermisoGlobal, setCambiandoPermisoGlobal] = useState(false);
 
@@ -58,10 +58,11 @@ function GestionMatricula() {
             );
 
             if (response && response.data) {
+                // Si el backend devuelve "2025-10-23" (LocalDate), esto ya funciona bien
                 setFechaInicio(response.data.fechaInicio || "");
                 setFechaFin(response.data.fechaFin || "");
 
-                // 👇 NUEVO: leemos el flag global si viene del backend
+                // Leemos el flag global si viene del backend
                 if (typeof response.data.matriculaHabilitada === "boolean") {
                     setMatriculaHabilitada(response.data.matriculaHabilitada);
                 } else {
@@ -179,7 +180,6 @@ function GestionMatricula() {
             setCambiandoPermisoGlobal(true);
             const config = { headers: { Authorization: `Bearer ${token}` } };
 
-            // 👉 Aquí usamos el endpoint nuevo que creaste:
             await axios.put(
                 `${API_BASE_URL}/configuracion/matricula/permiso-matricula`,
                 { habilitada: nuevoEstado },
@@ -267,7 +267,7 @@ function GestionMatricula() {
 
             const nombre = (e.nombre || "").toLowerCase();
             const email = (e.email || "").toLowerCase();
-            const dni = e.dni || e.dniAlumno || "";
+            const dni = (e.dni || e.dniAlumno || "").toString();
 
             return (
                 nombre.includes(texto) ||
@@ -372,7 +372,7 @@ function GestionMatricula() {
                     </div>
                 </form>
 
-                {/* 👉 NUEVO BLOQUE: ESTADO GLOBAL DE MATRÍCULA */}
+                {/* ESTADO GLOBAL DE MATRÍCULA */}
                 <div
                     style={{
                         marginTop: "15px",
@@ -397,7 +397,9 @@ function GestionMatricula() {
                                 onClick={handleTogglePermisoGlobal}
                                 className="btn-create"
                                 style={{
-                                    backgroundColor: matriculaHabilitada ? "#dc3545" : "#28a745",
+                                    backgroundColor: matriculaHabilitada
+                                        ? "#dc3545"
+                                        : "#28a745",
                                     border: "none",
                                     color: "white",
                                     padding: "8px 16px",
@@ -534,7 +536,9 @@ function GestionMatricula() {
                                             <button
                                                 onClick={() => handleTogglePermiso(est)}
                                                 className={
-                                                    est.habilitadoMatricula ? "btn-delete" : "btn-create"
+                                                    est.habilitadoMatricula
+                                                        ? "btn-delete"
+                                                        : "btn-create"
                                                 }
                                                 style={{
                                                     padding: "5px 10px",
@@ -547,7 +551,9 @@ function GestionMatricula() {
                                                         : "#28a745",
                                                 }}
                                             >
-                                                {est.habilitadoMatricula ? "Bloquear" : "Habilitar"}
+                                                {est.habilitadoMatricula
+                                                    ? "Bloquear"
+                                                    : "Habilitar"}
                                             </button>
                                         </td>
                                     </tr>

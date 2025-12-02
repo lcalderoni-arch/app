@@ -189,6 +189,12 @@
     margin-top: 20px;
 }
 
+@media (min-width: 1400px) {
+    .courses-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 .course-card {
     background: white;
     padding: 25px;

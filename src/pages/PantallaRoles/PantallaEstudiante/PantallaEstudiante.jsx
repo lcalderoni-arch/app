@@ -131,9 +131,6 @@ export default function PantallaEstudiante() {
                                 <p style={{color: '#666', marginTop: '5px'}}>Visualiza tus asignaturas del grado: <strong>{userGrado}</strong></p>
                             </div>
                             {/* Botón rápido para ir a matrícula */}
-                            <Link to="/pantalla-alumno/matricula" className="btn-course" style={{textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px'}}>
-                                <FontAwesomeIcon icon={faPenToSquare} /> Inscribir materias
-                            </Link>
                         </div>
 
                         {/* --- LOADING --- */}
