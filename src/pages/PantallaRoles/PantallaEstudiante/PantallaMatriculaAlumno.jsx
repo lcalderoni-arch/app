@@ -57,6 +57,8 @@ export default function PantallaMatriculaAlumno() {
                 config
             );
 
+            console.log("🟡 Configuración de matrícula (alumno):", response.data);
+
             if (response && response.data) {
                 setConfigMatricula(response.data);
             } else {
@@ -608,13 +610,11 @@ export default function PantallaMatriculaAlumno() {
                                             <tbody>
                                                 {cursosAgrupados.map(
                                                     (curso) => {
-                                                        const key = `${
-                                                            curso.codigoCurso ||
+                                                        const key = `${curso.codigoCurso ||
                                                             ""
-                                                        }__${
-                                                            curso.tituloCurso ||
+                                                            }__${curso.tituloCurso ||
                                                             ""
-                                                        }`;
+                                                            }`;
                                                         const turnosUnicos = [
                                                             ...new Set(
                                                                 curso.secciones.map(
@@ -668,7 +668,7 @@ export default function PantallaMatriculaAlumno() {
                                                                             }
                                                                         >
                                                                             {cursoExpandido ===
-                                                                            key
+                                                                                key
                                                                                 ? "Ocultar horarios"
                                                                                 : "Ver horarios"}
                                                                         </button>
@@ -677,135 +677,135 @@ export default function PantallaMatriculaAlumno() {
 
                                                                 {cursoExpandido ===
                                                                     key && (
-                                                                    <tr>
-                                                                        <td
-                                                                            colSpan={
-                                                                                3
-                                                                            }
-                                                                        >
-                                                                            <table className="styled-table-seccion inner-table">
-                                                                                <thead>
-                                                                                    <tr>
-                                                                                        <th>
-                                                                                            Sección
-                                                                                        </th>
-                                                                                        <th>
-                                                                                            Docente
-                                                                                        </th>
-                                                                                        <th>
-                                                                                            Turno
-                                                                                        </th>
-                                                                                        <th>
-                                                                                            Aula
-                                                                                        </th>
-                                                                                        <th>
-                                                                                            Periodo
-                                                                                        </th>
-                                                                                        <th>
-                                                                                            Cupo
-                                                                                        </th>
-                                                                                        <th>
-                                                                                            Acción
-                                                                                        </th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                    {curso.secciones.map(
-                                                                                        (
-                                                                                            seccion
-                                                                                        ) => {
-                                                                                            const yaEnCarrito =
-                                                                                                seccionesSeleccionadas.some(
-                                                                                                    (
-                                                                                                        s
-                                                                                                    ) =>
-                                                                                                        s.id ===
-                                                                                                        seccion.id
-                                                                                                );
-                                                                                            const yaMatriculado =
-                                                                                                misMatriculas.some(
-                                                                                                    (
-                                                                                                        m
-                                                                                                    ) =>
-                                                                                                        m.codigoCurso ===
-                                                                                                        seccion.codigoCurso
-                                                                                                );
-                                                                                            const mismoCursoEnCarrito =
-                                                                                                seccionesSeleccionadas.some(
-                                                                                                    (
-                                                                                                        s
-                                                                                                    ) =>
-                                                                                                        s.codigoCurso ===
-                                                                                                        seccion.codigoCurso
-                                                                                                );
+                                                                        <tr>
+                                                                            <td
+                                                                                colSpan={
+                                                                                    3
+                                                                                }
+                                                                            >
+                                                                                <table className="styled-table-seccion inner-table">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>
+                                                                                                Sección
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                Docente
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                Turno
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                Aula
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                Periodo
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                Cupo
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                Acción
+                                                                                            </th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        {curso.secciones.map(
+                                                                                            (
+                                                                                                seccion
+                                                                                            ) => {
+                                                                                                const yaEnCarrito =
+                                                                                                    seccionesSeleccionadas.some(
+                                                                                                        (
+                                                                                                            s
+                                                                                                        ) =>
+                                                                                                            s.id ===
+                                                                                                            seccion.id
+                                                                                                    );
+                                                                                                const yaMatriculado =
+                                                                                                    misMatriculas.some(
+                                                                                                        (
+                                                                                                            m
+                                                                                                        ) =>
+                                                                                                            m.codigoCurso ===
+                                                                                                            seccion.codigoCurso
+                                                                                                    );
+                                                                                                const mismoCursoEnCarrito =
+                                                                                                    seccionesSeleccionadas.some(
+                                                                                                        (
+                                                                                                            s
+                                                                                                        ) =>
+                                                                                                            s.codigoCurso ===
+                                                                                                            seccion.codigoCurso
+                                                                                                    );
 
-                                                                                            return (
-                                                                                                <tr
-                                                                                                    key={
-                                                                                                        seccion.id
-                                                                                                    }
-                                                                                                >
-                                                                                                    <td>
-                                                                                                        {
-                                                                                                            seccion.nombre
+                                                                                                return (
+                                                                                                    <tr
+                                                                                                        key={
+                                                                                                            seccion.id
                                                                                                         }
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        {
-                                                                                                            seccion.nombreProfesor
-                                                                                                        }
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        {
-                                                                                                            seccion.turno
-                                                                                                        }
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        {seccion.aula ||
-                                                                                                            "-"}
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        {formatoPeriodo(
-                                                                                                            seccion.fechaInicio,
-                                                                                                            seccion.fechaFin
-                                                                                                        )}
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        {capacidadRestante(
-                                                                                                            seccion
-                                                                                                        )}
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <button
-                                                                                                            className="btn-course"
-                                                                                                            onClick={() =>
-                                                                                                                agregarSeccionSeleccionada(
-                                                                                                                    seccion
-                                                                                                                )
+                                                                                                    >
+                                                                                                        <td>
+                                                                                                            {
+                                                                                                                seccion.nombre
                                                                                                             }
-                                                                                                            disabled={
-                                                                                                                !seccion.tieneCupo ||
-                                                                                                                yaEnCarrito ||
-                                                                                                                yaMatriculado ||
-                                                                                                                mismoCursoEnCarrito
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            {
+                                                                                                                seccion.nombreProfesor
                                                                                                             }
-                                                                                                        >
-                                                                                                            {yaMatriculado
-                                                                                                                ? "Ya matriculado"
-                                                                                                                : yaEnCarrito
-                                                                                                                ? "En carrito"
-                                                                                                                : "Agregar"}
-                                                                                                        </button>
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            );
-                                                                                        }
-                                                                                    )}
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-                                                                )}
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            {
+                                                                                                                seccion.turno
+                                                                                                            }
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            {seccion.aula ||
+                                                                                                                "-"}
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            {formatoPeriodo(
+                                                                                                                seccion.fechaInicio,
+                                                                                                                seccion.fechaFin
+                                                                                                            )}
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            {capacidadRestante(
+                                                                                                                seccion
+                                                                                                            )}
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            <button
+                                                                                                                className="btn-course"
+                                                                                                                onClick={() =>
+                                                                                                                    agregarSeccionSeleccionada(
+                                                                                                                        seccion
+                                                                                                                    )
+                                                                                                                }
+                                                                                                                disabled={
+                                                                                                                    !seccion.tieneCupo ||
+                                                                                                                    yaEnCarrito ||
+                                                                                                                    yaMatriculado ||
+                                                                                                                    mismoCursoEnCarrito
+                                                                                                                }
+                                                                                                            >
+                                                                                                                {yaMatriculado
+                                                                                                                    ? "Ya matriculado"
+                                                                                                                    : yaEnCarrito
+                                                                                                                        ? "En carrito"
+                                                                                                                        : "Agregar"}
+                                                                                                            </button>
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                );
+                                                                                            }
+                                                                                        )}
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    )}
                                                             </React.Fragment>
                                                         );
                                                     }
@@ -843,9 +843,9 @@ export default function PantallaMatriculaAlumno() {
                                                         (s) => (
                                                             <tr key={s.id}>
                                                                 <td>
-           
 
-                                                                <div className="curso-info">
+
+                                                                    <div className="curso-info">
                                                                         <strong>
                                                                             {
                                                                                 s.codigoCurso

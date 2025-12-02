@@ -8,7 +8,7 @@ import { formatDateLocal } from '../../../utils/dateUtils';
 import icon from "../../../assets/logo.png";
 
 // Reutilizamos estilos. Puedes usar el de docente si quieres que se vea igual la estructura interna
-import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css"; 
+import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 // Importamos los estilos de sección para la barra de semanas y estructura (asegúrate de que este archivo exista)
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
@@ -43,7 +43,7 @@ export default function PantallaSeccionAlumno() {
                 );
 
                 setSeccion(response.data);
-                
+
                 // Si la sección tiene una semana actual, la seleccionamos por defecto
                 if (response.data.semanaActual > 0) {
                     setSemanaSeleccionada(response.data.semanaActual);
@@ -104,12 +104,12 @@ export default function PantallaSeccionAlumno() {
                 <nav className="sidebar-menu">
                     <ul>
                         <li>
-                            <button 
-                                className="link-sidebar" 
+                            <button
+                                className="link-sidebar"
                                 onClick={() => navigate('/pantalla-estudiante')}
                                 style={{
-                                    background: 'none', border: 'none', cursor: 'pointer', width: '100%', 
-                                    textAlign: 'left', padding: '15px 20px', fontSize: '1rem', 
+                                    background: 'none', border: 'none', cursor: 'pointer', width: '100%',
+                                    textAlign: 'left', padding: '15px 20px', fontSize: '1rem',
                                     color: '#333', display: 'flex', alignItems: 'center', gap: '10px'
                                 }}
                             >
@@ -137,13 +137,13 @@ export default function PantallaSeccionAlumno() {
                     </div>
                     {/* Subtítulo estilo docente */}
                     <div style={{ marginTop: '10px', fontSize: '0.85rem', color: '#555' }}>
-                        Sección {seccion.gradoSeccion} - Nivel {seccion.nivelSeccion} | 
+                        Sección {seccion.gradoSeccion} - Nivel {seccion.nivelSeccion} |
                         Inicio: {formatDateLocal(seccion.fechaInicio)} | Fin: {formatDateLocal(seccion.fechaFin)}
                     </div>
                 </header>
 
                 <main className="student-main">
-                    
+
                     {/* BARRA DE SEMANAS */}
                     <section className="semanas-section">
                         <h2>Semana de aprendizaje:</h2>
@@ -178,6 +178,14 @@ export default function PantallaSeccionAlumno() {
                                 Contenido de la Semana {semanaSeleccionada}
                                 {semanaSeleccionada === semanaActual && <span style={{ fontSize: '0.8rem', color: '#4caf50', marginLeft: '10px' }}>(Semana Actual)</span>}
                             </h2>
+
+                            <button
+                                className="btn-course"
+                                onClick={() => navigate(`/alumno/seccion/${seccionId}/asistencias`)}
+                            >
+                                Ver mis asistencias
+                            </button>
+
                         </div>
 
                         {/* Placeholder del contenido */}

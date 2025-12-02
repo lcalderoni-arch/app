@@ -182,7 +182,7 @@ function GestionMatricula() {
 
             await axios.put(
                 `${API_BASE_URL}/configuracion/matricula/permiso-matricula`,
-                { habilitada: nuevoEstado },
+                { habilitado: nuevoEstado },   // 👈 CAMBIAR A "habilitado"
                 config
             );
 

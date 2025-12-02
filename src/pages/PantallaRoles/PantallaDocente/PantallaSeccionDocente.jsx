@@ -135,7 +135,7 @@ export default function PantallaSeccionDocente() {
                         </div>
                     </div>
                     <p className="subtitulo-seccion">
-                        Sección {seccion.gradoSeccion} - Nivel {seccion.nivelSeccion} | 
+                        Sección {seccion.gradoSeccion} - Nivel {seccion.nivelSeccion} |
                         Inicio: {formatDateLocal(seccion.fechaInicio)} | Fin: {formatDateLocal(seccion.fechaFin)}
                     </p>
                 </header>
@@ -175,6 +175,15 @@ export default function PantallaSeccionDocente() {
                             Contenido de la semana {semanaSeleccionada.toString().padStart(2, "0")}
                             {semanaSeleccionada === semanaActual && " (Semana actual)"}
                         </h3>
+
+                        <button
+                            className="btn-primary"
+                            onClick={() =>
+                                navigate(`/docente/seccion/${seccion.id}/asistencias/${semanaSeleccionada}`)
+                            }
+                        >
+                            Tomar asistencia de Semana {semanaSeleccionada}
+                        </button>
 
                         {/* Aquí luego puedes renderizar formularios, tareas, materiales, etc. */}
                         <div className="contenido-semana-card">
