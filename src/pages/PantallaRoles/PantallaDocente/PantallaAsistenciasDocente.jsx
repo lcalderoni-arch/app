@@ -69,6 +69,14 @@ export default function PantallaAsistenciasDocente() {
 
     const handleGuardar = async () => {
         try {
+            // 1) Validar antes de enviar
+            const sinEstado = asistencias.filter((a) => !a.estado);
+
+            if (sinEstado.length > 0) {
+                alert("Debes seleccionar un estado de asistencia para TODOS los alumnos antes de guardar.");
+                return;
+            }
+
             setGuardando(true);
             setError(null);
 
@@ -86,7 +94,7 @@ export default function PantallaAsistenciasDocente() {
                 sesionId: Number(sesionId),
                 registros: asistencias.map((a) => ({
                     alumnoId: a.alumnoId,
-                    estado: a.estado || null,
+                    estado: a.estado,           // aquí ya sabemos que NO es null
                     observaciones: a.observaciones || null,
                 })),
             };
