@@ -147,7 +147,7 @@
     flex-wrap: wrap
 }
 
-.auth-form-gestionmatricula-area-form .btn-create button {
+.auth-form-gestionmatricula-area-form .btn-create {
     width: 100%;
     max-width: 700px;
     padding: 15px 0;
@@ -164,9 +164,19 @@
     cursor: pointer;
 
     transition: background-color 0.5s ease;
+    display: block;      /* para que respete bien el width: 100% */
 }
-
-.auth-form-gestionmatricula-area-form .btn-create button:hover {
+.auth-form-gestionmatricula-area-form .btn-create:hover {
     background-color: #737373;
     color: #fff;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.form-buttons .btn-create {
+    width: 100%;
+    max-width: 700px;
 }

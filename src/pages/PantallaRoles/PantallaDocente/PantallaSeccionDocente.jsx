@@ -23,9 +23,48 @@ export default function PantallaSeccionDocente() {
     const [loading, setLoading] = useState(!seccionDesdeState);
     const [error, setError] = useState(null);
 
+    const [sesiones, setSesiones] = useState([]);
+    const [loadingSesiones, setLoadingSesiones] = useState(false);
+    const [errorSesiones, setErrorSesiones] = useState(null);
+
     const [semanaSeleccionada, setSemanaSeleccionada] = useState(
         seccionDesdeState?.semanaActual || 1
     );
+
+    useEffect(() => {
+        const cargarSesiones = async () => {
+            try {
+                setLoadingSesiones(true);
+                setErrorSesiones(null);
+
+                const token = localStorage.getItem('authToken');
+                if (!token) throw new Error("No estás autenticado.");
+
+                const config = {
+                    headers: { Authorization: `Bearer ${token}` },
+                };
+
+                const response = await axios.get(
+                    `${API_BASE_URL}/sesiones/seccion/${seccionId}`,
+                    config
+                );
+
+                setSesiones(response.data || []);
+            } catch (err) {
+                console.error("Error al cargar sesiones:", err);
+                setErrorSesiones(
+                    err.response?.data?.message || "No se pudieron cargar las sesiones de la sección."
+                );
+            } finally {
+                setLoadingSesiones(false);
+            }
+        };
+
+        if (seccionId) {
+            cargarSesiones();
+        }
+    }, [seccionId]);
+
 
     // 🔁 Si no llegó por state, la pedimos al backend
     useEffect(() => {
@@ -97,13 +136,31 @@ export default function PantallaSeccionDocente() {
         );
     }
 
-    const numeroSemanas = seccion.numeroSemanas || 0;
+    const numeroSemanas = seccion.numeroSemanas || sesiones.length || 0;
     const semanas = Array.from({ length: numeroSemanas }, (_, i) => i + 1);
     const semanaActual = seccion.semanaActual || 1;
 
     const handleClickSemana = (numSemana) => {
         setSemanaSeleccionada(numSemana);
         // aquí luego llamas a tu API para traer contenido de esa semana
+    };
+
+    const handleTomarAsistencia = () => {
+        if (!sesiones || sesiones.length === 0) {
+            alert("No hay sesiones creadas para esta sección.");
+            return;
+        }
+
+        // semanaSeleccionada empieza en 1, el array en 0
+        const index = semanaSeleccionada - 1;
+        const sesionSeleccionada = sesiones[index];
+
+        if (!sesionSeleccionada) {
+            alert("No se encontró la sesión correspondiente a esta semana.");
+            return;
+        }
+
+        navigate(`/docente/seccion/${seccion.id}/asistencias/${sesionSeleccionada.id}`);
     };
 
     return (
@@ -178,11 +235,12 @@ export default function PantallaSeccionDocente() {
 
                         <button
                             className="btn-primary"
-                            onClick={() =>
-                                navigate(`/docente/seccion/${seccion.id}/asistencias/${semanaSeleccionada}`)
-                            }
+                            onClick={handleTomarAsistencia}
+                            disabled={loadingSesiones || sesiones.length === 0}
                         >
-                            Tomar asistencia de Semana {semanaSeleccionada}
+                            {loadingSesiones
+                                ? "Cargando sesiones..."
+                                : `Tomar asistencia de Semana ${semanaSeleccionada}`}
                         </button>
 
                         {/* Aquí luego puedes renderizar formularios, tareas, materiales, etc. */}
