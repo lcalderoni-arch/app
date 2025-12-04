@@ -3,11 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
+
+import icon from "../../../assets/logo.png";
+
 import { API_BASE_URL } from '../../../config/api';
 import LogoutButton from '../../../components/login/LogoutButton';
 import { formatDateLocal } from '../../../utils/dateUtils';
 
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBook, faCalendar, faChartLine, faBell } from '@fortawesome/free-solid-svg-icons';
 
 export default function PantallaSeccionDocente() {
     const { seccionId } = useParams();
@@ -166,16 +172,38 @@ export default function PantallaSeccionDocente() {
     return (
         <div className="docente-layout">
             {/* Sidebar podría ser el mismo que ya usas, o uno reducido */}
-            <aside className="docente-sidebar">
-                <div className="sidebar-header">
-                    <span className="sidebar-role">Docente</span>
+            <aside className='docente-sidebar'>
+                <div className='sidebar-header'>
+                    <img className="sidebar-icon" src={icon} alt="Logo Campus" />
+                    <span className='sidebar-role'>Docente</span>
                 </div>
-                <nav className="sidebar-menu">
+
+                <nav className='sidebar-menu'>
+                    <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <button className="link-sidebar" onClick={() => navigate('/pantalla-docente')}>
-                                ← Mis cursos
-                            </button>
+                            <a href="/pantalla-docente" className='active'>
+                                <FontAwesomeIcon icon={faBook} className='icon-text' />
+                                Mis Cursos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#horario">
+                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                Horario
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#progreso">
+                                <FontAwesomeIcon icon={faChartLine} className='icon-text' />
+                                Progreso
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#notificaciones">
+                                <FontAwesomeIcon icon={faBell} className='icon-text' />
+                                Notificaciones
+                            </a>
                         </li>
                     </ul>
                 </nav>

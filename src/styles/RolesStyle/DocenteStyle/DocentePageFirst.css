@@ -267,7 +267,7 @@
     border-bottom: 2px solid #ccc;
     padding: 16px 0;
 
-    gap: 4px;
+    gap: 12px;
 }
 
 .docente-main .information-card span:nth-child(1){
@@ -373,7 +373,7 @@
 
 .btn-course {
     width: 100%;
-    margin-top: 15px;
+    margin-top: 5px;
     padding: 10px 20px;
     background-color: #1a64aa;
     color: white;
