@@ -25,7 +25,7 @@ export default function PantallaSeccionDocente() {
 
     const [sesiones, setSesiones] = useState([]);
     const [loadingSesiones, setLoadingSesiones] = useState(false);
-    const [setErrorSesiones] = useState(null);
+    const [errorSesiones, setErrorSesiones] = useState(null);
 
     const [semanaSeleccionada, setSemanaSeleccionada] = useState(
         seccionDesdeState?.semanaActual || 1
@@ -243,14 +243,17 @@ export default function PantallaSeccionDocente() {
                                 : `Tomar asistencia de Semana ${semanaSeleccionada}`}
                         </button>
 
-                        {/* Aquí luego puedes renderizar formularios, tareas, materiales, etc. */}
+                        {errorSesiones && (
+                            <p className="error-message">
+                                ❌ {errorSesiones}
+                            </p>
+                        )}
+
                         <div className="contenido-semana-card">
                             <p>
                                 Aquí irá el contenido que el profesor puede crear/editar para esta semana
                                 (materiales, tareas, foros, etc.).
                             </p>
-                            {/* Ejemplo de lugar donde luego colocarás tus componentes: */}
-                            {/* <EditorRecursosSemana seccionId={seccionId} semana={semanaSeleccionada} /> */}
                         </div>
                     </section>
                 </main>
