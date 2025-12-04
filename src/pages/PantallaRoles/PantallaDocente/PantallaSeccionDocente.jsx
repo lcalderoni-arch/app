@@ -25,7 +25,7 @@ export default function PantallaSeccionDocente() {
 
     const [sesiones, setSesiones] = useState([]);
     const [loadingSesiones, setLoadingSesiones] = useState(false);
-    const [errorSesiones, setErrorSesiones] = useState(null);
+    const [setErrorSesiones] = useState(null);
 
     const [semanaSeleccionada, setSemanaSeleccionada] = useState(
         seccionDesdeState?.semanaActual || 1
