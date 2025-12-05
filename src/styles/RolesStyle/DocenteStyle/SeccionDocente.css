@@ -139,9 +139,7 @@
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 1px;
-
     color: #444;
-
     margin-bottom: 5px;
 }
 
@@ -149,7 +147,6 @@
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 1px;
-
     color: #444;
 }
 
@@ -244,17 +241,12 @@
 @keyframes cambioColor {
     0% {
         background-color: #444;
-        /* Rojo tomate */
     }
-
     50% {
-        background-color: rgb(119, 119, 119, 0.8);
-        /* Azul acero */
+        background-color: rgba(119, 119, 119, 0.8);
     }
-
     100% {
         background-color: #444;
-        /* Rojo tomate */
     }
 }
 
@@ -272,15 +264,14 @@
 /*----------------------------*/
 /*----------------------------*/
 
-.contenido-semana-section-teacher div {
+.contenido-semana-section-teacher > div:first-child {
     display: flex;
     align-items: center;
     gap: 40px;
-
     margin-bottom: 30px;
 }
 
-.contenido-semana-section-teacher .title-sesion {
+.title-sesion {
     padding: 5px 10px;
     width: max-content;
     background: #d9a113;
@@ -291,13 +282,12 @@
 .btn-primary {
     margin: 10px;
     padding: 8px 15px;
-
     background: transparent;
     border: 2px solid #666;
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
-    color: 333;
+    color: #333;
     cursor: pointer;
     transition: background-color 0.2s;
 }
@@ -309,45 +299,44 @@
 
 /* ---- */
 
-.contenido-semana-section-teacher p {
-
+.contenido-semana-section-teacher > p {
     padding: 0 10px;
     margin-bottom: 1rem;
     letter-spacing: 1px;
-
     font-size: 18px;
     font-weight: 700;
 }
 
-
-.contenido-semana-section-teacher .contenido-semana-card {
+.contenido-semana-section-teacher .contenido-semana-card-seccion {
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
 
     border: 1px solid #444;
     border-radius: 8px;
     padding: 1rem;
-    min-height: 200px;
 }
 
-.contenido-semana-card div {
-
+.contenido-semana-card-seccion .area-explora,
+.contenido-semana-card-seccion .area-estudio,
+.contenido-semana-card-seccion .area-aplica {
     display: flex;
     flex-direction: column;
-
-    height: 200px;
-    width: 400px;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
 }
 
-.contenido-semana-card div h4{
-    padding-right: 200px;
+.contenido-semana-card-seccion .area-explora h4,
+.contenido-semana-card-seccion .area-estudio h4,
+.contenido-semana-card-seccion .area-aplica h4 {
     text-align: left;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
 }
-
-.contenido-semana-card div p{
-    font-size: 15px;
-}
-
 
 /* botón volver simple */
 .btn-volver {
@@ -356,4 +345,147 @@
     border-radius: 6px;
     border: none;
     cursor: pointer;
+}
+
+/* =========================
+   Tarjetas de recursos
+   ========================= */
+
+.recursos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Cada recurso como una card uniforme */
+.recurso-card {
+    background-color: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 10px 12px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    min-height: 110px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.recurso-card-header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.recurso-tipo-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background-color: #e5e8f9;
+    color: #265dd4;
+}
+
+.recurso-card-title {
+    margin: 4px 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+}
+
+.recurso-card-desc {
+    margin: 0 0 6px 0;
+    font-size: 12px;
+    color: #555;
+}
+
+/* Botón centrado en la parte baja de la tarjeta */
+.recurso-card-btn {
+    align-self: center;
+    margin-top: auto;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: none;
+    background-color: #265dd4;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.recurso-card-btn:hover {
+    background-color: #1b46a1;
+    transform: translateY(-1px);
+}
+
+/* =========================
+   Formulario de recursos
+   ========================= */
+
+.recurso-form {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px dashed #c5c5c5;
+    background-color: #fdfdfd;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.recurso-form h5 {
+    font-size: 13px;
+    margin: 0;
+    font-weight: 700;
+    color: #333;
+}
+
+.recurso-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 12px;
+}
+
+.recurso-form input[type="text"],
+.recurso-form input[type="url"],
+.recurso-form textarea,
+.recurso-form select {
+    font-size: 12px;
+    padding: 5px 7px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.recurso-form textarea {
+    resize: vertical;
+}
+
+.btn-recurso-guardar {
+    margin-top: 4px;
+    align-self: flex-end;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: none;
+    background-color: #265dd4;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-recurso-guardar:hover {
+    background-color: #1b46a1;
+}
+
+.recurso-error {
+    font-size: 11px;
+    color: #c0392b;
+    background-color: #ffecec;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px solid #ffb3b3;
 }

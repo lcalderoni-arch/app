@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-
 import icon from "../../../assets/logo.png";
 import icon2 from "../../../assets/logo2.png";
 
@@ -16,6 +15,190 @@ import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook, faCalendar, faChartLine, faBell, faCircleUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
+// ---- Subcomponente para crear recursos ----
+const opcionesTipoRecurso = [
+    { value: "LINK", label: "Recurso web / enlace" },
+    { value: "VIDEO", label: "Video" },
+    { value: "PDF", label: "PDF" },
+    { value: "DOCUMENTO", label: "Documento" },
+    { value: "ARCHIVO", label: "Archivo genérico" },
+    { value: "IMAGEN", label: "Imagen" },
+    { value: "OTRO", label: "Otro" },
+];
+
+function RecursoForm({ sesionId, momento, onRecursoCreado }) {
+    const [titulo, setTitulo] = useState("");
+    const [descripcion, setDescripcion] = useState("");
+    const [tipo, setTipo] = useState("LINK");
+    const [linkVideo, setLinkVideo] = useState("");
+    const [file, setFile] = useState(null);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState(null);
+
+    const esTipoLink = tipo === "LINK" || tipo === "VIDEO";
+    const requiereArchivo = !esTipoLink;
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!sesionId) {
+            alert("No se encontró la sesión actual.");
+            return;
+        }
+
+        if (!titulo.trim()) {
+            alert("El título es obligatorio.");
+            return;
+        }
+
+        if (requiereArchivo && !file) {
+            alert("Debes seleccionar un archivo para este tipo de recurso.");
+            return;
+        }
+
+        try {
+            setSaving(true);
+            setError(null);
+
+            const token = localStorage.getItem("authToken");
+            if (!token) throw new Error("No estás autenticado.");
+
+            // 👉 Caso LINK / VIDEO: solo JSON
+            if (esTipoLink) {
+                const payload = {
+                    sesionId,
+                    titulo: titulo.trim(),
+                    descripcion: descripcion.trim() || null,
+                    momento,           // ANTES / DURANTE / DESPUES
+                    tipo,              // LINK / VIDEO
+                    linkVideo: linkVideo.trim() || null,
+                    archivoUrl: null,
+                };
+
+                const response = await axios.post(
+                    `${API_BASE_URL}/recursos/crear`,
+                    payload,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                onRecursoCreado && onRecursoCreado(response.data);
+            } else {
+                // 👉 Caso archivos: multipart/form-data
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("titulo", titulo.trim());
+                if (descripcion.trim()) {
+                    formData.append("descripcion", descripcion.trim());
+                }
+                formData.append("momento", momento);       // ANTES / DURANTE / DESPUES
+                formData.append("tipoRecurso", tipo);      // PDF / DOCUMENTO / ARCHIVO / etc.
+
+                const response = await axios.post(
+                    `${API_BASE_URL}/recursos/sesion/${sesionId}/archivo`,
+                    formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            // axios setea automáticamente el Content-Type para FormData
+                        },
+                    }
+                );
+
+                onRecursoCreado && onRecursoCreado(response.data);
+            }
+
+            // Limpiar formulario
+            setTitulo("");
+            setDescripcion("");
+            setLinkVideo("");
+            setFile(null);
+            setTipo("LINK");
+        } catch (err) {
+            console.error("Error al crear recurso:", err);
+            setError(
+                err.response?.data?.message ||
+                "No se pudo crear el recurso."
+            );
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <form className="recurso-form" onSubmit={handleSubmit}>
+            <h5>Agregar recurso</h5>
+
+            <label>
+                Título
+                <input
+                    type="text"
+                    value={titulo}
+                    onChange={(e) => setTitulo(e.target.value)}
+                    placeholder="Ej: Guía de estudio semana 01"
+                />
+            </label>
+
+            <label>
+                Descripción (opcional)
+                <textarea
+                    rows={2}
+                    value={descripcion}
+                    onChange={(e) => setDescripcion(e.target.value)}
+                    placeholder="Breve descripción del recurso..."
+                />
+            </label>
+
+            <label>
+                Tipo de recurso
+                <select
+                    value={tipo}
+                    onChange={(e) => setTipo(e.target.value)}
+                >
+                    <option value="">Selecciona tipo</option>
+                    {opcionesTipoRecurso.map((op) => (
+                        <option key={op.value} value={op.value}>
+                            {op.label}
+                        </option>
+                    ))}
+                </select>
+            </label>
+
+            {esTipoLink && (
+                <label>
+                    URL (YouTube / Página web)
+                    <input
+                        type="url"
+                        value={linkVideo}
+                        onChange={(e) => setLinkVideo(e.target.value)}
+                        placeholder="https://..."
+                    />
+                </label>
+            )}
+
+            {requiereArchivo && (
+                <label>
+                    Archivo
+                    <input
+                        type="file"
+                        onChange={(e) => setFile(e.target.files[0] || null)}
+                    />
+                </label>
+            )}
+
+            {error && <p className="recurso-error">❌ {error}</p>}
+
+            <button type="submit" className="btn-recurso-guardar" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar recurso"}
+            </button>
+        </form>
+    );
+}
+
 export default function PantallaSeccionDocente() {
     const { seccionId } = useParams();
     const location = useLocation();
@@ -24,7 +207,6 @@ export default function PantallaSeccionDocente() {
     const userName = localStorage.getItem('userName');
     const userEmail = localStorage.getItem('userEmail');
 
-    // si venimos desde PantallaDocente, ya tenemos la sección
     const seccionDesdeState = location.state?.seccion || null;
 
     const [seccion, setSeccion] = useState(seccionDesdeState);
@@ -39,6 +221,12 @@ export default function PantallaSeccionDocente() {
         seccionDesdeState?.semanaActual || 1
     );
 
+    // 🔹 Recursos de la sesión actual
+    const [recursos, setRecursos] = useState([]);
+    const [loadingRecursos, setLoadingRecursos] = useState(false);
+    const [errorRecursos, setErrorRecursos] = useState(null);
+
+    // --- Cargar sesiones de la sección ---
     useEffect(() => {
         const cargarSesiones = async () => {
             try {
@@ -73,11 +261,10 @@ export default function PantallaSeccionDocente() {
         }
     }, [seccionId]);
 
-
     // 🔁 Si no llegó por state, la pedimos al backend
     useEffect(() => {
         const cargarSeccion = async () => {
-            if (seccion) return; // ya la tenemos
+            if (seccion) return;
 
             try {
                 setLoading(true);
@@ -108,11 +295,57 @@ export default function PantallaSeccionDocente() {
         cargarSeccion();
     }, [seccion, seccionId]);
 
-    // 👉 aquí podrías hacer otra llamada para cargar el contenido de la semana
-    // por ejemplo: GET /secciones/{id}/semanas/{semana}
-    // por ahora lo dejo como placeholder
-    // const [contenidoSemana, setContenidoSemana] = useState(null);
-    // useEffect(() => { ...cargarContenidoSemana(seccionId, semanaSeleccionada) }, [semanaSeleccionada]);
+    // 🔹 Sesión actual según semana seleccionada
+    let sesionActualId = null;
+    if (sesiones && sesiones.length > 0) {
+        const index = semanaSeleccionada - 1;
+        sesionActualId = sesiones[index]?.id || null;
+    }
+
+    // 🔹 Cargar recursos cuando cambie la semana o las sesiones
+    useEffect(() => {
+        const cargarRecursos = async () => {
+            if (!sesionActualId) {
+                setRecursos([]);
+                setErrorRecursos(null);
+                return;
+            }
+
+            try {
+                setLoadingRecursos(true);
+                setErrorRecursos(null);
+
+                const token = localStorage.getItem("authToken");
+                if (!token) throw new Error("No estás autenticado.");
+
+                const config = {
+                    headers: { Authorization: `Bearer ${token}` },
+                };
+
+                const response = await axios.get(
+                    `${API_BASE_URL}/recursos/sesion/${sesionActualId}`,
+                    config
+                );
+
+                setRecursos(response.data || []);
+            } catch (err) {
+                console.error("Error al cargar recursos:", err);
+                setErrorRecursos(
+                    err.response?.data?.message ||
+                    "No se pudieron cargar los recursos de la sesión."
+                );
+                setRecursos([]);
+            } finally {
+                setLoadingRecursos(false);
+            }
+        };
+
+        cargarRecursos();
+    }, [sesionActualId]);
+
+    const handleRecursoCreado = (nuevoRecurso) => {
+        setRecursos((prev) => [...prev, nuevoRecurso]);
+    };
 
     if (loading) {
         return (
@@ -150,7 +383,6 @@ export default function PantallaSeccionDocente() {
 
     const handleClickSemana = (numSemana) => {
         setSemanaSeleccionada(numSemana);
-        // aquí luego llamas a tu API para traer contenido de esa semana
     };
 
     const handleTomarAsistencia = () => {
@@ -159,7 +391,6 @@ export default function PantallaSeccionDocente() {
             return;
         }
 
-        // semanaSeleccionada empieza en 1, el array en 0
         const index = semanaSeleccionada - 1;
         const sesionSeleccionada = sesiones[index];
 
@@ -171,9 +402,66 @@ export default function PantallaSeccionDocente() {
         navigate(`/docente/seccion/${seccion.id}/asistencias/${sesionSeleccionada.id}`);
     };
 
+    // 🔹 Agrupar recursos por momento
+    const recursosExplora = recursos.filter((r) => r.momento === "ANTES");
+    const recursosEstudia = recursos.filter((r) => r.momento === "DURANTE");
+    const recursosAplica = recursos.filter((r) => r.momento === "DESPUES");
+
+    const renderListaRecursos = (lista) => {
+        if (loadingRecursos) return <p>Cargando recursos...</p>;
+        if (errorRecursos) return <p className="recurso-error">❌ {errorRecursos}</p>;
+        if (!lista || lista.length === 0) return <p>No hay recursos registrados aún.</p>;
+
+        return (
+            <div className="recursos-grid">
+                {lista.map((r) => {
+                    const isLink = !!r.linkVideo;
+                    const isFile = !!r.archivoUrl;
+
+                    const href = isLink
+                        ? r.linkVideo
+                        : isFile
+                            ? r.archivoUrl
+                            : null;
+
+                    const botonTexto = isLink
+                        ? "Abrir enlace"
+                        : isFile
+                            ? "Ver / descargar"
+                            : "Ver recurso";
+
+                    return (
+                        <article key={r.id} className="recurso-card">
+                            <header className="recurso-card-header">
+                                <span className="recurso-tipo-badge">{r.tipo}</span>
+                            </header>
+
+                            <h5 className="recurso-card-title">{r.titulo}</h5>
+
+                            {r.descripcion && (
+                                <p className="recurso-card-desc">{r.descripcion}</p>
+                            )}
+
+                            {href && (
+                                <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="recurso-card-btn"
+                                >
+                                    {botonTexto}
+                                </a>
+                            )}
+                        </article>
+                    );
+                })}
+            </div>
+        );
+    };
+
     return (
         <div className="docente-layout">
-            {/* Sidebar podría ser el mismo que ya usas, o uno reducido */}
+            {/* SIDEBAR */}
             <aside className='docente-sidebar'>
                 <div className='sidebar-header'>
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
@@ -237,18 +525,15 @@ export default function PantallaSeccionDocente() {
                             </div>
                             <div className='content-second'>
                                 <p>
-                                    Nivel: <strong>{seccion.nivelSeccion}</strong>
+                                    Nivel:
+                                    <strong>{seccion.nivelSeccion}</strong>
                                 </p>
                             </div>
                             <div className='content-third'>
                                 <FontAwesomeIcon icon={faCalendar} className='icon-text' />
                                 <div>
-                                    <p>
-                                        Inicio: {formatDateLocal(seccion.fechaInicio)}
-                                    </p>
-                                    <p>
-                                        Fin: {formatDateLocal(seccion.fechaFin)}
-                                    </p>
+                                    <p>Inicio: {formatDateLocal(seccion.fechaInicio)}</p>
+                                    <p>Fin: {formatDateLocal(seccion.fechaFin)}</p>
                                 </div>
                             </div>
                         </div>
@@ -269,7 +554,6 @@ export default function PantallaSeccionDocente() {
                                 <p>{userEmail}</p>
                             </div>
                         </div>
-
                     </div>
 
                     <div className='content-body-seccion'>
@@ -281,7 +565,7 @@ export default function PantallaSeccionDocente() {
                                     {semanas.map((num) => {
                                         const esActual = num === semanaActual;
                                         const esSeleccionada = num === semanaSeleccionada;
-                                        const esBloqueada = num > semanaActual; // si quieres bloquear semanas futuras
+                                        const esBloqueada = num > semanaActual;
 
                                         return (
                                             <button
@@ -305,8 +589,10 @@ export default function PantallaSeccionDocente() {
                             {/* CONTENIDO DE LA SEMANA SELECCIONADA */}
                             <section className="contenido-semana-section-teacher">
                                 <div>
-                                    <h3 className='title-sesion'>Sesión {semanaSeleccionada.toString().padStart(2, "0")}
-                                        {semanaSeleccionada === semanaActual && " (Semana actual)"}</h3>
+                                    <h3 className='title-sesion'>
+                                        Sesión {semanaSeleccionada.toString().padStart(2, "0")}
+                                        {semanaSeleccionada === semanaActual && " (Semana actual)"}
+                                    </h3>
                                     <button
                                         className="btn-primary"
                                         onClick={handleTomarAsistencia}
@@ -318,9 +604,7 @@ export default function PantallaSeccionDocente() {
                                     </button>
                                 </div>
 
-                                <p>
-                                    Contenido del Curso:
-                                </p>
+                                <p>Contenido del Curso:</p>
 
                                 {errorSesiones && (
                                     <p className="error-message">
@@ -328,24 +612,50 @@ export default function PantallaSeccionDocente() {
                                     </p>
                                 )}
 
-                                <div className="contenido-semana-card">
+                                <div className="contenido-semana-card-seccion">
+                                    {/* EXPLORA */}
                                     <div className='area-explora'>
-                                        <h4>EXPLORA</h4>
-                                        <p>
-                                            Aqui ira contenido de tipo documentos, enlaces a videos o redirecciones de paginas de retroalimentacion o conocimiento extra (QUITAR ESTE TEXTO DESPUES DE IMPLEMENTAR LA LOGICA)
-                                        </p>
+                                        <h4>EXPLORAMOS</h4>
+
+                                        {sesionActualId && (
+                                            <RecursoForm
+                                                sesionId={sesionActualId}
+                                                momento="ANTES"
+                                                onRecursoCreado={handleRecursoCreado}
+                                            />
+                                        )}
+
+                                        {renderListaRecursos(recursosExplora)}
                                     </div>
+
+                                    {/* ESTUDIA */}
                                     <div className='area-estudio'>
-                                        <h4>ESTUDIA</h4>
-                                        <p>
-                                            Aquí irá contenido de documentos, ppt, words de la institucion (QUITAR ESTE TEXTO DESPUES DE IMPLEMENTAR LA LOGICA)
-                                        </p>
+                                        <h4>ESTUDIAMOS</h4>
+
+                                        {sesionActualId && (
+                                            <RecursoForm
+                                                sesionId={sesionActualId}
+                                                momento="DURANTE"
+                                                onRecursoCreado={handleRecursoCreado}
+                                            />
+                                        )}
+
+                                        {renderListaRecursos(recursosEstudia)}
                                     </div>
+
+                                    {/* APLICA */}
                                     <div className='area-aplica'>
-                                        <h4>APLICA</h4>
-                                        <p>
-                                            Aqui ira contenido como tareas, enlaces, foros, etc... (QUITAR ESTE TEXTO DESPUES DE IMPLEMENTAR LA LOGICA)
-                                        </p>
+                                        <h4>APLICAMOS</h4>
+
+                                        {sesionActualId && (
+                                            <RecursoForm
+                                                sesionId={sesionActualId}
+                                                momento="DESPUES"
+                                                onRecursoCreado={handleRecursoCreado}
+                                            />
+                                        )}
+
+                                        {renderListaRecursos(recursosAplica)}
                                     </div>
                                 </div>
                             </section>
