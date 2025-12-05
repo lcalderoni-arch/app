@@ -9,7 +9,8 @@ import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import { faChalkboard } from '@fortawesome/free-solid-svg-icons';
-import { faClipboard } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
 export default function Sidebar({ isOpen, onClose }) {
     const navigate = useNavigate();
@@ -71,8 +72,8 @@ export default function Sidebar({ isOpen, onClose }) {
                         <Link to="/dashboard-admin/usuarios" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faUsers} />Gestión de Usuarios</Link>
                         <Link to="/dashboard-admin/cursos" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faBookOpen} />Gestión de Cursos</Link>
                         <Link to="/dashboard-admin/secciones" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faChalkboard} />Gestión de Secciones</Link>
-                        <Link to="/dashboard-admin/matriculas" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faClipboard} />Gestión de Matrículas</Link>
-                        <Link to="/dashboard-admin/monitor-asistencias" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faClipboard} />Apartado de Asistencias</Link>
+                        <Link to="/dashboard-admin/matriculas" className='text-nav' onClick={onClose}><FontAwesomeIcon icon={faPenToSquare} className='icon-nav' />Gestión de Matrículas</Link>
+                        <Link to="/dashboard-admin/monitor-asistencias" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faCalendar} />Apartado de Asistencias</Link>
                         
                     </>
                 )}

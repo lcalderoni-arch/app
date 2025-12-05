@@ -1,10 +1,200 @@
+.container-all {
+    background-color: #f4f4f4;
+}
+
+.second-container {
+    margin: 30px 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.header-content-left {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+
+    padding: 25px 30px;
+    height: 250px;
+    width: 100%;
+    border: 3px solid #ededed;
+    background-color: #fff;
+    box-shadow: 0 5px 6px 0 #d9d9d9;
+    border-radius: 20px;
+}
+
+.content-first {
+    display: flex;
+    align-items: center;
+}
+
+.content-first .icon-class {
+    width: 50px;
+}
+
+.content-first div {
+    margin-left: 15px;
+}
+
+.content-first h2 {
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.content-first p {
+    font-size: 16px;
+    color: #555;
+}
+
+.content-second {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.content-second p {
+    letter-spacing: 1px;
+}
+
+.content-second strong {
+    font-size: 15px;
+    margin-left: 5px;
+    padding: 5px 10px;
+    background: #e5e8f9;
+    border-radius: 10px;
+    color: #265dd4;
+    font-weight: 600;
+}
+
+.content-third {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.content-third .icon-text {
+    font-size: 20px;
+}
+
+.content-third div {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.content-third div p {
+    letter-spacing: 1px;
+    color: #333;
+    font-size: 14px;
+}
+
+/*--------------------------------------- */
+
+.header-content-right {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 250px;
+    width: 850px;
+
+    padding: 25px 30px;
+    border: 3px solid #ededed;
+    background-color: #fff;
+    box-shadow: 0 5px 6px 0 #d9d9d9;
+    border-radius: 20px;
+}
+
+.header-content-right .content-first {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-content-right .content-first .icon-text {
+    font-size: 35px;
+    color: #265dd4;
+}
+
+.header-content-right .content-first h2 {
+    font-size: 22px;
+    text-transform: none;
+    letter-spacing: 1.5px;
+}
+
+.header-content-right .content-second {
+    margin-left: 55px;
+}
+
+.header-content-right .content-second div {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.header-content-right .content-second div h3 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    color: #444;
+
+    margin-bottom: 5px;
+}
+
+.header-content-right .content-second div p {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    color: #444;
+}
+
+.header-content-right .content-third {
+    margin-left: 55px;
+    gap: 12px;
+}
+
+.header-content-right .content-third .icon-text {
+    font-size: 20px;
+    color: #386997;
+}
+
+.header-content-right .content-third p {
+    font-size: 16px;
+    color: #386997;
+}
+
+/*------------------------------*/
+/*------------------------------*/
+/*------------------------------*/
+
+.content-body-seccion {
+    margin: 30px 80px;
+    border: 3px solid #ededed;
+    background-color: #fff;
+    box-shadow: 0 5px 6px 0 #d9d9d9;
+    border-radius: 20px;
+}
+
+.content-body-seccion .docente-main {
+    padding: 20px 40px;
+    background-color: #fff;
+    border-radius: 20px;
+}
+
 .semanas-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .semanas-section h2 {
     margin-bottom: 0.5rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    color: #444;
 }
 
 .semanas-container {
@@ -12,53 +202,152 @@
     flex-wrap: nowrap;
     gap: 0.5rem;
     overflow-x: auto;
-    padding: 0.5rem 0;
-    background-color: #222;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    border-bottom: 3px solid #707070;
     border-radius: 8px;
 }
 
 .semana-item {
-    min-width: 40px;
+    min-width: 50px;
     padding: 0.4rem 0.6rem;
-    border-radius: 6px;
+    border-radius: 12px 12px 0 0;
     border: none;
     background-color: #444;
     color: #f5f5f5;
     font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
     transition: transform 0.1s ease, background-color 0.15s ease;
 }
 
 .semana-item:hover {
     transform: translateY(-1px);
-    background-color: #555;
+    background-color: #6c6c6c;
 }
 
 .semana-activa {
-    background-color: #fff;
-    color: #000;
+    background-color: #5281bb;
+    color: #ffffff;
+}
+
+.semana-activa:hover {
+    background-color: #5281bb;
+    color: #ffffff;
 }
 
 .semana-actual {
-    box-shadow: 0 2px 0 #ffa500;
+    border-bottom: none;
     font-weight: 600;
+    animation: cambioColor 3s infinite;
+}
+
+@keyframes cambioColor {
+    0% {
+        background-color: #444;
+        /* Rojo tomate */
+    }
+
+    50% {
+        background-color: rgb(119, 119, 119, 0.8);
+        /* Azul acero */
+    }
+
+    100% {
+        background-color: #444;
+        /* Rojo tomate */
+    }
 }
 
 .semana-bloqueada {
-    opacity: 0.4;
+    background: #ec9f9f;
     cursor: not-allowed;
 }
 
-.contenido-semana-section h3 {
-    margin-bottom: 0.75rem;
+.semana-bloqueada:hover {
+    background: #ec9f9f;
+    cursor: not-allowed;
 }
 
-.contenido-semana-card {
-    background-color: #222;
+/*----------------------------*/
+/*----------------------------*/
+/*----------------------------*/
+
+.contenido-semana-section-teacher div {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+
+    margin-bottom: 30px;
+}
+
+.contenido-semana-section-teacher .title-sesion {
+    padding: 5px 10px;
+    width: max-content;
+    background: #d9a113;
+    border-radius: 10px;
+    color: #fff;
+}
+
+.btn-primary {
+    margin: 10px;
+    padding: 8px 15px;
+
+    background: transparent;
+    border: 2px solid #666;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: 333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #666;
+    color: #fff;
+}
+
+/* ---- */
+
+.contenido-semana-section-teacher p {
+
+    padding: 0 10px;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+.contenido-semana-section-teacher .contenido-semana-card {
+    display: flex;
+    justify-content: center;
+
+    border: 1px solid #444;
     border-radius: 8px;
     padding: 1rem;
-    min-height: 120px;
+    min-height: 200px;
 }
+
+.contenido-semana-card div {
+
+    display: flex;
+    flex-direction: column;
+
+    height: 200px;
+    width: 400px;
+}
+
+.contenido-semana-card div h4{
+    padding-right: 200px;
+    text-align: left;
+}
+
+.contenido-semana-card div p{
+    font-size: 15px;
+}
+
 
 /* botón volver simple */
 .btn-volver {

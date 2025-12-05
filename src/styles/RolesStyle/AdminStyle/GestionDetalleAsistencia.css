@@ -1,0 +1,155 @@
+
+.link-sidebar {
+    padding: 15px 20px;
+    border: none;
+    background-color: #c74c4c;
+    border-radius: 15px;
+
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+
+    margin-bottom: 20px;
+    cursor: pointer;
+
+    transition: background-color 0.5s ease;
+}
+
+.link-sidebar:hover {
+    background-color: #d20a0a;
+    color: #fff;
+}
+
+/* Contenedor general de la sección */
+/* Contenedor general de la sección */
+.contenido-semana-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 0 40px 0;
+}
+
+/* Card del listado */
+.detalle-asistencia-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+}
+
+/* Cabecera del card */
+.detalle-asistencia-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.detalle-asistencia-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.detalle-asistencia-header p {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+/* Wrapper para la tabla (permite scroll horizontal si se achica la pantalla) */
+.detalle-tabla-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Tabla estilo dashboard */
+.styled-table-seccion {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.styled-table-seccion thead tr {
+    background-color: #f3f4f6;
+}
+
+.styled-table-seccion th,
+.styled-table-seccion td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.styled-table-seccion th {
+    font-weight: 600;
+    color: #4b5563;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    width: 100px;
+}
+
+.styled-table-seccion tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.styled-table-seccion tbody tr:hover {
+    background-color: #eef2ff;
+}
+
+.styled-table-seccion tbody td:nth-child(2) {
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+/* Select e input dentro de la tabla */
+.estado-select,
+.observacion-input {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 0.9rem;
+    background-color: #ffffff;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.estado-select:focus,
+.observacion-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+}
+
+/* Botón de guardar alineado a la derecha */
+.detalle-acciones {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-guardar-asistencias {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.38);
+    transition: transform 0.12s ease, box-shadow 0.12s ease,
+        filter 0.12s ease;
+}
+
+.btn-guardar-asistencias:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.45);
+    filter: brightness(1.05);
+}
+
+.btn-guardar-asistencias:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+}

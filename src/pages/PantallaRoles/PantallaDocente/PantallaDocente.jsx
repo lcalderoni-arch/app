@@ -139,9 +139,11 @@ export default function PantallaDocente() {
                 {/* HEADER */}
                 <header className='docente-header'>
                     <div className='header-content'>
-                        <h1>Campus Virtual</h1>
-                        <div className='header-right'>
+                        <div className='name-header'>
                             <p>Bienvenido, <strong>{userName}</strong></p>
+                            <h1>Campus Virtual</h1>
+                        </div>
+                        <div className='header-right'>
                             <LogoutButton />
                         </div>
                     </div>
@@ -201,7 +203,7 @@ export default function PantallaDocente() {
                                                     <span>Nombre: <strong>{userName}</strong></span>
                                                     <span>Email: <strong>{userEmail}</strong></span>
                                                     <span className='datos-fecha'><strong>{getDayOfWeek(seccion.fechaInicio)}</strong><strong> - {seccion.turno}:</strong>{' '}
-                                                        {obtenerHorario(seccion.turno)} - <strong>  ({seccion.aula || 'No asignado'})</strong></span>
+                                                        {obtenerHorario(seccion.turno)} <br></br>  <strong>  ({seccion.aula || 'No asignado'})</strong></span>
                                                 </div>
                                             </div>
 

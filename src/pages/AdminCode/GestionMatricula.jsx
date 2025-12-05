@@ -375,7 +375,7 @@ function GestionMatricula() {
                     {matriculaHabilitada !== null && (
                         <>
                             <p style={{ marginBottom: "10px" }}>
-                                Estado actual de matrículas:{" "}
+                                Pantalla de Matricula:{" "}
                                 {matriculaHabilitada ? (
                                     <span style={{ color: "green", fontWeight: "bold" }}>
                                         <FontAwesomeIcon icon={faLockOpen} /> HABILITADAS
@@ -398,6 +398,7 @@ function GestionMatricula() {
                                     padding: "8px 16px",
                                     borderRadius: "4px",
                                     cursor: "pointer",
+                                    marginBottom: "20px"
                                 }}
                                 disabled={cambiandoPermisoGlobal}
                             >
@@ -417,7 +418,7 @@ function GestionMatricula() {
                 className="box-actions-ciclo"
                 style={{
                     textAlign: "center",
-                    margin: "30px auto",
+                    margin: "30px auto 50px auto",
                     maxWidth: "800px",
                     padding: "15px",
                     border: "1px dashed #dc3545",

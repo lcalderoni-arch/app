@@ -1,0 +1,247 @@
+/* src/styles/RolesStyle/AdminStyle/GestionAsistencia.css */
+
+.box-formulario-gestionasistencia {
+    margin: 25px 4%;
+    margin-bottom: 100px;
+    border: 2px solid #d2d2d2;
+    border-radius: 10px;
+}
+
+.box-formulario-gestionasistencia .centrar-tercer-titulo {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    margin: 25px 0 0 0;
+    gap: 5px;
+}
+
+.centrar-tercer-titulo h3 {
+    font-size: 18px;
+    color: #353535;
+    letter-spacing: 1px;
+}
+
+.centrar-tercer-titulo p {
+    font-size: 14px;
+    color: #636363;
+    letter-spacing: 1px;
+}
+
+.auth-form-gestionusuarios-area-rol {
+    margin: 20px 45px;
+}
+
+.auth-form-gestionusuarios-area-rol .rol-text {
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+
+.auth-form-gestionusuarios-area-rol label {
+    margin: 0 25px;
+}
+
+/* Contenedor del select personalizado */
+.monitor-select-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* Trigger (lo que se ve antes de abrir) */
+.monitor-select-trigger {
+    font-size: 14px;
+    padding: 10px 12px;
+    background: white;
+    background: transparent;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    min-width: 200px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 1px;
+    align-items: center;
+    transition: border 0.2s ease;
+}
+
+.monitor-select-trigger span {
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Cuando hay algo seleccionado */
+.monitor-select-trigger.selected span {
+    color: #111827;
+    font-weight: 500;
+}
+
+/* Icono del ángulo */
+.monitor-select-trigger .icon-increment {
+    font-size: 0.85rem;
+    margin-left: 8px;
+    color: #6b7280;
+}
+
+/* Hover/focus */
+.monitor-select-trigger:hover {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
+
+/* Dropdown */
+.monitor-select-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #d0d7e2;
+    box-shadow: 0 12px 25px rgba(15, 23, 42, 0.18);
+    z-index: 20;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+/* Opción */
+.monitor-select-option {
+    padding: 9px 12px;
+    font-size: 0.93rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    color: #374151;
+}
+
+.monitor-select-option:hover {
+    background-color: #f3f4ff;
+    color: #111827;
+}
+
+/* Opción activa (seleccionada) */
+.monitor-select-option.active {
+    background-color: #e0ecff;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+/* ---- */
+
+/* Layout del dashboard por sesión */
+.sesion-dashboard {
+    margin-top: 18px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Contenedor del gráfico */
+.sesion-dashboard-chart-wrapper {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    flex-shrink: 0;
+}
+
+/* Texto en el centro de la dona */
+.donut-center-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.donut-total {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.donut-subtitle {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.sesion-dashboard-row {
+    display: flex;
+    align-items: center;
+    /* 👉 centra verticalmente label y donut */
+    gap: 32px;
+}
+
+/* Panel de detalles (derecha) */
+.sesion-dashboard-details {
+    margin-top: 0;
+}
+
+.sesion-dashboard-details h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.details-subtitle {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+/* Lista de items del gráfico */
+.sesion-dashboard-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sesion-dashboard-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sesion-dashboard-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    flex-shrink: 0;
+}
+
+.sesion-dashboard-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.sesion-dashboard-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.sesion-dashboard-values {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sesion-dashboard {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sesion-dashboard-chart-wrapper {
+        margin: 0 auto;
+    }
+}

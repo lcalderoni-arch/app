@@ -5,6 +5,7 @@ import axios from 'axios';
 
 
 import icon from "../../../assets/logo.png";
+import icon2 from "../../../assets/logo2.png";
 
 import { API_BASE_URL } from '../../../config/api';
 import LogoutButton from '../../../components/login/LogoutButton';
@@ -13,7 +14,7 @@ import { formatDateLocal } from '../../../utils/dateUtils';
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook, faCalendar, faChartLine, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faBook, faCalendar, faChartLine, faBell, faCircleUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 export default function PantallaSeccionDocente() {
     const { seccionId } = useParams();
@@ -21,6 +22,7 @@ export default function PantallaSeccionDocente() {
     const navigate = useNavigate();
 
     const userName = localStorage.getItem('userName');
+    const userEmail = localStorage.getItem('userEmail');
 
     // si venimos desde PantallaDocente, ya tenemos la sección
     const seccionDesdeState = location.state?.seccion || null;
@@ -212,79 +214,144 @@ export default function PantallaSeccionDocente() {
             <div className="docente-right-area">
                 {/* HEADER */}
                 <header className="docente-header">
-                    <div className="header-content">
-                        <h1>{seccion.nombre}</h1>
-                        <div className="header-right">
-                            <p>Profesor: <strong>{userName}</strong></p>
+                    <div className='header-content'>
+                        <div className='name-header'>
+                            <p>Bienvenido, <strong>{userName}</strong></p>
+                            <h1>Campus Virtual</h1>
+                        </div>
+                        <div className='header-right'>
                             <LogoutButton />
                         </div>
                     </div>
-                    <p className="subtitulo-seccion">
-                        Sección {seccion.gradoSeccion} - Nivel {seccion.nivelSeccion} |
-                        Inicio: {formatDateLocal(seccion.fechaInicio)} | Fin: {formatDateLocal(seccion.fechaFin)}
-                    </p>
                 </header>
 
-                <main className="docente-main">
-                    {/* BARRA DE SEMANAS */}
-                    <section className="semanas-section">
-                        <h2>Sesiones de clase:</h2>
-                        <div className="semanas-container">
-                            {semanas.map((num) => {
-                                const esActual = num === semanaActual;
-                                const esSeleccionada = num === semanaSeleccionada;
-                                const esBloqueada = num > semanaActual; // si quieres bloquear semanas futuras
+                <div className='container-all'>
+                    <div className='second-container'>
+                        <div className="header-content-left">
+                            <div className='content-first'>
+                                <img className="icon-class" src={icon2} alt="Logo Campus" />
+                                <div>
+                                    <h2>{seccion.nombre}</h2>
+                                    <p><strong>Sección</strong> {seccion.gradoSeccion}</p>
+                                </div>
+                            </div>
+                            <div className='content-second'>
+                                <p>
+                                    Nivel: <strong>{seccion.nivelSeccion}</strong>
+                                </p>
+                            </div>
+                            <div className='content-third'>
+                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                <div>
+                                    <p>
+                                        Inicio: {formatDateLocal(seccion.fechaInicio)}
+                                    </p>
+                                    <p>
+                                        Fin: {formatDateLocal(seccion.fechaFin)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
-                                return (
+                        <div className='header-content-right'>
+                            <div className='content-first'>
+                                <FontAwesomeIcon icon={faCircleUser} className='icon-text' />
+                                <h2>Docente</h2>
+                            </div>
+                            <div className='content-second'>
+                                <div>
+                                    <h3>NOMBRE</h3>
+                                    <p>{userName}</p>
+                                </div>
+                            </div>
+                            <div className='content-third'>
+                                <FontAwesomeIcon icon={faEnvelope} className='icon-text' />
+                                <p>{userEmail}</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div className='content-body-seccion'>
+                        <main className="docente-main">
+                            {/* BARRA DE SEMANAS */}
+                            <section className="semanas-section">
+                                <h2>Sesiones de clase:</h2>
+                                <div className="semanas-container">
+                                    {semanas.map((num) => {
+                                        const esActual = num === semanaActual;
+                                        const esSeleccionada = num === semanaSeleccionada;
+                                        const esBloqueada = num > semanaActual; // si quieres bloquear semanas futuras
+
+                                        return (
+                                            <button
+                                                key={num}
+                                                className={[
+                                                    "semana-item",
+                                                    esSeleccionada ? "semana-activa" : "",
+                                                    esActual ? "semana-actual" : "",
+                                                    esBloqueada ? "semana-bloqueada" : "",
+                                                ].join(" ")}
+                                                onClick={() => !esBloqueada && handleClickSemana(num)}
+                                                disabled={esBloqueada}
+                                            >
+                                                {num.toString().padStart(2, "0")}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+
+                            {/* CONTENIDO DE LA SEMANA SELECCIONADA */}
+                            <section className="contenido-semana-section-teacher">
+                                <div>
+                                    <h3 className='title-sesion'>Sesión {semanaSeleccionada.toString().padStart(2, "0")}
+                                        {semanaSeleccionada === semanaActual && " (Semana actual)"}</h3>
                                     <button
-                                        key={num}
-                                        className={[
-                                            "semana-item",
-                                            esSeleccionada ? "semana-activa" : "",
-                                            esActual ? "semana-actual" : "",
-                                            esBloqueada ? "semana-bloqueada" : "",
-                                        ].join(" ")}
-                                        onClick={() => !esBloqueada && handleClickSemana(num)}
-                                        disabled={esBloqueada}
+                                        className="btn-primary"
+                                        onClick={handleTomarAsistencia}
+                                        disabled={loadingSesiones || sesiones.length === 0}
                                     >
-                                        {num.toString().padStart(2, "0")}
+                                        {loadingSesiones
+                                            ? "Cargando sesiones..."
+                                            : `Tomar asistencia de Semana ${semanaSeleccionada}`}
                                     </button>
-                                );
-                            })}
-                        </div>
-                    </section>
+                                </div>
 
-                    {/* CONTENIDO DE LA SEMANA SELECCIONADA */}
-                    <section className="contenido-semana-section">
-                        <h3>
-                            Contenido de la semana {semanaSeleccionada.toString().padStart(2, "0")}
-                            {semanaSeleccionada === semanaActual && " (Semana actual)"}
-                        </h3>
+                                <p>
+                                    Contenido del Curso:
+                                </p>
 
-                        <button
-                            className="btn-primary"
-                            onClick={handleTomarAsistencia}
-                            disabled={loadingSesiones || sesiones.length === 0}
-                        >
-                            {loadingSesiones
-                                ? "Cargando sesiones..."
-                                : `Tomar asistencia de Semana ${semanaSeleccionada}`}
-                        </button>
+                                {errorSesiones && (
+                                    <p className="error-message">
+                                        ❌ {errorSesiones}
+                                    </p>
+                                )}
 
-                        {errorSesiones && (
-                            <p className="error-message">
-                                ❌ {errorSesiones}
-                            </p>
-                        )}
-
-                        <div className="contenido-semana-card">
-                            <p>
-                                Aquí irá el contenido que el profesor puede crear/editar para esta semana
-                                (materiales, tareas, foros, etc.).
-                            </p>
-                        </div>
-                    </section>
-                </main>
+                                <div className="contenido-semana-card">
+                                    <div className='area-explora'>
+                                        <h4>EXPLORA</h4>
+                                        <p>
+                                            Aqui ira contenido de tipo documentos, enlaces a videos o redirecciones de paginas de retroalimentacion o conocimiento extra (QUITAR ESTE TEXTO DESPUES DE IMPLEMENTAR LA LOGICA)
+                                        </p>
+                                    </div>
+                                    <div className='area-estudio'>
+                                        <h4>ESTUDIA</h4>
+                                        <p>
+                                            Aquí irá contenido de documentos, ppt, words de la institucion (QUITAR ESTE TEXTO DESPUES DE IMPLEMENTAR LA LOGICA)
+                                        </p>
+                                    </div>
+                                    <div className='area-aplica'>
+                                        <h4>APLICA</h4>
+                                        <p>
+                                            Aqui ira contenido como tareas, enlaces, foros, etc... (QUITAR ESTE TEXTO DESPUES DE IMPLEMENTAR LA LOGICA)
+                                        </p>
+                                    </div>
+                                </div>
+                            </section>
+                        </main>
+                    </div>
+                </div>
             </div>
         </div>
     );

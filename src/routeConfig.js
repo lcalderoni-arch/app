@@ -11,6 +11,8 @@ import GestionCursos from "./pages/AdminCode/GestionCursos.jsx";
 import GestionSecciones from "./pages/AdminCode/GestionSecciones.jsx";
 import GestionMatricula from "./pages/AdminCode/GestionMatricula.jsx";
 import PantallaMonitorAsistencias from "./pages/AdminCode/PantallaMonitorAsistencias.jsx";
+import PantallaMonitorDetalleAsistencias from "./pages/AdminCode/PantallaMonitorDetalleAsistencias.jsx";
+
 
 import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante/PantallaEstudiante.jsx";
 import PantallaMatriculaAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaMatriculaAlumno.jsx";
@@ -81,6 +83,14 @@ const routeConfig = [
         element: (
           <ProtectedRoute allowedRoles={["ADMINISTRADOR", "COORDINADOR"]}>
             <PantallaMonitorAsistencias />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "monitor-asistencias/:seccionId/:sesionId",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
+            <PantallaMonitorDetalleAsistencias />
           </ProtectedRoute>
         ),
       },
