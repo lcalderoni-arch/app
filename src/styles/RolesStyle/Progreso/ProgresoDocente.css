@@ -1,14 +1,19 @@
+/* CONTENEDOR GENERAL DEL PROGRESO */
 .progreso-wrapper {
     padding: 20px;
     color: #f3f4f6;
+    max-width: 1200px;        /* evita que se haga gigante en pantallas grandes */
+    margin: 0 auto;           /* centra el contenido */
 }
 
+/* TÍTULO PRINCIPAL */
 .progreso-title {
     font-size: 22px;
     margin-bottom: 16px;
     font-weight: 600;
 }
 
+/* CARDS RESUMEN (ARRIBA) */
 .progreso-cards {
     display: flex;
     gap: 12px;
@@ -18,41 +23,72 @@
 
 .progreso-card {
     background: #1f2937;
-    padding: 16px;
+    padding: 14px 16px;
     border-radius: 12px;
-    flex: 1 1 160px;
+    flex: 1 1 180px;
     text-align: center;
     color: white;
     box-shadow: 0 6px 15px rgba(0,0,0,0.4);
 }
 
 .progreso-card h3 {
-    font-size: 14px;
+    font-size: 13px;
     opacity: 0.8;
 }
 
 .progreso-card p {
-    margin-top: 6px;
-    font-size: 20px;
+    margin-top: 4px;
+    font-size: 18px;
 }
 
+/* CONTENEDOR DE GRÁFICOS */
 .progreso-charts {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 columnas en desktop */
+    gap: 16px;
+    margin-bottom: 24px;
+    align-items: stretch;
 }
 
+/* CADA CAJA DE GRÁFICO */
 .chart-box {
     background: #111827;
-    padding: 20px;
+    padding: 14px 16px;
     border-radius: 14px;
-    flex: 1 1 260px;
-    min-height: 320px;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
 }
 
+.chart-box h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* Contenedor interno donde va el canvas */
+.chart-box > div {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Limitamos la altura del gráfico */
+.chart-box canvas {
+    max-height: 220px !important;
+}
+
+/* TABLA DE DETALLE */
 .progreso-table {
-    margin-top: 20px;
+    margin-top: 16px;
+}
+
+.progreso-table h4 {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .progreso-table table {
@@ -62,20 +98,53 @@
     color: white;
     border-radius: 12px;
     overflow: hidden;
+    font-size: 13px;
 }
 
 .progreso-table th,
 .progreso-table td {
-    padding: 12px;
+    padding: 10px 12px;
     border-bottom: 1px solid #334155;
-    font-size: 13px;
+}
+
+.progreso-table th {
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #9ca3af;
 }
 
 .progreso-table tr:hover {
     background: #0f172a;
 }
 
+/* TEXTOS DE ESTADO */
 .loading-text,
 .error-text {
     padding: 12px 0;
+}
+
+/* RESPONSIVE BREAKPOINTS */
+
+/* Pantallas medianas: 2 gráficos por fila */
+@media (max-width: 1200px) {
+    .progreso-charts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Pantallas pequeñas: 1 gráfico por fila y un poco menos de padding */
+@media (max-width: 768px) {
+    .progreso-wrapper {
+        padding: 14px;
+    }
+
+    .progreso-charts {
+        grid-template-columns: 1fr;
+    }
+
+    .progreso-card {
+        flex: 1 1 100%;
+    }
 }

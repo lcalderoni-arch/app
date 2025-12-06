@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-import { API_BASE_URL } from "../../../config/api.js";
+import { API_BASE_URL } from "../../../config/api";
 import icon from "../../../assets/logo.png";
+import LogoutButton from "../../../components/login/LogoutButton";
 
-
-import LogoutButton from '../../../components/login/LogoutButton';
 import "../../../styles/RolesStyle/Progreso/ProgresoDocente.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -18,87 +17,123 @@ import {
     faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { Doughnut, Bar } from "react-chartjs-2";
 import {
     Chart as ChartJS,
-    ArcElement,
-    Tooltip,
-    Legend,
     CategoryScale,
     LinearScale,
     BarElement,
+    ArcElement,
+    Tooltip,
+    Legend,
 } from "chart.js";
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+import { Bar, Doughnut } from "react-chartjs-2";
 
-function PantallaProgresoDocente() {
-    const [resumen, setResumen] = useState(null);
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    ArcElement,
+    Tooltip,
+    Legend
+);
+
+export default function PantallaProgresoDocente() {
+    const userName = localStorage.getItem("userName");
+
+    const [dataResumen, setDataResumen] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const userName = localStorage.getItem('userName');
+    const COLORS = [
+        "#f87171",
+        "#60a5fa",
+        "#34d399",
+        "#fbbf24",
+        "#a78bfa",
+        "#fb7185",
+        "#4ade80",
+    ]
 
     useEffect(() => {
-        const fetchProgreso = async () => {
+        const cargarProgreso = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
                 const token = localStorage.getItem("authToken");
-                if (!token) {
-                    throw new Error("No hay token de autenticación.");
-                }
+                if (!token) throw new Error("No estás autenticado.");
 
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                };
+                const config = { headers: { Authorization: `Bearer ${token}` } };
 
                 const resp = await axios.get(`${API_BASE_URL}/docente/progreso`, config);
-                setResumen(resp.data);
+                setDataResumen(resp.data || null);
             } catch (err) {
-                console.error("Error cargando progreso del docente:", err);
-                setError("No se pudo cargar el progreso.");
+                console.error("Error al cargar progreso docente:", err);
+                setError(
+                    err.response?.data?.message ||
+                    "No se pudo cargar el progreso del docente."
+                );
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProgreso();
+        cargarProgreso();
     }, []);
 
-    // Datos para gráficos cuando ya hay resumen
-    let donutData = null;
-    let barData = null;
+    const secciones = dataResumen?.secciones || [];
 
-    if (resumen) {
-        donutData = {
-            labels: ["Total Secciones", "Alumnos Activos"],
-            datasets: [
-                {
-                    data: [resumen.totalSecciones, resumen.totalAlumnos],
-                    backgroundColor: ["#4ade80", "#60a5fa"],
-                    borderWidth: 1,
-                },
-            ],
-        };
+    // === Gráfico: alumnos por sección ===
+    const barDataAlumnos = {
+        labels: secciones.map(
+            (s) => s.cursoTitulo || s.seccionNombre || `Sección ${s.seccionId}`
+        ),
+        datasets: [
+            {
+                label: "Alumnos activos",
+                data: secciones.map((s) => s.alumnosActivos || 0),
+                backgroundColor: COLORS.slice(0, secciones.length),
+                borderColor: "#ffffff22",
+                borderWidth: 1,
+            },
+        ],
+    };
 
-        barData = {
-            labels: resumen.secciones.map((s) => s.seccionNombre),
-            datasets: [
-                {
-                    label: "Promedio",
-                    data: resumen.secciones.map((s) => s.notaPromedioSeccion ?? 0),
-                    backgroundColor: "#fb923c",
-                },
-            ],
-        };
-    }
+    // === Gráfico: promedio por sección ===
+    const barDataPromedios = {
+        labels: secciones.map(
+            (s) => s.cursoTitulo || s.seccionNombre || `Sección ${s.seccionId}`
+        ),
+        datasets: [
+            {
+                label: "Promedio de la sección",
+                data: secciones.map((s) => s.notaPromedioSeccion ?? 0),
+                backgroundColor: COLORS.slice(0, secciones.length),
+                borderColor: "#ffffff22",
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    // === Donut: distribución de alumnos por sección ===
+    const doughnutData = {
+        labels: secciones.map(
+            (s) => s.cursoTitulo || s.seccionNombre || `Sección ${s.seccionId}`
+        ),
+        datasets: [
+            {
+                data: secciones.map((s) => s.alumnosActivos || 0),
+                backgroundColor: COLORS.slice(0, secciones.length),
+                borderColor: "#ffffff22",
+                borderWidth: 1,
+            },
+        ],
+    };
 
     return (
         <div className="docente-layout">
-            {/* SIDEBAR DOCENTE */}
+            {/* SIDEBAR IZQUIERDO */}
             <aside className="docente-sidebar">
                 <div className="sidebar-header">
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
@@ -148,85 +183,131 @@ function PantallaProgresoDocente() {
                 </nav>
             </aside>
 
-            {/* CONTENIDO DERECHA */}
-            <div className="student-right-area">
+            {/* COLUMNA DERECHA */}
+            <div className="docente-right-area">
                 <header className="docente-header">
-                    <div className='header-content'>
-                        <div className='name-header'>
-                            <p>Bienvenido, <strong>{userName}</strong></p>
-                            <h1>Campus Virtual</h1>
+                    <div className="header-content">
+                        <div className="name-header">
+                            <p>
+                                Bienvenido, <strong>{userName}</strong>
+                            </p>
+                            <h1>Progreso de mis secciones</h1>
                         </div>
-                        <div className='header-right'>
+                        <div className="header-right">
                             <LogoutButton />
                         </div>
                     </div>
                 </header>
 
-                {/* MAIN */}
                 <main className="docente-main">
-                    {loading && <p className="loading-text">Cargando progreso...</p>}
-                    {error && <p className="error-text" style={{ color: "salmon" }}>{error}</p>}
+                    <div className="progreso-wrapper">
+                        {loading && <p className="loading-text">Cargando resumen...</p>}
+                        {error && <p className="error-text">❌ {error}</p>}
 
-                    {resumen && (
-                        <div className="progreso-wrapper">
-                            <h2 className="progreso-title">📊 Resumen general</h2>
+                        {dataResumen && (
+                            <>
+                                {/* Título */}
+                                <h2 className="progreso-title">Resumen general</h2>
 
-                            <div className="progreso-cards">
-                                <div className="progreso-card">
-                                    <h3>Total Secciones</h3>
-                                    <p>{resumen.totalSecciones}</p>
+                                {/* CARDS RESUMEN */}
+                                <div className="progreso-cards">
+                                    <div className="progreso-card">
+                                        <h3>Total de secciones</h3>
+                                        <p>{dataResumen.totalSecciones ?? 0}</p>
+                                    </div>
+                                    <div className="progreso-card">
+                                        <h3>Total de alumnos</h3>
+                                        <p>{dataResumen.totalAlumnos ?? 0}</p>
+                                    </div>
+                                    <div className="progreso-card">
+                                        <h3>Promedio global</h3>
+                                        <p>
+                                            {dataResumen.calificacionPromedioGlobal != null
+                                                ? dataResumen.calificacionPromedioGlobal.toFixed(2)
+                                                : "-"}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="progreso-card">
-                                    <h3>Total Alumnos</h3>
-                                    <p>{resumen.totalAlumnos}</p>
-                                </div>
-                                <div className="progreso-card">
-                                    <h3>Promedio Global</h3>
-                                    <p>{resumen.calificacionPromedioGlobal ?? "—"}</p>
-                                </div>
-                            </div>
 
-                            <div className="progreso-charts">
-                                <div className="chart-box">
-                                    <h3>Distribución General</h3>
-                                    <Doughnut data={donutData} />
+                                {/* GRAFICOS */}
+                                <div className="progreso-charts">
+                                    <div className="chart-box">
+                                        <h4>Alumnos activos por sección</h4>
+                                        {secciones.length > 0 ? (
+                                            <Bar data={barDataAlumnos} />
+                                        ) : (
+                                            <p>No hay secciones con alumnos activos.</p>
+                                        )}
+                                    </div>
+
+                                    <div className="chart-box">
+                                        <h4>Promedio de notas por sección</h4>
+                                        {secciones.length > 0 ? (
+                                            <Bar data={barDataPromedios} />
+                                        ) : (
+                                            <p>Aún no hay promedios registrados.</p>
+                                        )}
+                                    </div>
+
+                                    <div className="chart-box">
+                                        <h4>Distribución de alumnos por sección</h4>
+                                        {secciones.length > 0 ? (
+                                            <Doughnut data={doughnutData} />
+                                        ) : (
+                                            <p>No hay datos suficientes.</p>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <div className="chart-box">
-                                    <h3>Promedio por Sección</h3>
-                                    <Bar data={barData} />
-                                </div>
-                            </div>
-
-                            <div className="progreso-table">
-                                <h3>📚 Detalle por Sección</h3>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Curso</th>
-                                            <th>Sección</th>
-                                            <th>Alumnos Activos</th>
-                                            <th>Promedio</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {resumen.secciones.map((s) => (
-                                            <tr key={s.seccionId}>
-                                                <td>{s.cursoTitulo}</td>
-                                                <td>{s.seccionNombre}</td>
-                                                <td>{s.alumnosActivos}</td>
-                                                <td>{s.notaPromedioSeccion ?? "—"}</td>
+                                {/* TABLA DETALLE */}
+                                <div className="progreso-table">
+                                    <h4>Detalle de secciones</h4>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Curso</th>
+                                                <th>Sección</th>
+                                                <th>Alumnos activos</th>
+                                                <th>Promedio</th>
+                                                <th>Exámenes</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
+                                        </thead>
+                                        <tbody>
+                                            {secciones.map((s) => (
+                                                <tr key={s.seccionId}>
+                                                    <td>{s.cursoTitulo}</td>
+                                                    <td>{s.seccionNombre}</td>
+                                                    <td>{s.alumnosActivos ?? 0}</td>
+                                                    <td>
+                                                        {s.notaPromedioSeccion != null
+                                                            ? s.notaPromedioSeccion.toFixed(2)
+                                                            : "-"}
+                                                    </td>
+                                                    <td>
+                                                        <Link
+                                                            to={`/docente/seccion/${s.seccionId}/examenes`}
+                                                            style={{ fontSize: "12px", color: "#60a5fa" }}
+                                                        >
+                                                            Ver exámenes →
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {secciones.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={5} style={{ textAlign: "center" }}>
+                                                        No tienes secciones registradas aún.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </main>
             </div>
         </div>
     );
 }
-
-export default PantallaProgresoDocente;

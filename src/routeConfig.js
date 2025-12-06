@@ -29,8 +29,12 @@ import PantallaMatriculaAlumno from "./pages/PantallaRoles/PantallaEstudiante/Pa
 import PantallaAsistenciasAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaAsistenciasAlumno.jsx";
 import PantallaAsistenciasDocente from "./pages/PantallaRoles/PantallaDocente/PantallaAsistenciasDocente.jsx";
 
+import PantallaExamenesAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaExamenesAlumno.jsx";
+import PantallaExamenesDocente from "./pages/PantallaRoles/PantallaDocente/PantallaExamenesDocente.jsx";
+
 // IMPORTAMOS LA NUEVA VISTA
 import PantallaSeccionEstudiante from "./pages/PantallaRoles/PantallaEstudiante/PantallaSeccionEstudiante.jsx";
+
 
 import PantallaDocente from "./pages/PantallaRoles/PantallaDocente/PantallaDocente.jsx";
 import PantallaSeccionDocente from "./pages/PantallaRoles/PantallaDocente/PantallaSeccionDocente.jsx";
@@ -157,6 +161,14 @@ const routeConfig = [
       </ProtectedRoute>
     ),
   },
+  {
+    path: "/pantalla-alumno/examenes",
+    element: (
+      <ProtectedRoute allowedRoles={["ALUMNO"]}>
+        <PantallaExamenesAlumno />
+      </ProtectedRoute>
+    ),
+  },
 
   // --- RUTAS DOCENTE ---
   {
@@ -205,6 +217,14 @@ const routeConfig = [
     element: (
       <ProtectedRoute allowedRoles={["PROFESOR"]}>
         <PantallaProgresoDocente />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/docente/seccion/:seccionId/examenes",
+    element: (
+      <ProtectedRoute allowedRoles={["PROFESOR"]}>
+        <PantallaExamenesDocente />
       </ProtectedRoute>
     ),
   },

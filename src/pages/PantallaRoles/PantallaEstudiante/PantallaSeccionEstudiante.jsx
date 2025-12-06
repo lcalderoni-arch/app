@@ -524,6 +524,18 @@ export default function PantallaSeccionEstudiante() {
                                     >
                                         Ver mis asistencias
                                     </button>
+
+                                    <button
+                                        className="btn-primary"
+                                        onClick={() =>
+                                            navigate("/pantalla-alumno/examenes", {
+                                                state: { seccionId },   // si tu pantalla de exámenes quiere filtrar por sección
+                                            })
+                                        }
+                                    >
+                                        Ver notas de exámenes
+                                    </button>
+
                                 </div>
 
                                 <p>Contenido del Curso:</p>

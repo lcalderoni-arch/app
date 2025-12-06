@@ -1,0 +1,122 @@
+/* Layout general */
+.alumno-examenes-main {
+    margin-top: 20px;
+    padding: 16px 18px;
+    background: #020617;
+    border-radius: 12px;
+    border: 1px solid #1f2933;
+    color: #f9fafb;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+/* Contenedor */
+.examenes-alumno-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) 1fr;
+    gap: 20px;
+}
+
+/* Lista de exámenes (izquierda) */
+.examenes-alumno-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.examen-card {
+    background: #0b1120;
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #1f2937;
+}
+
+.examen-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.examen-sub {
+    font-size: 12px;
+    color: #e5e7eb;
+    margin-bottom: 4px;
+}
+
+.examen-stats-mini {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 2px;
+}
+
+.examen-prom {
+    font-size: 12px;
+    color: #f97316;
+}
+
+/* Panel de detalle / tabla */
+.examenes-alumno-detalle {
+    background: #020617;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
+    padding: 12px 14px;
+}
+
+/* Tabla de notas del alumno */
+.tabla-notas-examen-alumno {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: #020617;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.tabla-notas-examen-alumno thead {
+    background: #111827;
+}
+
+.tabla-notas-examen-alumno th,
+.tabla-notas-examen-alumno td {
+    border-bottom: 1px solid #1f2937;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.tabla-notas-examen-alumno th {
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #9ca3af;
+}
+
+.tabla-notas-examen-alumno tbody tr:hover {
+    background: #020617;
+}
+
+/* Reutilizamos los mismos badges de estado */
+.badge-estado {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-estado.badge-aprobado {
+    background: rgba(22, 163, 74, 0.15);
+    color: #bbf7d0;
+    border: 1px solid #22c55e;
+}
+
+.badge-estado.badge-desaprobado {
+    background: rgba(220, 38, 38, 0.15);
+    color: #fecaca;
+    border: 1px solid #ef4444;
+}
+
+.badge-estado.badge-pendiente {
+    background: rgba(148, 163, 184, 0.15);
+    color: #e5e7eb;
+    border: 1px solid #6b7280;
+}

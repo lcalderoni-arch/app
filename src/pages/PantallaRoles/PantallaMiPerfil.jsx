@@ -209,7 +209,7 @@ function PantallaMiPerfil() {
             {/* ===== COLUMNA DERECHA: HEADER + CONTENIDO ===== */}
             <div className={esAlumno ? "student-right-area" : "docente-right-area"}>
                 {/* HEADER */}
-                <header className={esAlumno ? "student-header-perfil" : "docente-header-perfil"}>
+                <header className={esAlumno ? "docente-header-perfil" : "docente-header-perfil"}>
                     <div className="header-left">
                         <div className="header-text">
                             <h1>Mi Perfil</h1>

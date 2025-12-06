@@ -1,0 +1,342 @@
+/* ===========================
+   Layout general
+   =========================== */
+
+.docente-examenes-main {
+    margin-top: 20px;
+    padding: 16px 18px;
+    background: #020617;
+    border-radius: 12px;
+    border: 1px solid #1f2933;
+    color: #f9fafb;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+/* Información de la sección (arriba) */
+.examenes-seccion-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1f2937;
+}
+
+.examenes-seccion-info h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.examenes-seccion-info p {
+    font-size: 13px;
+    color: #e5e7eb;
+}
+
+.examenes-seccion-info .btn-volver {
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    border: 1px solid #4b5563;
+    background: #0b1120;
+    color: #e5e7eb;
+    cursor: pointer;
+}
+
+.examenes-seccion-info .btn-volver:hover {
+    background: #111827;
+}
+
+/* ===========================
+   Grid principal (2 columnas)
+   =========================== */
+
+.examenes-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) 1fr;
+    gap: 20px;
+}
+
+/* Columna izquierda */
+.examenes-col-left h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+/* Lista de exámenes */
+.examenes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.examen-card {
+    background: #0b1120;
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #1f2937;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.examen-card:hover {
+    border-color: #f97316;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
+}
+
+.examen-card-activo {
+    border-color: #f97316;
+    background: #111827;
+}
+
+.examen-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.examen-sub {
+    font-size: 12px;
+    color: #e5e7eb;
+    margin-bottom: 4px;
+}
+
+.examen-stats-mini {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 2px;
+}
+
+.examen-prom {
+    font-size: 12px;
+    color: #f97316;
+}
+
+/* ===========================
+   Formulario: nuevo examen
+   =========================== */
+
+.examen-crear-section {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #2a2e3f;
+    border: 1px dashed #374151;
+}
+
+.examen-crear-section h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.examen-crear-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.examen-crear-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.examen-crear-form input,
+.examen-crear-form textarea {
+    border-radius: 8px;
+    border: 1px solid #4b5563;
+    background: #020617;
+    color: #f9fafb;
+    padding: 6px 8px;
+    font-size: 12px;
+    resize: vertical;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+/* Reutilizamos .btn-primary global, pero por si acaso: */
+.btn-primary-examen {
+    margin-top: 6px;
+    border-radius: 8px;
+    border: none;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    background: #1680f9;
+    color: #111827;
+    font-weight: 600;
+}
+
+.btn-primary:hover:enabled {
+    filter: brightness(1.05);
+}
+
+/* ===========================
+   Columna derecha (notas)
+   =========================== */
+
+.examenes-col-right {
+    background: #191c29;
+    border-radius: 10px;
+    border: 1px solid #1f2937;
+    padding: 12px 14px;
+    min-height: 200px;
+}
+
+/* Header de notas del examen seleccionado */
+.examen-notas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.examen-notas-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.examen-notas-header p {
+    font-size: 12px;
+    color: #e5e7eb;
+}
+
+/* Estadísticas (aprob, desap, pend) */
+.examen-stats-boxes {
+    display: flex;
+    gap: 8px;
+}
+
+.examen-stat-box {
+    min-width: 90px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+    border: 1px solid #374151;
+    background: #020617;
+}
+
+.examen-stat-box span {
+    color: #9ca3af;
+}
+
+.examen-stat-box strong {
+    font-size: 14px;
+}
+
+/* Colores por tipo */
+.examen-stat-box.aprob {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
+}
+
+.examen-stat-box.desap {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+}
+
+.examen-stat-box.pend {
+    border-color: #6b7280;
+}
+
+/* ===========================
+   Tabla de notas
+   =========================== */
+
+.tabla-notas-examen {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: #020617;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.tabla-notas-examen thead {
+    background: #111827;
+}
+
+.tabla-notas-examen th,
+.tabla-notas-examen td {
+    border-bottom: 1px solid #1f2937;
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.tabla-notas-examen th {
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #9ca3af;
+}
+
+.tabla-notas-examen tbody tr:hover {
+    background: #020617;
+}
+
+/* Input de nota */
+.input-nota {
+    width: 70px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px solid #4b5563;
+    background: #020617;
+    color: #f9fafb;
+    font-size: 12px;
+}
+
+/* Badges de estado */
+.badge-estado {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* OJO: aquí usamos las clases EXACTAS del JSX:
+   className="badge-estado badge-aprobado" etc. */
+.badge-estado.badge-aprobado {
+    background: rgba(22, 163, 74, 0.15);
+    color: #bbf7d0;
+    border: 1px solid #22c55e;
+}
+
+.badge-estado.badge-desaprobado {
+    background: rgba(220, 38, 38, 0.15);
+    color: #fecaca;
+    border: 1px solid #ef4444;
+}
+
+.badge-estado.badge-pendiente {
+    background: rgba(148, 163, 184, 0.15);
+    color: #e5e7eb;
+    border: 1px solid #6b7280;
+}
+
+/* Footer de notas (botón guardar) */
+.examen-notas-footer {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    font-size: 12px;
+    color: #9ca3af;
+}

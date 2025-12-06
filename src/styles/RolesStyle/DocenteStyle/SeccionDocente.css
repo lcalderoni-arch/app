@@ -789,3 +789,15 @@
 .icon-button:hover {
     background-color: #e5e7eb;
 }
+
+.acciones-alumno {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.acciones-botones {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-import { API_BASE_URL } from "../../../config/api.js";
+import { API_BASE_URL } from "../../../config/api";
 import icon from "../../../assets/logo.png";
-
-import LogoutButton from '../../../components/login/LogoutButton';
+import LogoutButton from "../../../components/login/LogoutButton";
 
 import "../../../styles/RolesStyle/Progreso/ProgresoAlumno.css";
 
@@ -19,87 +18,135 @@ import {
     faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { Doughnut, Bar } from "react-chartjs-2";
 import {
     Chart as ChartJS,
-    ArcElement,
-    Tooltip,
-    Legend,
     CategoryScale,
     LinearScale,
     BarElement,
+    ArcElement,
+    Tooltip,
+    Legend,
 } from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    ArcElement,
+    Tooltip,
+    Legend
+);
 
-function PantallaProgresoAlumno() {
-    const [resumen, setResumen] = useState(null);
+export default function PantallaProgresoAlumno() {
+    const userName = localStorage.getItem("userName");
+
+    const [dataResumen, setDataResumen] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const userName = localStorage.getItem('userName');
+    const COLORS = [
+        "#f87171",
+        "#60a5fa",
+        "#34d399",
+        "#fbbf24",
+        "#a78bfa",
+        "#fb7185",
+        "#4ade80",
+    ]
+
 
     useEffect(() => {
-        const fetchProgreso = async () => {
+        const cargarProgreso = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
                 const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No hay token de autenticación.");
+                if (!token) throw new Error("No estás autenticado.");
 
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                };
+                const config = { headers: { Authorization: `Bearer ${token}` } };
 
                 const resp = await axios.get(`${API_BASE_URL}/alumno/progreso`, config);
-                setResumen(resp.data);
+                setDataResumen(resp.data || null);
             } catch (err) {
-                console.error("Error cargando progreso del alumno:", err);
-                setError("No se pudo cargar el progreso.");
+                console.error("Error al cargar progreso alumno:", err);
+                setError(
+                    err.response?.data?.message ||
+                    "No se pudo cargar tu progreso académico."
+                );
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProgreso();
+        cargarProgreso();
     }, []);
 
-    let donutData = null;
-    let barData = null;
+    const cursos = dataResumen?.cursos || [];
 
-    if (resumen) {
-        donutData = {
-            labels: ["Cursos Activos", "Avance Promedio"],
-            datasets: [
-                {
-                    data: [
-                        resumen.totalCursosActivos,
-                        Math.round(resumen.avancePromedio ?? 0),
-                    ],
-                    backgroundColor: ["#34d399", "#60a5fa"],
-                    borderWidth: 1,
-                },
-            ],
-        };
+    // === Gráfico: notas finales por curso ===
+    const barDataNotas = {
+        labels: cursos.map(
+            (c) => c.cursoTitulo || c.seccionNombre || `Sección ${c.seccionId}`
+        ),
+        datasets: [
+            {
+                label: "Nota final",
+                data: cursos.map((c) => c.notaFinal ?? 0),
+                backgroundColor: COLORS.slice(0, cursos.length),
+                borderColor: "#ffffff22",
+                borderWidth: 1,
+            },
+        ],
+    };
 
-        barData = {
-            labels: resumen.cursos.map((c) => c.cursoTitulo),
-            datasets: [
-                {
-                    label: "Nota Final",
-                    data: resumen.cursos.map((c) => c.notaFinal ?? 0),
-                    backgroundColor: "#fb7185",
-                },
-            ],
-        };
-    }
+    // === Gráfico: avance por curso ===
+    const barDataAvance = {
+        labels: cursos.map(
+            (c) => c.cursoTitulo || c.seccionNombre || `Sección ${c.seccionId}`
+        ),
+        datasets: [
+            {
+                label: "Avance (%)",
+                data: cursos.map((c) => c.avancePorcentaje ?? 0),
+                backgroundColor: COLORS.slice(0, cursos.length),
+                borderColor: "#ffffff22",
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    // === Donut: cursos aprobados / desaprobados / sin nota ===
+    let aprobados = 0;
+    let desaprobados = 0;
+    let sinNota = 0;
+
+    cursos.forEach((c) => {
+        if (c.notaFinal == null) {
+            sinNota++;
+        } else if (c.notaFinal >= 10.5) {
+            aprobados++;
+        } else {
+            desaprobados++;
+        }
+    });
+
+    const donutEstadoCursos = {
+        labels: ["Aprobados", "Desaprobados", "Sin nota"],
+        datasets: [
+            {
+                data: [aprobados, desaprobados, sinNota],
+                backgroundColor: COLORS.slice(0, 3),
+                borderColor: "#ffffff22",
+                borderWidth: 1,
+            },
+        ],
+    };
 
     return (
         <div className="student-layout">
-            {/* SIDEBAR ESTUDIANTE */}
+            {/* SIDEBAR */}
             <aside className="student-sidebar">
                 <div className="sidebar-header">
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
@@ -146,7 +193,7 @@ function PantallaProgresoAlumno() {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/mi-perfil">
+                            <Link to="/mi-perfil" className="desactive">
                                 <FontAwesomeIcon icon={faUser} className="icon-text" />
                                 Mi Perfil
                             </Link>
@@ -155,85 +202,139 @@ function PantallaProgresoAlumno() {
                 </nav>
             </aside>
 
-            {/* CONTENIDO DERECHA */}
+            {/* COLUMNA DERECHA */}
             <div className="student-right-area">
                 <header className="docente-header">
-                    <div className='header-content'>
-                        <div className='name-header'>
-                            <p>Bienvenido, <strong>{userName}</strong></p>
-                            <h1>Campus Virtual</h1>
+                    <div className="header-content">
+                        <div className="name-header">
+                            <p>
+                                Bienvenido, <strong>{userName}</strong>
+                            </p>
+                            <h1>Mi progreso académico</h1>
                         </div>
-                        <div className='header-right'>
+                        <div className="header-right">
                             <LogoutButton />
                         </div>
                     </div>
                 </header>
 
-                {/* MAIN */}
-                <main className="student-main">
-                    {loading && <p className="loading-text">Cargando progreso...</p>}
-                    {error && <p className="error-text" style={{ color: "salmon" }}>{error}</p>}
+                <main className="perfil-main">
+                    <div className="progreso-wrapper">
+                        {loading && <p className="loading-text">Cargando progreso...</p>}
+                        {error && <p className="error-text">❌ {error}</p>}
 
-                    {resumen && (
-                        <div className="progreso-wrapper">
-                            <h2 className="progreso-title">🎓 Resumen general</h2>
+                        {dataResumen && (
+                            <>
+                                <h2 className="progreso-title">Resumen general</h2>
 
-                            <div className="progreso-cards">
-                                <div className="progreso-card">
-                                    <h3>Cursos Activos</h3>
-                                    <p>{resumen.totalCursosActivos}</p>
+                                {/* CARDS */}
+                                <div className="progreso-cards">
+                                    <div className="progreso-card">
+                                        <h3>Cursos activos</h3>
+                                        <p>{dataResumen.totalCursosActivos ?? 0}</p>
+                                    </div>
+                                    <div className="progreso-card">
+                                        <h3>Nota promedio</h3>
+                                        <p>
+                                            {dataResumen.notaPromedio != null
+                                                ? dataResumen.notaPromedio.toFixed(2)
+                                                : "-"}
+                                        </p>
+                                    </div>
+                                    <div className="progreso-card">
+                                        <h3>Avance promedio</h3>
+                                        <p>
+                                            {dataResumen.avancePromedio != null
+                                                ? `${dataResumen.avancePromedio.toFixed(0)}%`
+                                                : "-"}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="progreso-card">
-                                    <h3>Nota Promedio</h3>
-                                    <p>{resumen.notaPromedio ?? "—"}</p>
-                                </div>
-                                <div className="progreso-card">
-                                    <h3>Avance Promedio</h3>
-                                    <p>{Math.round(resumen.avancePromedio ?? 0)}%</p>
-                                </div>
-                            </div>
 
-                            <div className="progreso-charts">
-                                <div className="chart-box">
-                                    <h3>Resumen General</h3>
-                                    <Doughnut data={donutData} />
+                                {/* GRAFICOS */}
+                                <div className="progreso-charts">
+                                    <div className="chart-box">
+                                        <h4>Notas finales por curso</h4>
+                                        {cursos.length > 0 ? (
+                                            <Bar data={barDataNotas} />
+                                        ) : (
+                                            <p>Aún no tienes notas registradas.</p>
+                                        )}
+                                    </div>
+
+                                    <div className="chart-box">
+                                        <h4>Avance por curso</h4>
+                                        {cursos.length > 0 ? (
+                                            <Bar data={barDataAvance} />
+                                        ) : (
+                                            <p>Aún no hay información de avance.</p>
+                                        )}
+                                    </div>
+
+                                    <div className="chart-box">
+                                        <h4>Estado de mis cursos</h4>
+                                        {cursos.length > 0 ? (
+                                            <Doughnut data={donutEstadoCursos} />
+                                        ) : (
+                                            <p>No hay cursos para mostrar.</p>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <div className="chart-box">
-                                    <h3>Notas por Curso</h3>
-                                    <Bar data={barData} />
-                                </div>
-                            </div>
-
-                            <div className="progreso-table">
-                                <h3>📘 Cursos Matriculados</h3>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Curso</th>
-                                            <th>Sección</th>
-                                            <th>Nota Final</th>
-                                            <th>Avance</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {resumen.cursos.map((c) => (
-                                            <tr key={c.seccionId}>
-                                                <td>{c.cursoTitulo}</td>
-                                                <td>{c.seccionNombre}</td>
-                                                <td>{c.notaFinal ?? "—"}</td>
-                                                <td>{Math.round(c.avancePorcentaje ?? 0)}%</td>
+                                {/* TABLA DETALLE */}
+                                <div className="progreso-table">
+                                    <h4>Detalle por curso</h4>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Curso</th>
+                                                <th>Sección</th>
+                                                <th>Nota final</th>
+                                                <th>Avance</th>
+                                                <th>Estado</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
+                                        </thead>
+                                        <tbody>
+                                            {cursos.map((c) => {
+                                                let estado = "Sin nota";
+                                                if (c.notaFinal != null) {
+                                                    estado =
+                                                        c.notaFinal >= 10.5 ? "Aprobado" : "Desaprobado";
+                                                }
+
+                                                return (
+                                                    <tr key={c.seccionId}>
+                                                        <td>{c.cursoTitulo}</td>
+                                                        <td>{c.seccionNombre}</td>
+                                                        <td>
+                                                            {c.notaFinal != null
+                                                                ? c.notaFinal.toFixed(2)
+                                                                : "-"}
+                                                        </td>
+                                                        <td>
+                                                            {c.avancePorcentaje != null
+                                                                ? `${c.avancePorcentaje.toFixed(0)}%`
+                                                                : "-"}
+                                                        </td>
+                                                        <td>{estado}</td>
+                                                    </tr>
+                                                );
+                                            })}
+                                            {cursos.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={5} style={{ textAlign: "center" }}>
+                                                        No estás matriculado en ningún curso todavía.
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </main>
             </div>
         </div>
     );
 }
-
-export default PantallaProgresoAlumno;

@@ -774,7 +774,7 @@ export default function PantallaSeccionDocente() {
                     <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <Link to="/pantalla-docente">
+                            <Link to="/pantalla-docente"  className="active">
                                 <FontAwesomeIcon icon={faBook} className="icon-text" />
                                 Mis Cursos
                             </Link>
@@ -786,7 +786,7 @@ export default function PantallaSeccionDocente() {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/docente/progreso" className="active">
+                            <Link to="/docente/progreso">
                                 <FontAwesomeIcon icon={faChartLine} className="icon-text" />
                                 Progreso
                             </Link>
@@ -915,6 +915,13 @@ export default function PantallaSeccionDocente() {
                                         {loadingSesiones
                                             ? "Cargando sesiones..."
                                             : `Tomar asistencia de Semana ${semanaSeleccionada}`}
+                                    </button>
+
+                                    <button
+                                        className="btn-primary"
+                                        onClick={() => navigate(`/docente/seccion/${seccion.id}/examenes`)}
+                                    >
+                                        Gestionar exámenes
                                     </button>
                                 </div>
 
