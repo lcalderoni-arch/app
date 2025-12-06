@@ -348,7 +348,7 @@
 }
 
 /* =========================
-   Tarjetas de recursos
+    Tarjetas de recursos
    ========================= */
 
 .recursos-grid {
@@ -428,7 +428,7 @@
     margin-top: 12px;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px dashed #c5c5c5;
+    border: 2px dashed #363636;
     background-color: #fdfdfd;
     display: flex;
     flex-direction: column;
@@ -489,3 +489,250 @@
     border-radius: 6px;
     border: 1px solid #ffb3b3;
 }
+
+.recurso-card-actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.btn-recurso-edit,
+.btn-recurso-delete {
+    flex: 1;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: none;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.05s ease;
+}
+
+.btn-recurso-edit {
+    background-color: #e5e8f9;
+    color: #265dd4;
+}
+
+.btn-recurso-edit:hover {
+    background-color: #d0d7f7;
+    transform: translateY(-1px);
+}
+
+.btn-recurso-delete {
+    background-color: #ffe8e8;
+    color: #c0392b;
+}
+
+.btn-recurso-delete:hover {
+    background-color: #ffd0d0;
+    transform: translateY(-1px);
+}
+
+/* ---------------- TAREAS ---------------- */
+
+.tarea-fields-divider {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    border-top: 1px dashed #d0d0d0;
+}
+
+.tarea-label-group {
+    font-size: 12px;
+    font-weight: 700;
+    color: #444;
+    margin-bottom: 4px;
+}
+
+.tarea-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* meta de tarea dentro de la card */
+.recurso-tarea-meta {
+    margin-top: 4px;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: #444;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.recurso-tarea-meta p {
+    margin: 0;
+}
+
+.pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.pill-green {
+    background-color: #e1f6e8;
+    color: #1f8c3a;
+}
+
+.pill-gray {
+    background-color: #eee;
+    color: #666;
+}
+
+/* acciones de editar / eliminar en la card docente */
+.recurso-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.btn-recurso-edit,
+.btn-recurso-delete {
+    border: none;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-recurso-edit {
+    background-color: #f0f3ff;
+    color: #265dd4;
+}
+
+.btn-recurso-delete {
+    background-color: #ffe8e8;
+    color: #c0392b;
+}
+
+.btn-recurso-edit:hover {
+    background-color: #d9e1ff;
+}
+
+.btn-recurso-delete:hover {
+    background-color: #ffcccc;
+}
+
+/* si quieres que el botón de tarea no sea clickeable en docente */
+.tarea-btn-disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+/* ---------------- MODAL TAREA (ALUMNO) ---------------- */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: #222;
+    color: #f5f5f5;
+    border-radius: 16px;
+    width: 520px;
+    max-width: 95%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 16px 18px 18px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.modal-close {
+    border: none;
+    background: transparent;
+    color: #f5f5f5;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.modal-body {
+    font-size: 13px;
+}
+
+.modal-tarea-desc {
+    margin-bottom: 10px;
+}
+
+.modal-tarea-meta {
+    background: #333;
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.modal-tarea-meta p {
+    margin: 2px 0;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 12px;
+}
+
+.modal-form input[type="text"],
+.modal-form textarea,
+.modal-form input[type="file"] {
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    padding: 5px 7px;
+    background: #111;
+    color: #f5f5f5;
+}
+
+.modal-note {
+    font-size: 11px;
+    color: #bbb;
+}
+
+.modal-submit-btn {
+    margin-top: 4px;
+    align-self: flex-end;
+    padding: 6px 16px;
+    border-radius: 999px;
+    border: none;
+    background-color: #f6a623;
+    color: #222;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.modal-submit-btn:hover {
+    background-color: #ffb836;
+}
+

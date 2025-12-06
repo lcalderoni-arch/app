@@ -1,34 +1,51 @@
+// frontend/PantallaSeccionAlumno.jsx
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import { API_BASE_URL } from '../../../config/api';
 import LogoutButton from '../../../components/login/LogoutButton';
 import { formatDateLocal } from '../../../utils/dateUtils';
-import icon from "../../../assets/logo.png";
 
-// Reutilizamos estilos. Puedes usar el de docente si quieres que se vea igual la estructura interna
+import icon from "../../../assets/logo.png";
+import icon2 from "../../../assets/logo2.png";
+
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
-// Importamos los estilos de sección para la barra de semanas y estructura (asegúrate de que este archivo exista)
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faBook, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faBook, faSpinner, faBell, faChartLine, faCalendar, faCircleUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
-export default function PantallaSeccionAlumno() {
+export default function PantallaSeccionEstudiante() {
     const { seccionId } = useParams();
     const navigate = useNavigate();
+
     const userName = localStorage.getItem('userName');
+    const userEmail = localStorage.getItem('userEmail');
 
     const [seccion, setSeccion] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [sesiones, setSesiones] = useState([]);
     const [semanaSeleccionada, setSemanaSeleccionada] = useState(1);
 
-    // --- Cargar datos de la sección ---
+    const [recursos, setRecursos] = useState([]);
+    const [loadingRecursos, setLoadingRecursos] = useState(false);
+    const [errorRecursos, setErrorRecursos] = useState(null);
+
+    // Modal de tarea
+    const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
+    const [showModalTarea, setShowModalTarea] = useState(false);
+
+    const [tituloEntrega, setTituloEntrega] = useState("");
+    const [descripcionEntrega, setDescripcionEntrega] = useState("");
+    const [archivoEntrega, setArchivoEntrega] = useState(null);
+    const [enviandoEntrega, setEnviandoEntrega] = useState(false);
+
+    // --- cargar sección + sesiones ---
     useEffect(() => {
-        const cargarSeccion = async () => {
+        const cargarDatos = async () => {
             try {
                 setLoading(true);
                 const token = localStorage.getItem('authToken');
@@ -36,17 +53,16 @@ export default function PantallaSeccionAlumno() {
 
                 const config = { headers: { Authorization: `Bearer ${token}` } };
 
-                // Reutilizamos el endpoint para obtener info básica de la sección
-                const response = await axios.get(
-                    `${API_BASE_URL}/secciones/${seccionId}`,
-                    config
-                );
+                const [seccionRes, sesionesRes] = await Promise.all([
+                    axios.get(`${API_BASE_URL}/secciones/${seccionId}`, config),
+                    axios.get(`${API_BASE_URL}/sesiones/seccion/${seccionId}`, config),
+                ]);
 
-                setSeccion(response.data);
+                setSeccion(seccionRes.data);
+                setSesiones(sesionesRes.data || []);
 
-                // Si la sección tiene una semana actual, la seleccionamos por defecto
-                if (response.data.semanaActual > 0) {
-                    setSemanaSeleccionada(response.data.semanaActual);
+                if (seccionRes.data.semanaActual > 0) {
+                    setSemanaSeleccionada(seccionRes.data.semanaActual);
                 }
             } catch (err) {
                 console.error("Error al cargar la sección:", err);
@@ -56,12 +72,229 @@ export default function PantallaSeccionAlumno() {
             }
         };
 
-        cargarSeccion();
+        cargarDatos();
     }, [seccionId]);
+
+    // Sesión actual
+    let sesionActualId = null;
+    if (sesiones && sesiones.length > 0) {
+        const index = semanaSeleccionada - 1;
+        sesionActualId = sesiones[index]?.id || null;
+    }
+
+    // Cargar recursos de la sesión actual
+    useEffect(() => {
+        const cargarRecursos = async () => {
+            if (!sesionActualId) {
+                setRecursos([]);
+                setErrorRecursos(null);
+                return;
+            }
+
+            try {
+                setLoadingRecursos(true);
+                setErrorRecursos(null);
+
+                const token = localStorage.getItem("authToken");
+                if (!token) throw new Error("No estás autenticado.");
+
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+
+                const response = await axios.get(
+                    `${API_BASE_URL}/recursos/sesion/${sesionActualId}`,
+                    config
+                );
+
+                setRecursos(response.data || []);
+            } catch (err) {
+                console.error("Error al cargar recursos:", err);
+                setErrorRecursos(
+                    err.response?.data?.message ||
+                    "No se pudieron cargar los recursos de la sesión."
+                );
+                setRecursos([]);
+            } finally {
+                setLoadingRecursos(false);
+            }
+        };
+
+        cargarRecursos();
+    }, [sesionActualId]);
 
     const handleClickSemana = (numSemana) => {
         setSemanaSeleccionada(numSemana);
-        // Aquí cargarías materiales/tareas de esa semana en el futuro
+    };
+
+    const numeroSemanas = seccion?.numeroSemanas || sesiones.length || 0;
+    const semanas = Array.from({ length: numeroSemanas }, (_, i) => i + 1);
+    const semanaActual = seccion?.semanaActual || 0;
+
+    const recursosExplora = recursos.filter((r) => r.momento === "ANTES");
+    const recursosEstudia = recursos.filter((r) => r.momento === "DURANTE");
+    const recursosAplica = recursos.filter((r) => r.momento === "DESPUES");
+
+    const formatDateTimeLocal = (value) => {
+        if (!value) return "";
+        const d = new Date(value);
+        return d.toLocaleString();
+    };
+
+    const ahoraDentroDeRango = (tarea) => {
+        if (!tarea) return false;
+        const ahora = new Date().getTime();
+        const ini = tarea.fechaInicioEntrega ? new Date(tarea.fechaInicioEntrega).getTime() : null;
+        const fin = tarea.fechaFinEntrega ? new Date(tarea.fechaFinEntrega).getTime() : null;
+
+        if (ini && ahora < ini) return false;
+        if (fin && ahora > fin) return false;
+        return true;
+    };
+
+    const abrirModalTarea = (tarea) => {
+        setTareaSeleccionada(tarea);
+        setTituloEntrega("");
+        setDescripcionEntrega("");
+        setArchivoEntrega(null);
+        setShowModalTarea(true);
+    };
+
+    const cerrarModalTarea = () => {
+        setShowModalTarea(false);
+        setTareaSeleccionada(null);
+    };
+
+    const handleEnviarEntrega = async (e) => {
+        e.preventDefault();
+        if (!tareaSeleccionada || !archivoEntrega) {
+            alert("Debes seleccionar un archivo para enviar tu tarea.");
+            return;
+        }
+
+        try {
+            setEnviandoEntrega(true);
+            const token = localStorage.getItem("authToken");
+            if (!token) throw new Error("No estás autenticado.");
+
+            const formData = new FormData();
+            formData.append("file", archivoEntrega);
+            if (tituloEntrega.trim()) formData.append("titulo", tituloEntrega.trim());
+            if (descripcionEntrega.trim()) formData.append("descripcion", descripcionEntrega.trim());
+
+            await axios.post(
+                `${API_BASE_URL}/tareas/${tareaSeleccionada.id}/entregar`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        // Content-Type lo maneja axios
+                    },
+                }
+            );
+
+            alert("Tarea enviada correctamente ✨");
+            cerrarModalTarea();
+        } catch (err) {
+            console.error("Error al enviar tarea:", err);
+            alert(
+                err.response?.data?.message || "No se pudo enviar la tarea."
+            );
+        } finally {
+            setEnviandoEntrega(false);
+        }
+    };
+
+    const renderListaRecursos = (lista) => {
+        if (loadingRecursos) return <p>Cargando recursos...</p>;
+        if (errorRecursos) return <p className="recurso-error">❌ {errorRecursos}</p>;
+        if (!lista || lista.length === 0) return <p>No hay recursos registrados aún.</p>;
+
+        return (
+            <div className="recursos-grid">
+                {lista.map((r) => {
+                    const isLink = !!r.linkVideo;
+                    const isFile = !!r.archivoUrl;
+                    const isTarea = r.tipo === "TAREA";
+
+                    const href = isLink
+                        ? r.linkVideo
+                        : isFile
+                            ? r.archivoUrl
+                            : null;
+
+                    const botonTexto = isLink
+                        ? "Abrir enlace"
+                        : isFile
+                            ? "Ver / descargar"
+                            : (isTarea ? "Ver / responder" : "Ver recurso");
+
+                    const entregasHabilitadas = isTarea && r.permiteEntregas && ahoraDentroDeRango(r);
+
+                    return (
+                        <article key={r.id} className="recurso-card">
+                            <header className="recurso-card-header">
+                                <span className="recurso-tipo-badge">{r.tipo}</span>
+                            </header>
+
+                            <h5 className="recurso-card-title">{r.titulo}</h5>
+
+                            {r.descripcion && (
+                                <p className="recurso-card-desc">{r.descripcion}</p>
+                            )}
+
+                            {isTarea && (
+                                <div className="recurso-tarea-meta">
+                                    {r.fechaInicioEntrega && (
+                                        <p>
+                                            <strong>Inicio:</strong>{" "}
+                                            {formatDateTimeLocal(r.fechaInicioEntrega)}
+                                        </p>
+                                    )}
+                                    {r.fechaFinEntrega && (
+                                        <p>
+                                            <strong>Fin:</strong>{" "}
+                                            {formatDateTimeLocal(r.fechaFinEntrega)}
+                                        </p>
+                                    )}
+                                    <span
+                                        className={
+                                            entregasHabilitadas
+                                                ? "pill pill-green"
+                                                : "pill pill-gray"
+                                        }
+                                    >
+                                        {entregasHabilitadas
+                                            ? "Entregas habilitadas"
+                                            : "Fuera de plazo o deshabilitada"}
+                                    </span>
+                                </div>
+                            )}
+
+                            {!isTarea && href && (
+                                <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="recurso-card-btn"
+                                >
+                                    {botonTexto}
+                                </a>
+                            )}
+
+                            {isTarea && (
+                                <button
+                                    type="button"
+                                    className="recurso-card-btn"
+                                    disabled={!entregasHabilitadas}
+                                    onClick={() => entregasHabilitadas && abrirModalTarea(r)}
+                                >
+                                    {botonTexto}
+                                </button>
+                            )}
+                        </article>
+                    );
+                })}
+            </div>
+        );
     };
 
     if (loading) {
@@ -89,114 +322,247 @@ export default function PantallaSeccionAlumno() {
         );
     }
 
-    const numeroSemanas = seccion.numeroSemanas || 0;
-    const semanas = Array.from({ length: numeroSemanas }, (_, i) => i + 1);
-    const semanaActual = seccion.semanaActual || 0;
-
     return (
         <div className="student-layout">
             {/* SIDEBAR */}
-            <aside className="student-sidebar">
-                <div className="sidebar-header">
+            <aside className='student-sidebar'>
+                <div className='sidebar-header'>
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
-                    <span className="sidebar-role">Estudiante</span>
+                    <span className='sidebar-role'>Estudiante</span>
                 </div>
-                <nav className="sidebar-menu">
+
+                <nav className='sidebar-menu'>
+                    <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <button
-                                className="link-sidebar"
-                                onClick={() => navigate('/pantalla-estudiante')}
-                                style={{
-                                    background: 'none', border: 'none', cursor: 'pointer', width: '100%',
-                                    textAlign: 'left', padding: '15px 20px', fontSize: '1rem',
-                                    color: '#333', display: 'flex', alignItems: 'center', gap: '10px'
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faArrowLeft} /> Volver a Mis Cursos
-                            </button>
+                            <Link to="/pantalla-estudiante" className='active'>
+                                <FontAwesomeIcon icon={faBook} className='icon-text' />
+                                Mis Cursos
+                            </Link>
+                        </li>
+                        <li>
+                            <a href="#horario">
+                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                Horario
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#progreso">
+                                <FontAwesomeIcon icon={faChartLine} className='icon-text' />
+                                Progreso
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#notificaciones">
+                                <FontAwesomeIcon icon={faBell} className='icon-text' />
+                                Notificaciones
+                            </a>
+                        </li>
+                        <li>
+                            <Link to="/pantalla-alumno/matricula">
+                                <FontAwesomeIcon icon={faPenToSquare} className='icon-text' />
+                                Matricúlate Aquí
+                            </Link>
                         </li>
                     </ul>
                 </nav>
             </aside>
 
             {/* AREA PRINCIPAL */}
-            <div className="student-right-area">
-                <header className="student-header">
-                    <div className="header-content">
-                        <div>
-                            <h1>{seccion.nombre}</h1>
-                            <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>
-                                Prof. {seccion.nombreProfesor} | {seccion.aula || 'Aula Virtual'}
-                            </p>
+            <div className="docente-right-area">
+                {/* HEADER */}
+                <header className="docente-header">
+                    <div className='header-content'>
+                        <div className='name-header'>
+                            <p>Bienvenido, <strong>{userName}</strong></p>
+                            <h1>Campus Virtual</h1>
                         </div>
-                        <div className="header-right">
-                            <p>Hola, <strong>{userName}</strong></p>
+                        <div className='header-right'>
                             <LogoutButton />
                         </div>
                     </div>
-                    {/* Subtítulo estilo docente */}
-                    <div style={{ marginTop: '10px', fontSize: '0.85rem', color: '#555' }}>
-                        Sección {seccion.gradoSeccion} - Nivel {seccion.nivelSeccion} |
-                        Inicio: {formatDateLocal(seccion.fechaInicio)} | Fin: {formatDateLocal(seccion.fechaFin)}
-                    </div>
                 </header>
 
-                <main className="student-main">
+                <div className='container-all'>
+                    <div className='second-container'>
+                        <div className="header-content-left">
+                            <div className='content-first'>
+                                <img className="icon-class" src={icon2} alt="Logo Campus" />
+                                <div>
+                                    <h2>{seccion.nombre}</h2>
+                                    <p><strong>Sección</strong> {seccion.gradoSeccion}</p>
+                                </div>
+                            </div>
+                            <div className='content-second'>
+                                <p>
+                                    Nivel:
+                                    <strong>{seccion.nivelSeccion}</strong>
+                                </p>
+                            </div>
+                            <div className='content-third'>
+                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                <div>
+                                    <p>Inicio: {formatDateLocal(seccion.fechaInicio)}</p>
+                                    <p>Fin: {formatDateLocal(seccion.fechaFin)}</p>
+                                </div>
+                            </div>
+                        </div>
 
-                    {/* BARRA DE SEMANAS */}
-                    <section className="semanas-section">
-                        <h2>Semana de aprendizaje:</h2>
-                        <div className="semanas-container">
-                            {semanas.map((num) => {
-                                const esActual = num === semanaActual;
-                                const esSeleccionada = num === semanaSeleccionada;
-                                // Puedes agregar lógica de bloqueo si lo deseas
-                                // const esBloqueada = num > semanaActual; 
+                        <div className='header-content-right'>
+                            <div className='content-first'>
+                                <FontAwesomeIcon icon={faCircleUser} className='icon-text' />
+                                <h2>Docente</h2>
+                            </div>
+                            <div className='content-second'>
+                                <div>
+                                    <h3>NOMBRE</h3>
+                                    <p>{userName}</p>
+                                </div>
+                            </div>
+                            <div className='content-third'>
+                                <FontAwesomeIcon icon={faEnvelope} className='icon-text' />
+                                <p>{userEmail}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                                return (
+                    <div className='content-body-seccion'>
+                        <main className="docente-main">
+                            {/* BARRA DE SEMANAS */}
+                            <section className="semanas-section">
+                                <h2>Semana de aprendizaje:</h2>
+                                <div className="semanas-container">
+                                    {semanas.map((num) => {
+                                        const esActual = num === semanaActual;
+                                        const esSeleccionada = num === semanaSeleccionada;
+
+                                        return (
+                                            <button
+                                                key={num}
+                                                className={[
+                                                    "semana-item",
+                                                    esSeleccionada ? "semana-activa" : "",
+                                                    esActual ? "semana-actual" : "",
+                                                ].join(" ")}
+                                                onClick={() => handleClickSemana(num)}
+                                            >
+                                                {num.toString().padStart(2, "0")}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+
+                            {/* CONTENIDO DE LA SEMANA */}
+                            <section className="contenido-semana-section-teacher">
+                                <div>
+                                    <h3 className='title-sesion'>
+                                        Sesión {semanaSeleccionada.toString().padStart(2, "0")}
+                                        {semanaSeleccionada === semanaActual && " (ACTUAL)"}
+                                    </h3>
+
                                     <button
-                                        key={num}
-                                        className={[
-                                            "semana-item",
-                                            esSeleccionada ? "semana-activa" : "",
-                                            esActual ? "semana-actual" : "",
-                                        ].join(" ")}
-                                        onClick={() => handleClickSemana(num)}
+                                        className="btn-primary"
+                                        onClick={() => navigate(`/alumno/seccion/${seccionId}/asistencias`)}
                                     >
-                                        {num.toString().padStart(2, "0")}
+                                        Ver mis asistencias
                                     </button>
-                                );
-                            })}
-                        </div>
-                    </section>
+                                </div>
 
-                    {/* CONTENIDO DE LA SEMANA */}
-                    <section className="contenido-semana-section">
-                        <div style={{ borderBottom: '1px solid #eee', marginBottom: '20px', paddingBottom: '10px' }}>
-                            <h2 style={{ color: '#1976d2', margin: 0 }}>
-                                Contenido de la Semana {semanaSeleccionada}
-                                {semanaSeleccionada === semanaActual && <span style={{ fontSize: '0.8rem', color: '#4caf50', marginLeft: '10px' }}>(Semana Actual)</span>}
-                            </h2>
+                                <p>Contenido del Curso:</p>
 
-                            <button
-                                className="btn-course"
-                                onClick={() => navigate(`/alumno/seccion/${seccionId}/asistencias`)}
-                            >
-                                Ver mis asistencias
-                            </button>
-
-                        </div>
-
-                        {/* Placeholder del contenido */}
-                        <div className="contenido-semana-card" style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                            <FontAwesomeIcon icon={faBook} size="3x" style={{ marginBottom: '15px', opacity: 0.5 }} />
-                            <p>Aquí verás los materiales, tareas y exámenes correspondientes a la semana {semanaSeleccionada}.</p>
-                        </div>
-                    </section>
-
-                </main>
+                                <div className="contenido-semana-card-seccion">
+                                    <div className='area-explora'>
+                                        <h4>EXPLORAMOS</h4>
+                                        {renderListaRecursos(recursosExplora)}
+                                    </div>
+                                    <div className='area-estudio'>
+                                        <h4>ESTUDIAMOS</h4>
+                                        {renderListaRecursos(recursosEstudia)}
+                                    </div>
+                                    <div className='area-aplica'>
+                                        <h4>APLICAMOS</h4>
+                                        {renderListaRecursos(recursosAplica)}
+                                    </div>
+                                </div>
+                            </section>
+                        </main>
+                    </div>
+                </div>
             </div>
+
+            {/* MODAL TAREA */}
+            {showModalTarea && tareaSeleccionada && (
+                <div className="modal-backdrop" onClick={cerrarModalTarea}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>{tareaSeleccionada.titulo}</h3>
+                            <button className="modal-close" onClick={cerrarModalTarea}>✕</button>
+                        </div>
+
+                        <div className="modal-body">
+                            {tareaSeleccionada.descripcion && (
+                                <p className="modal-tarea-desc">{tareaSeleccionada.descripcion}</p>
+                            )}
+
+                            <div className="modal-tarea-meta">
+                                {tareaSeleccionada.fechaInicioEntrega && (
+                                    <p>
+                                        <strong>Inicio de entrega:</strong>{" "}
+                                        {formatDateTimeLocal(tareaSeleccionada.fechaInicioEntrega)}
+                                    </p>
+                                )}
+                                {tareaSeleccionada.fechaFinEntrega && (
+                                    <p>
+                                        <strong>Fin de entrega:</strong>{" "}
+                                        {formatDateTimeLocal(tareaSeleccionada.fechaFinEntrega)}
+                                    </p>
+                                )}
+                            </div>
+
+                            <form className="modal-form" onSubmit={handleEnviarEntrega}>
+                                <label>
+                                    Título de tu entrega (opcional)
+                                    <input
+                                        type="text"
+                                        value={tituloEntrega}
+                                        onChange={(e) => setTituloEntrega(e.target.value)}
+                                    />
+                                </label>
+
+                                <label>
+                                    Comentario / descripción (opcional)
+                                    <textarea
+                                        rows={3}
+                                        value={descripcionEntrega}
+                                        onChange={(e) => setDescripcionEntrega(e.target.value)}
+                                    />
+                                </label>
+
+                                <label>
+                                    Archivo a subir
+                                    <input
+                                        type="file"
+                                        onChange={(e) => setArchivoEntrega(e.target.files[0] || null)}
+                                    />
+                                </label>
+
+                                <p className="modal-note">
+                                    Solo se acepta <strong>un archivo</strong> (PDF, Word, video, ZIP, RAR, etc.).
+                                </p>
+
+                                <button
+                                    type="submit"
+                                    className="modal-submit-btn"
+                                    disabled={enviandoEntrega}
+                                >
+                                    {enviandoEntrega ? "Enviando..." : "Enviar tarea"}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
