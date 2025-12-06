@@ -1004,10 +1004,14 @@ export default function PantallaSeccionDocente() {
 
                                 // PDF
                                 if (tipo === "PDF") {
+                                    const googleViewerUrl =
+                                        "https://docs.google.com/gview?embedded=true&url=" +
+                                        encodeURIComponent(url);
+
                                     return (
                                         <div className="preview-frame-wrapper">
                                             <iframe
-                                                src={url}
+                                                src={googleViewerUrl}
                                                 title={recursoSeleccionado.titulo}
                                                 className="preview-frame"
                                             />

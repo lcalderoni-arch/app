@@ -1,0 +1,240 @@
+/* Contenedor general de la vista de matrícula */
+.student-main .content-section {
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+/* Texto de resumen del alumno */
+.matricula-user-summary {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+/* Mensajes de error simples (texto rojo) */
+.matricula-error-message,
+.matricula-error-text {
+    color: #c62828;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+/* Texto de carga */
+.matricula-loading-text {
+    color: #555;
+    font-size: 0.95rem;
+}
+
+/* Texto cuando no hay datos */
+.matricula-empty-text {
+    color: #777;
+    font-size: 0.95rem;
+}
+
+/* Alertas generales (caja de info) */
+.matricula-alert {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 0.95rem;
+}
+
+.matricula-alert h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.matricula-alert-text {
+    margin-top: 0.5rem;
+}
+
+/* Alerta tipo "warning" (matrícula cerrada) */
+.matricula-alert-warning {
+    background: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+/* Alerta tipo "error" / bloqueado */
+.matricula-alert-danger {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Lista dentro del mensaje de alumno bloqueado */
+.matricula-blocked-list {
+    margin-top: 0.5rem;
+    padding-left: 1.2rem;
+}
+
+.matricula-blocked-list li {
+    margin-bottom: 0.25rem;
+}
+
+/* Filtro de matrícula */
+.matricula-filter {
+    margin: 1.25rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.matricula-filter select {
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+}
+
+/* Wrapper de cada bloque de tabla (disponibles, carrito, mis cursos) */
+.matricula-table-wrapper {
+    margin-top: 1.25rem;
+    padding: 1.1rem 1.25rem;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    border: 1px solid #eee;
+}
+
+.matricula-table-wrapper h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.05rem;
+}
+
+/* Scroll horizontal para tablas en pantallas pequeñas */
+.matricula-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Tablas generales */
+.styled-table-seccion {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.styled-table-seccion thead {
+    background: #f3f4f6;
+}
+
+.styled-table-seccion thead th {
+    padding: 0.7rem 0.6rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.styled-table-seccion tbody td {
+    padding: 0.6rem;
+    border-bottom: 1px solid #f1f1f1;
+    color: #4b5563;
+}
+
+/* Filas alternadas */
+.styled-table-seccion tbody tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+
+/* Hover fila */
+.styled-table-seccion tbody tr:hover {
+    background-color: #eef2ff;
+}
+
+/* Tabla interna de horarios (inner-table) */
+.inner-table thead {
+    background: #e5e7eb;
+}
+
+.inner-table tbody tr:nth-child(odd) {
+    background-color: #f9fafb;
+}
+
+/* Fila que contiene la tabla interna (expansión) */
+.matricula-inner-row td {
+    padding: 0;
+    background: #f9fafb;
+}
+
+/* Wrapper de la tabla interna para que tenga padding propio */
+.matricula-inner-table-wrapper {
+    padding: 0.75rem 0.5rem 0.5rem;
+}
+
+/* Info del curso dentro de una celda (código + título en columna) */
+.curso-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.curso-info strong {
+    font-size: 0.9rem;
+}
+
+.curso-info span {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* Botones dentro de las tablas (versión pequeña) */
+.btn-course-sm {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.8rem !important;
+}
+
+/* Botón "Quitar" en carrito (versión peligrosa) */
+.btn-course-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Botón de confirmar matrícula */
+.btn-course-confirm {
+    margin-top: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+}
+
+/* Botón para retirar curso ya matriculado */
+.btn-delete-matricula {
+    background-color: #dc3545;
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-matricula:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+
+/* Pequeños ajustes responsive */
+@media (max-width: 768px) {
+    .student-main .content-section {
+        padding: 0 0.5rem;
+    }
+
+    .matricula-table-wrapper {
+        padding: 0.9rem;
+    }
+
+    .matricula-filter {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

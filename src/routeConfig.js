@@ -13,6 +13,15 @@ import GestionMatricula from "./pages/AdminCode/GestionMatricula.jsx";
 import PantallaMonitorAsistencias from "./pages/AdminCode/PantallaMonitorAsistencias.jsx";
 import PantallaMonitorDetalleAsistencias from "./pages/AdminCode/PantallaMonitorDetalleAsistencias.jsx";
 
+import PantallaMiPerfil from "./pages/PantallaRoles/PantallaMiPerfil.jsx";
+
+import PantallaHorarioAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaHorarioAlumno.jsx";
+import PantallaHorarioDocente from "./pages/PantallaRoles/PantallaDocente/PantallaHorarioDocente.jsx";
+
+// NUEVAS PANTALLAS DE PROGRESO
+import PantallaProgresoAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaProgresoAlumno.jsx";
+import PantallaProgresoDocente from "./pages/PantallaRoles/PantallaDocente/PantallaProgresoDocente.jsx";
+
 
 import PantallaEstudiante from "./pages/PantallaRoles/PantallaEstudiante/PantallaEstudiante.jsx";
 import PantallaMatriculaAlumno from "./pages/PantallaRoles/PantallaEstudiante/PantallaMatriculaAlumno.jsx";
@@ -114,6 +123,14 @@ const routeConfig = [
       </ProtectedRoute>
     ),
   },
+  {
+    path: "/pantalla-alumno/horario",
+    element: (
+      <ProtectedRoute allowedRoles={["ALUMNO"]}>
+        <PantallaHorarioAlumno />
+      </ProtectedRoute>
+    ),
+  },
   // ⭐ NUEVA RUTA PARA VER EL CONTENIDO DE LA SECCIÓN
   {
     path: "/pantalla-estudiante/seccion/:seccionId",
@@ -129,6 +146,14 @@ const routeConfig = [
     element: (
       <ProtectedRoute allowedRoles={["ALUMNO"]}>
         <PantallaAsistenciasAlumno />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/pantalla-alumno/progreso",
+    element: (
+      <ProtectedRoute allowedRoles={["ALUMNO"]}>
+        <PantallaProgresoAlumno />
       </ProtectedRoute>
     ),
   },
@@ -156,6 +181,30 @@ const routeConfig = [
     element: (
       <ProtectedRoute allowedRoles={["PROFESOR"]}>
         <PantallaAsistenciasDocente />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/docente/horario",
+    element: (
+      <ProtectedRoute allowedRoles={["PROFESOR"]}>
+        <PantallaHorarioDocente />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/mi-perfil",
+    element: (
+      <ProtectedRoute allowedRoles={["ALUMNO", "PROFESOR"]}>
+        <PantallaMiPerfil />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/docente/progreso",
+    element: (
+      <ProtectedRoute allowedRoles={["PROFESOR"]}>
+        <PantallaProgresoDocente />
       </ProtectedRoute>
     ),
   },

@@ -1,0 +1,148 @@
+/* ===== LAYOUT GENERAL DEL DASHBOARD DE PROGRESO ===== */
+
+.progress-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.summary-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.summary-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.summary-icon.blue {
+    background: #2563eb;
+}
+
+.summary-icon.green {
+    background: #16a34a;
+}
+
+.summary-icon.orange {
+    background: #f97316;
+}
+
+.summary-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #6b7280;
+}
+
+.summary-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* ===== GRID DE GRÁFICOS ===== */
+
+.progress-charts-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.progress-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px 18px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+}
+
+.progress-card h2 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.chart-container {
+    width: 100%;
+    height: 260px;
+}
+
+/* ===== TABLA DETALLE ===== */
+
+.progress-table-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px 18px 14px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+}
+
+.progress-table-card h2 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.progress-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.progress-table thead {
+    background: #f9fafb;
+}
+
+.progress-table th,
+.progress-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.progress-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+}
+
+.progress-table tbody tr:hover {
+    background: #f3f4ff;
+}
+
+.progress-hint {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 1024px) {
+    .progress-charts-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

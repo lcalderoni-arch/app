@@ -892,3 +892,65 @@
   color: #999;
   font-style: italic;
 }
+
+/* =======================
+   PASSWORD INPUT + ICONO
+   ======================= */
+
+.password-label-with-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+}
+
+/* Contenedor relativo para posicionar el botón dentro */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Input de contraseña con espacio a la derecha para el icono */
+.input-password {
+  width: 100%;
+  font-size: 15px;
+  padding: 10px;
+  padding-right: 36px;      /* 👈 espacio para el ojito */
+  border: 1px solid #d7d7d7;
+  border-radius: 6px;
+  transition: border 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input-password:focus {
+  border-color: #1a64aa;
+  outline: none;
+}
+
+/* Botón del ojito */
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icono del ojito */
+.password-toggle-btn .icon-see {
+  font-size: 16px;
+  color: #3E6FA3;
+}
+
+/* Texto de ayuda debajo del input */
+.field-help {
+  font-size: 12px;
+  color: #777;
+}

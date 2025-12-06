@@ -156,8 +156,21 @@ export default function PantallaAsistenciasDocente() {
                             <button
                                 className="link-sidebar"
                                 onClick={() => navigate(`/docente/seccion/${seccionId}`)}
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    width: "100%",
+                                    textAlign: "left",
+                                    padding: "15px 20px",
+                                    fontSize: "1rem",
+                                    color: "#333",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "10px",
+                                }}
                             >
-                                ← Volver a la sección
+                                ← Volver al curso
                             </button>
                         </li>
                     </ul>

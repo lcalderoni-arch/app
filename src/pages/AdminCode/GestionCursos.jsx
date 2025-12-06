@@ -16,8 +16,6 @@ import {
     faSquarePlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-import EditCursoModal from "../../components/EditCursoModal.jsx";
-
 function GestionCursos() {
     // --- Estados de la lista de cursos ---
     const [cursos, setCursos] = useState([]);
@@ -27,20 +25,21 @@ function GestionCursos() {
     const [isNivelOpen, setIsNivelOpen] = useState(false);
     const nivelSelectRef = useRef(null);
 
-    // --- Estados del Modal de Edición ---
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [editingCurso, setEditingCurso] = useState(null);
-
-    // --- ⭐ NUEVOS ESTADOS para el formulario de creación ---
+    // --- ⭐ Estados del formulario (crear / editar) ---
     const [titulo, setTitulo] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [nivelDestino, setNivelDestino] = useState("");
     const [formError, setFormError] = useState(null);
-    const [creatingCurso, setCreatingCurso] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+
+    // --- ⭐ Modo edición ---
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingCurso, setEditingCurso] = useState(null); // guarda el curso original
+    const formRef = useRef(null);
 
     const API_URL = API_ENDPOINTS.cursos;
 
-    // --- AGREGAR: useEffect para cerrar dropdown al hacer click fuera ---
+    // --- Cerrar dropdown al hacer click fuera ---
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -104,6 +103,11 @@ function GestionCursos() {
             await axios.delete(`${API_URL}/${cursoId}`, config);
             setCursos((current) => current.filter((curso) => curso.id !== cursoId));
             alert(`Curso "${cursoTitulo}" eliminado.`);
+
+            // Si estabas editando este curso, resetea el formulario
+            if (isEditMode && editingCurso && editingCurso.id === cursoId) {
+                limpiarFormularioCurso();
+            }
         } catch (err) {
             console.error(`Error al eliminar ${cursoId}:`, err);
             if (
@@ -123,50 +127,56 @@ function GestionCursos() {
         }
     };
 
-    // --- 3. Manejo de Modal de Edición ---
+    // --- 3. Editar: pasar datos al formulario ---
     const handleEdit = (curso) => {
+        setIsEditMode(true);
         setEditingCurso(curso);
-        setIsEditModalOpen(true);
+        setTitulo(curso.titulo || "");
+        setDescripcion(curso.descripcion || "");
+        setNivelDestino(curso.nivelDestino || "");
+        setFormError(null);
+
+        // Scroll suave hacia el formulario
+        if (formRef.current) {
+            formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
     };
 
-    const handleCursoUpdated = (cursoActualizado) => {
+    const handleCursoActualizadoEnLista = (cursoActualizado) => {
         setCursos((currentCursos) =>
             currentCursos.map((c) =>
                 c.id === cursoActualizado.id ? cursoActualizado : c
             )
         );
-        alert(`Curso "${cursoActualizado.titulo}" actualizado.`);
     };
 
-    // --- ⭐ NUEVA FUNCIÓN: Limpiar formulario ---
+    // --- ⭐ Limpiar formulario (y salir de modo edición) ---
     const limpiarFormularioCurso = () => {
         setTitulo("");
         setDescripcion("");
-        setNivelDestino(""); // CORREGIDO: Limpiar estado unificado
+        setNivelDestino("");
         setFormError(null);
+        setIsEditMode(false);
+        setEditingCurso(null);
     };
 
-    // --- ⭐ NUEVA FUNCIÓN: Crear curso ---
-    const handleCreateCurso = async (e) => {
+    // --- ⭐ Enviar formulario: Crear o Editar ---
+    const handleSubmitCurso = async (e) => {
         e.preventDefault();
-        setCreatingCurso(true);
+        setSubmitting(true);
         setFormError(null);
 
-        // ✅ VALIDACIÓN: Campos obligatorios
         if (!titulo.trim() || !nivelDestino) {
             setFormError("Título y Nivel son obligatorios.");
-            setCreatingCurso(false);
+            setSubmitting(false);
             return;
         }
 
-        // ✅ Construir payload
         const payload = {
             titulo: titulo.trim(),
             descripcion: descripcion.trim(),
-            nivelDestino: nivelDestino, // ⭐ Usa el estado unificado
+            nivelDestino: nivelDestino,
         };
-
-        console.log("📤 Enviando payload de curso:", payload);
 
         try {
             const token = localStorage.getItem("authToken");
@@ -179,22 +189,40 @@ function GestionCursos() {
                 },
             };
 
-            const url = `${API_BASE_URL}/cursos`;
-            const response = await axios.post(url, payload, config);
+            // 🔹 MODO CREAR
+            if (!isEditMode) {
+                const url = `${API_BASE_URL}/cursos`;
+                const response = await axios.post(url, payload, config);
 
-            // ✅ Agregar curso a la lista
-            setCursos((current) => [response.data, ...current]);
-            alert(`Curso "${response.data.titulo}" creado correctamente.`);
+                setCursos((current) => [response.data, ...current]);
+                alert(`Curso "${response.data.titulo}" creado correctamente.`);
+                limpiarFormularioCurso();
+            }
+            // 🔹 MODO EDITAR
+            else if (isEditMode && editingCurso) {
+                const url = `${API_BASE_URL}/cursos/${editingCurso.id}`;
 
-            // ✅ Limpiar formulario
-            limpiarFormularioCurso();
+                // Opcional: evitar llamada si no hay cambios
+                if (
+                    payload.titulo === (editingCurso.titulo || "") &&
+                    payload.descripcion === (editingCurso.descripcion || "") &&
+                    payload.nivelDestino === editingCurso.nivelDestino
+                ) {
+                    setFormError("No se realizaron cambios.");
+                    setSubmitting(false);
+                    return;
+                }
+
+                const response = await axios.put(url, payload, config);
+
+                handleCursoActualizadoEnLista(response.data);
+                alert(`Curso "${response.data.titulo}" actualizado correctamente.`);
+                limpiarFormularioCurso();
+            }
         } catch (err) {
-            console.error("❌ Error al crear curso:", err);
+            console.error("❌ Error al guardar curso:", err);
 
             if (err.response) {
-                console.log("📊 Status:", err.response.status);
-                console.log("📦 Data:", err.response.data);
-
                 const status = err.response.status;
                 const errorData = err.response.data;
 
@@ -204,7 +232,7 @@ function GestionCursos() {
                     );
                 } else if (status === 403) {
                     setFormError(
-                        "No tienes permisos de Administrador para crear cursos."
+                        "No tienes permisos de Administrador para gestionar cursos."
                     );
                 } else if (status === 400 && errorData?.message) {
                     setFormError(errorData.message);
@@ -225,7 +253,7 @@ function GestionCursos() {
                 setFormError("Ocurrió un error inesperado: " + err.message);
             }
         } finally {
-            setCreatingCurso(false);
+            setSubmitting(false);
         }
     };
 
@@ -250,24 +278,28 @@ function GestionCursos() {
                 </div>
                 <p>Administra los cursos registrados en la plataforma.</p>
 
-                {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+                {error && <p style={{ color: "red" }}>Error: {error}</p>}
                 {loading && <p>Actualizando lista...</p>}
             </div>
 
-            {/* FORMULARIO DE CREACIÓN */}
-            <div className="box-formulario-gestioncursos">
+            {/* FORMULARIO CREAR / EDITAR */}
+            <div className="box-formulario-gestioncursos" ref={formRef}>
                 <div className="centrar-tercer-titulo">
                     <h3>
                         <FontAwesomeIcon className="icon" icon={faSquarePlus} />
-                        Crear Nuevo Curso
+                        {isEditMode ? "Editar Curso" : "Crear Nuevo Curso"}
                     </h3>
-                    <p>Complete los campos para registrar un nuevo curso en el sistema</p>
+                    <p>
+                        {isEditMode
+                            ? "Modifica los datos del curso seleccionado y guarda los cambios."
+                            : "Complete los campos para registrar un nuevo curso en el sistema."}
+                    </p>
                 </div>
 
-                <form className="auth-form-gestioncursos" onSubmit={handleCreateCurso}>
-                    <div className='auth-form-gestioncursos-area-form'>
+                <form className="auth-form-gestioncursos" onSubmit={handleSubmitCurso}>
+                    <div className="auth-form-gestioncursos-area-form">
                         <div className="auth-form-area-form">
-                            <div className='form-area-datos-cursos'>
+                            <div className="form-area-datos-cursos">
                                 {/* TÍTULO */}
                                 <label>
                                     Título del Curso
@@ -285,7 +317,8 @@ function GestionCursos() {
                                     Nivel
                                     <div className="nivel-select-container" ref={nivelSelectRef}>
                                         <div
-                                            className={`nivel-select-trigger ${nivelDestino !== "" ? "selected" : ""}`}
+                                            className={`nivel-select-trigger ${nivelDestino !== "" ? "selected" : ""
+                                                }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setIsNivelOpen(!isNivelOpen);
@@ -300,13 +333,17 @@ function GestionCursos() {
                                                             ? "Primaria"
                                                             : "Secundaria"}
                                             </span>
-                                            <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
+                                            <FontAwesomeIcon
+                                                className="icon-increment"
+                                                icon={faAngleDown}
+                                            />
                                         </div>
 
                                         {isNivelOpen && (
                                             <div className="nivel-select-dropdown">
                                                 <div
-                                                    className={`nivel-select-option ${nivelDestino === 'INICIAL' ? 'active' : ''}`}
+                                                    className={`nivel-select-option ${nivelDestino === "INICIAL" ? "active" : ""
+                                                        }`}
                                                     onClick={() => {
                                                         setNivelDestino("INICIAL");
                                                         setIsNivelOpen(false);
@@ -315,7 +352,8 @@ function GestionCursos() {
                                                     Inicial
                                                 </div>
                                                 <div
-                                                    className={`nivel-select-option ${nivelDestino === 'PRIMARIA' ? 'active' : ''}`}
+                                                    className={`nivel-select-option ${nivelDestino === "PRIMARIA" ? "active" : ""
+                                                        }`}
                                                     onClick={() => {
                                                         setNivelDestino("PRIMARIA");
                                                         setIsNivelOpen(false);
@@ -324,7 +362,8 @@ function GestionCursos() {
                                                     Primaria
                                                 </div>
                                                 <div
-                                                    className={`nivel-select-option ${nivelDestino === 'SECUNDARIA' ? 'active' : ''}`}
+                                                    className={`nivel-select-option ${nivelDestino === "SECUNDARIA" ? "active" : ""
+                                                        }`}
                                                     onClick={() => {
                                                         setNivelDestino("SECUNDARIA");
                                                         setIsNivelOpen(false);
@@ -336,15 +375,16 @@ function GestionCursos() {
                                         )}
                                     </div>
                                     <small className="codigo-preview">
-                                        {nivelDestino === 'INICIAL' && 'El código será: INI-XXX'}
-                                        {nivelDestino === 'PRIMARIA' && 'El código será: PRI-XXX'}
-                                        {nivelDestino === 'SECUNDARIA' && 'El código será: SEC-XXX'}
-                                        {nivelDestino === '' && 'Selecciona un nivel para ver el código'}
+                                        {nivelDestino === "INICIAL" && "El código será: INI-XXX"}
+                                        {nivelDestino === "PRIMARIA" && "El código será: PRI-XXX"}
+                                        {nivelDestino === "SECUNDARIA" && "El código será: SEC-XXX"}
+                                        {nivelDestino === "" &&
+                                            "Selecciona un nivel para ver el código sugerido"}
                                     </small>
                                 </label>
                             </div>
 
-                            <div className='form-area-description'>
+                            <div className="form-area-description">
                                 {/* DESCRIPCIÓN */}
                                 <label>
                                     Descripción (Opcional)
@@ -369,23 +409,32 @@ function GestionCursos() {
                                 <button
                                     type="submit"
                                     className="btn-create"
-                                    disabled={creatingCurso}
+                                    disabled={submitting}
                                 >
-                                    {creatingCurso ? 'Creando...' : 'Crear Curso'}
+                                    {submitting
+                                        ? isEditMode
+                                            ? "Guardando..."
+                                            : "Creando..."
+                                        : isEditMode
+                                            ? "Guardar Cambios"
+                                            : "Crear Curso"}
                                 </button>
                                 <button
                                     type="button"
                                     className="btn-clear"
                                     onClick={limpiarFormularioCurso}
-                                    disabled={creatingCurso}
+                                    disabled={submitting}
                                 >
-                                    Limpiar Formulario
+                                    {isEditMode ? "Cancelar edición" : "Limpiar Formulario"}
                                 </button>
                             </div>
 
                             {/* Nota informativa */}
                             <div className="info-note">
-                                <p><strong>Nota:</strong> El código del curso se generará automáticamente según el nivel seleccionado (INI-XXX, PRI-XXX, SEC-XXX).</p>
+                                <p>
+                                    <strong>Nota:</strong> El código del curso se genera automáticamente
+                                    según el nivel seleccionado (INI-XXX, PRI-XXX, SEC-XXX).
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -430,15 +479,25 @@ function GestionCursos() {
                                             </span>
                                         </td>
                                         <td>
-                                            <span className={`badge-rol badge-${curso.nivelDestino.toLowerCase()}`}>
+                                            <span
+                                                className={`badge-rol badge-${curso.nivelDestino.toLowerCase()}`}
+                                            >
                                                 {curso.nivelDestino}
                                             </span>
                                         </td>
                                         <td>
-                                            <button className="btn-edit" onClick={() => handleEdit(curso)}>
+                                            <button
+                                                className="btn-edit"
+                                                onClick={() => handleEdit(curso)}
+                                            >
                                                 Editar
                                             </button>
-                                            <button className="btn-delete" onClick={() => handleDelete(curso.id, curso.titulo)}>
+                                            <button
+                                                className="btn-delete"
+                                                onClick={() =>
+                                                    handleDelete(curso.id, curso.titulo)
+                                                }
+                                            >
                                                 Eliminar
                                             </button>
                                         </td>
@@ -446,8 +505,8 @@ function GestionCursos() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" style={{ textAlign: 'center' }}>
-                                        {error ? 'Error al cargar cursos.' : 'No hay cursos registrados.'}
+                                    <td colSpan="6" style={{ textAlign: "center" }}>
+                                        {error ? "Error al cargar cursos." : "No hay cursos registrados."}
                                     </td>
                                 </tr>
                             )}
@@ -455,14 +514,6 @@ function GestionCursos() {
                     </table>
                 </div>
             </div>
-
-            {/* Modal de Edición */}
-            <EditCursoModal
-                isOpen={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-                cursoToEdit={editingCurso}
-                onCursoUpdated={handleCursoUpdated}
-            />
         </div>
     );
 }

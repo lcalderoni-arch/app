@@ -1,0 +1,81 @@
+.progreso-wrapper {
+    padding: 20px;
+    color: #f3f4f6;
+}
+
+.progreso-title {
+    font-size: 22px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.progreso-cards {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.progreso-card {
+    background: #1f2937;
+    padding: 16px;
+    border-radius: 12px;
+    flex: 1 1 160px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+
+.progreso-card h3 {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.progreso-card p {
+    margin-top: 6px;
+    font-size: 20px;
+}
+
+.progreso-charts {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.chart-box {
+    background: #111827;
+    padding: 20px;
+    border-radius: 14px;
+    flex: 1 1 260px;
+    min-height: 320px;
+}
+
+.progreso-table {
+    margin-top: 20px;
+}
+
+.progreso-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1e293b;
+    color: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.progreso-table th,
+.progreso-table td {
+    padding: 12px;
+    border-bottom: 1px solid #334155;
+    font-size: 13px;
+}
+
+.progreso-table tr:hover {
+    background: #0f172a;
+}
+
+.loading-text,
+.error-text {
+    padding: 12px 0;
+}

@@ -1,6 +1,49 @@
 /* ========================================
    LAYOUT GENERAL
 ======================================== */
+
+.content-grado-student {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 4px;
+}
+
+
+
+.content-grado-student span {
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #555;
+}
+
+.content-grado-student .matricula {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-Size: 0.75rem;
+    font-Weight: bold;
+    white-space: nowrap;
+}
+
+.content-grado-student-two {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    
+    margin-bottom: 16px;
+}
+
+.content-grado-student-two span {
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #555;
+}
+
 .student-layout {
     display: flex;
     min-height: 100vh;
@@ -57,7 +100,7 @@
     /* ✅ Scroll si hay muchas opciones */
 }
 
-.sidebar-menu h3{
+.sidebar-menu h3 {
     padding: 15px 20px;
     font-size: 15px;
     font-weight: 500;

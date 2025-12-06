@@ -14,14 +14,34 @@ import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faBook, faSpinner, faBell, faChartLine, faCalendar, faCircleUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import {
+    faPenToSquare,
+    faBook,
+    faSpinner,
+    faBell,
+    faChartLine,
+    faCalendar,
+    faCircleUser,
+    faEnvelope,
+    faDownload,
+    faUpRightFromSquare,
+    faUser
+} from '@fortawesome/free-solid-svg-icons';
+
+// 🔹 Igual que en PantallaSeccionDocente
+const buildFileUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+
+    const apiRoot = API_BASE_URL.replace(/\/api\/?$/, "");
+    return `${apiRoot}${path}`;
+};
 
 export default function PantallaSeccionEstudiante() {
     const { seccionId } = useParams();
     const navigate = useNavigate();
 
     const userName = localStorage.getItem('userName');
-    const userEmail = localStorage.getItem('userEmail');
 
     const [seccion, setSeccion] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -42,6 +62,20 @@ export default function PantallaSeccionEstudiante() {
     const [descripcionEntrega, setDescripcionEntrega] = useState("");
     const [archivoEntrega, setArchivoEntrega] = useState(null);
     const [enviandoEntrega, setEnviandoEntrega] = useState(false);
+
+    // 🔹 Modal vista previa recurso (PDF / IMAGEN / DOC / ARCHIVO)
+    const [recursoSeleccionado, setRecursoSeleccionado] = useState(null);
+    const [showModalRecurso, setShowModalRecurso] = useState(false);
+
+    const abrirModalRecurso = (recurso) => {
+        setRecursoSeleccionado(recurso);
+        setShowModalRecurso(true);
+    };
+
+    const cerrarModalRecurso = () => {
+        setShowModalRecurso(false);
+        setRecursoSeleccionado(null);
+    };
 
     // --- cargar sección + sesiones ---
     useEffect(() => {
@@ -215,16 +249,12 @@ export default function PantallaSeccionEstudiante() {
                     const isFile = !!r.archivoUrl;
                     const isTarea = r.tipo === "TAREA";
 
-                    const href = isLink
-                        ? r.linkVideo
-                        : isFile
-                            ? r.archivoUrl
-                            : null;
+                    const fileUrl = isFile ? buildFileUrl(r.archivoUrl) : null;
 
                     const botonTexto = isLink
                         ? "Abrir enlace"
                         : isFile
-                            ? "Ver / descargar"
+                            ? "Ver recurso"
                             : (isTarea ? "Ver / responder" : "Ver recurso");
 
                     const entregasHabilitadas = isTarea && r.permiteEntregas && ahoraDentroDeRango(r);
@@ -269,9 +299,10 @@ export default function PantallaSeccionEstudiante() {
                                 </div>
                             )}
 
-                            {!isTarea && href && (
+                            {/* LINK (YouTube / web) → abre nueva pestaña */}
+                            {!isTarea && isLink && (
                                 <a
-                                    href={href}
+                                    href={r.linkVideo}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="recurso-card-btn"
@@ -280,6 +311,18 @@ export default function PantallaSeccionEstudiante() {
                                 </a>
                             )}
 
+                            {/* Archivos físicos → modal de vista previa */}
+                            {!isTarea && isFile && fileUrl && (
+                                <button
+                                    type="button"
+                                    className="recurso-card-btn"
+                                    onClick={() => abrirModalRecurso(r)}
+                                >
+                                    {botonTexto}
+                                </button>
+                            )}
+
+                            {/* TAREA → modal de entrega */}
                             {isTarea && (
                                 <button
                                     type="button"
@@ -358,10 +401,22 @@ export default function PantallaSeccionEstudiante() {
                                 Notificaciones
                             </a>
                         </li>
+                    </ul>
+                </nav>
+
+                <nav className='sidebar-menu'>
+                    <h3>Otros campos</h3>
+                    <ul>
                         <li>
                             <Link to="/pantalla-alumno/matricula">
                                 <FontAwesomeIcon icon={faPenToSquare} className='icon-text' />
                                 Matricúlate Aquí
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/mi-perfil" className="desactive">
+                                <FontAwesomeIcon icon={faUser} className="icon-text" />
+                                Mi Perfil
                             </Link>
                         </li>
                     </ul>
@@ -413,15 +468,17 @@ export default function PantallaSeccionEstudiante() {
                                 <FontAwesomeIcon icon={faCircleUser} className='icon-text' />
                                 <h2>Docente</h2>
                             </div>
+
                             <div className='content-second'>
                                 <div>
                                     <h3>NOMBRE</h3>
-                                    <p>{userName}</p>
+                                    <p>{seccion.nombreProfesor || 'No registrado'}</p>
                                 </div>
                             </div>
+
                             <div className='content-third'>
                                 <FontAwesomeIcon icon={faEnvelope} className='icon-text' />
-                                <p>{userEmail}</p>
+                                <p>{seccion.correoProfesor || 'No registrado'}</p>
                             </div>
                         </div>
                     </div>
@@ -490,6 +547,129 @@ export default function PantallaSeccionEstudiante() {
                     </div>
                 </div>
             </div>
+
+            {/* MODAL VISTA PREVIA RECURSO (PDF / IMAGEN / DOC / ARCHIVO GENÉRICO) */}
+            {showModalRecurso && recursoSeleccionado && (
+                <div className="modal-backdrop" onClick={cerrarModalRecurso}>
+                    <div className="modal-content modal-preview" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>{recursoSeleccionado.titulo}</h3>
+                            <button className="modal-close" onClick={cerrarModalRecurso}>
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="modal-body">
+                            {recursoSeleccionado.descripcion && (
+                                <p className="modal-tarea-desc">{recursoSeleccionado.descripcion}</p>
+                            )}
+
+                            {(() => {
+                                const url = buildFileUrl(recursoSeleccionado.archivoUrl);
+                                const tipo = recursoSeleccionado.tipo;
+
+                                if (!url) {
+                                    return <p>No se encontró la URL del archivo.</p>;
+                                }
+
+                                // IMAGEN
+                                if (tipo === "IMAGEN") {
+                                    return (
+                                        <div className="preview-center">
+                                            <img
+                                                src={url}
+                                                alt={recursoSeleccionado.titulo}
+                                                className="preview-image"
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                                // PDF → Google Viewer
+                                if (tipo === "PDF") {
+                                    const googleViewerUrl =
+                                        "https://docs.google.com/gview?embedded=true&url=" +
+                                        encodeURIComponent(url);
+
+                                    return (
+                                        <div className="preview-frame-wrapper">
+                                            <iframe
+                                                src={googleViewerUrl}
+                                                title={recursoSeleccionado.titulo}
+                                                className="preview-frame"
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                                // DOCUMENTO (Word) → Google Viewer
+                                if (tipo === "DOCUMENTO") {
+                                    const googleViewerUrl =
+                                        "https://docs.google.com/gview?embedded=true&url=" +
+                                        encodeURIComponent(url);
+
+                                    return (
+                                        <div className="preview-frame-wrapper">
+                                            <iframe
+                                                src={googleViewerUrl}
+                                                title={recursoSeleccionado.titulo}
+                                                className="preview-frame"
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                                // ARCHIVO genérico (ZIP, RAR, etc.)
+                                return (
+                                    <div className="preview-center">
+                                        <p>Este tipo de archivo no se puede previsualizar.</p>
+                                        <a
+                                            href={url}
+                                            download
+                                            className="btn-primary"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            Descargar archivo
+                                        </a>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+
+                        {/* Barra de acciones (descargar / nueva ventana) */}
+                        <div className="modal-footer-actions">
+                            {recursoSeleccionado.archivoUrl && (
+                                <>
+                                    <a
+                                        href={buildFileUrl(recursoSeleccionado.archivoUrl)}
+                                        download
+                                        className="icon-button"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <FontAwesomeIcon icon={faDownload} /> Descargar
+                                    </a>
+
+                                    <button
+                                        type="button"
+                                        className="icon-button"
+                                        onClick={() =>
+                                            window.open(
+                                                buildFileUrl(recursoSeleccionado.archivoUrl),
+                                                "_blank",
+                                                "noopener,noreferrer"
+                                            )
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faUpRightFromSquare} /> Nueva ventana
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* MODAL TAREA */}
             {showModalTarea && tareaSeleccionada && (

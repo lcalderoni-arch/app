@@ -5,10 +5,20 @@ import { Link } from "react-router-dom";
 
 import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
+import "../../../styles/RolesStyle/StudentStyle/StudentPageMatricula.css";
 import { API_BASE_URL, API_ENDPOINTS } from "../../../config/api";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+    faBook,
+    faCalendar,
+    faChartLine,
+    faBell,
+    faPenToSquare,
+    faArrowLeft,
+    faTrashCan,
+    faUser
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function PantallaMatriculaAlumno() {
     const userName = localStorage.getItem("userName");
@@ -409,22 +419,76 @@ export default function PantallaMatriculaAlumno() {
 
     return (
         <div className="student-layout">
+            <aside className='student-sidebar'>
+                <div className='sidebar-header'>
+                    <img className="sidebar-icon" src={icon} alt="Logo Campus" />
+                    <span className='sidebar-role'>Estudiante</span>
+                </div>
+
+                <nav className='sidebar-menu'>
+                    <h3>Menú Principal</h3>
+                    <ul>
+                        <li>
+                            <Link to="/pantalla-estudiante">
+                                <FontAwesomeIcon icon={faBook} className='icon-text' />
+                                Mis Cursos
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/pantalla-alumno/horario">
+                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                Horario
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/pantalla-alumno/progreso">
+                                <FontAwesomeIcon icon={faChartLine} className="icon-text" />
+                                Progreso
+                            </Link>
+                        </li>
+                        <li>
+                            <a href="#notificaciones">
+                                <FontAwesomeIcon icon={faBell} className='icon-text' />
+                                Notificaciones
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <nav className='sidebar-menu'>
+                    <h3>Otros campos</h3>
+                    <ul>
+                        <li>
+                            <Link to="/pantalla-alumno/matricula" className="active">
+                                <FontAwesomeIcon icon={faPenToSquare} className='icon-text' />
+                                Matricúlate Aquí
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/mi-perfil" className="desactive">
+                                <FontAwesomeIcon icon={faUser} className="icon-text" />
+                                Mi Perfil
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
             <div className="student-right-area">
-                <header className="student-header">
-                    <div className="header-content">
-                        <div className="header-left">
-                            <img
-                                className="sidebar-icon"
-                                src={icon}
-                                alt="Logo Campus"
-                            />
-                            <h1>Matriculación de Cursos</h1>
+                <header className="docente-header">
+                    <div className='header-content'>
+                        <div className='name-header'>
+                            <p>Bienvenido, <strong>{userName}</strong></p>
+                            <h1>Campus Virtual</h1>
                         </div>
-                        <div className="header-right">
-                            <p>
-                                Alumno: <strong>{userName}</strong>
-                            </p>
-                            <Link to="/pantalla-estudiante" className="btn-back">
+                        <div className='header-right'>
+                            <Link to="/pantalla-estudiante" className="btn-back" style={{
+                                fontSize: "14px",
+                                padding: "8px 15px",
+                                background: "#1a64aa",
+                                borderRadius: "10px",
+                                color: "#fff",
+                                textDecoration: "none"
+                            }}>
                                 <FontAwesomeIcon icon={faArrowLeft} /> Volver al
                                 inicio
                             </Link>
@@ -435,55 +499,36 @@ export default function PantallaMatriculaAlumno() {
                 <main className="student-main">
                     <section className="content-section">
                         <h2>Matricúlate Aquí</h2>
-                        <p>
-                            Nivel:{" "}
-                            <strong>{userNivel || "No definido"}</strong>{" "}
+                        <p className="matricula-user-summary">
+                            Nivel: <strong>{userNivel || "No definido"}</strong>
                             &nbsp; | &nbsp;
-                            Grado:{" "}
-                            <strong>{userGrado || "No definido"}</strong>
+                            Grado: <strong>{userGrado || "No definido"}</strong>
                         </p>
 
                         {/* Errores de carga de estado */}
                         {errorConfig && (
-                            <p
-                                style={{
-                                    color: "red",
-                                    marginBottom: "0.5rem",
-                                }}
-                            >
+                            <p className="matricula-error-message">
                                 {errorConfig}
                             </p>
                         )}
                         {errorUsuario && (
-                            <p
-                                style={{
-                                    color: "red",
-                                    marginBottom: "0.5rem",
-                                }}
-                            >
+                            <p className="matricula-error-message">
                                 {errorUsuario}
                             </p>
                         )}
 
                         {/* 1) Cargando estado inicial de matrícula/usuario */}
                         {cargandoEstadoInicial ? (
-                            <p>Cargando información de matrícula...</p>
+                            <p className="matricula-loading-text">
+                                Cargando información de matrícula...
+                            </p>
                         ) : isMatriculaCerrada ? (
                             // 2) MATRÍCULA CERRADA
-                            <div
-                                style={{
-                                    marginTop: "1.5rem",
-                                    padding: "1rem",
-                                    borderRadius: "8px",
-                                    background: "#fff3cd",
-                                    border: "1px solid #ffeeba",
-                                    color: "#856404",
-                                }}
-                            >
+                            <div className="matricula-alert matricula-alert-warning">
                                 <h3>La matrícula está cerrada actualmente</h3>
                                 {configMatricula?.fechaInicio &&
                                     configMatricula?.fechaFin && (
-                                        <p style={{ marginTop: "0.5rem" }}>
+                                        <p className="matricula-alert-text">
                                             Periodo de matrícula:&nbsp;
                                             <strong>
                                                 {configMatricula.fechaInicio} al{" "}
@@ -491,50 +536,28 @@ export default function PantallaMatriculaAlumno() {
                                             </strong>
                                         </p>
                                     )}
-                                <p style={{ marginTop: "0.5rem" }}>
+                                <p className="matricula-alert-text">
                                     Por favor, consulta con la institución para
                                     conocer el próximo periodo de matrícula.
                                 </p>
                             </div>
                         ) : isAlumnoBloqueado ? (
                             // 3) MATRÍCULA ABIERTA, PERO ALUMNO BLOQUEADO
-                            <div
-                                style={{
-                                    marginTop: "1.5rem",
-                                    padding: "1rem",
-                                    borderRadius: "8px",
-                                    background: "#f8d7da",
-                                    border: "1px solid #f5c6cb",
-                                    color: "#721c24",
-                                }}
-                            >
-                                <h3>
-                                    Tu matrícula está temporalmente bloqueada
-                                </h3>
-                                <p style={{ marginTop: "0.5rem" }}>
+                            <div className="matricula-alert matricula-alert-danger">
+                                <h3>Tu matrícula está temporalmente bloqueada</h3>
+                                <p className="matricula-alert-text">
                                     Para poder matricularte, por favor:
                                 </p>
-                                <ul
-                                    style={{
-                                        marginTop: "0.5rem",
-                                        paddingLeft: "1.2rem",
-                                    }}
-                                >
-                                    <li>
-                                        Acércate a caja en la institución.
-                                    </li>
-                                    <li>
-                                        Comunícate con el administrador académico.
-                                    </li>
+                                <ul className="matricula-blocked-list">
+                                    <li>Acércate a caja en la institución.</li>
+                                    <li>Comunícate con el administrador académico.</li>
                                     <li>
                                         O escribe al correo:&nbsp;
-                                        <strong>
-                                            informes@fundaciondeportiva.pe
-                                        </strong>{" "}
+                                        <strong>informes@fundaciondeportiva.pe</strong>{" "}
                                         (ejemplo).
                                     </li>
                                 </ul>
-                                <p style={{ marginTop: "0.5rem" }}>
+                                <p className="matricula-alert-text">
                                     Una vez que tu matrícula sea habilitada,
                                     podrás ver aquí las secciones disponibles y
                                     completar tu registro.
@@ -542,26 +565,21 @@ export default function PantallaMatriculaAlumno() {
                             </div>
                         ) : !puedeMatricular ? (
                             // Seguridad extra por si habilitadoMatricula es null
-                            <p style={{ marginTop: "1rem", color: "red" }}>
-                                No hemos podido determinar tu estado de
-                                matrícula. Por favor, contacta con el
-                                administrador.
+                            <p className="matricula-error-text">
+                                No hemos podido determinar tu estado de matrícula.
+                                Por favor, contacta con el administrador.
                             </p>
                         ) : (
                             // 4) MATRÍCULA ABIERTA Y ALUMNO HABILITADO
                             <>
                                 {errorMatricula && (
-                                    <p
-                                        style={{
-                                            color: "red",
-                                            marginBottom: "1rem",
-                                        }}
-                                    >
+                                    <p className="matricula-error-message">
                                         {errorMatricula}
                                     </p>
                                 )}
 
-                                <div style={{ marginBottom: "1rem" }}>
+                                {/* FILTRO POR TURNO */}
+                                <div className="matricula-filter">
                                     <label>
                                         Filtrar por turno:&nbsp;
                                         <select
@@ -570,18 +588,10 @@ export default function PantallaMatriculaAlumno() {
                                                 setFiltroTurno(e.target.value)
                                             }
                                         >
-                                            <option value="TODOS">
-                                                Todos
-                                            </option>
-                                            <option value="MAÑANA">
-                                                Mañana
-                                            </option>
-                                            <option value="TARDE">
-                                                Tarde
-                                            </option>
-                                            <option value="NOCHE">
-                                                Noche
-                                            </option>
+                                            <option value="TODOS">Todos</option>
+                                            <option value="MAÑANA">Mañana</option>
+                                            <option value="TARDE">Tarde</option>
+                                            <option value="NOCHE">Noche</option>
                                         </select>
                                     </label>
                                 </div>
@@ -590,179 +600,120 @@ export default function PantallaMatriculaAlumno() {
                                 <div className="matricula-table-wrapper">
                                     <h3>Secciones disponibles para ti</h3>
                                     {loadingSecciones ? (
-                                        <p>Cargando secciones disponibles...</p>
+                                        <p className="matricula-loading-text">
+                                            Cargando secciones disponibles...
+                                        </p>
                                     ) : cursosAgrupados.length === 0 ? (
-                                        <p>
-                                            No hay secciones disponibles que
-                                            coincidan con tu nivel y grado.
+                                        <p className="matricula-empty-text">
+                                            No hay secciones disponibles que coincidan con tu nivel y grado.
                                         </p>
                                     ) : (
-                                        <table className="styled-table-seccion">
-                                            <thead>
-                                                <tr>
-                                                    <th>Curso</th>
-                                                    <th>
-                                                        Secciones / Turnos
-                                                    </th>
-                                                    <th>Acción</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {cursosAgrupados.map(
-                                                    (curso) => {
-                                                        const key = `${curso.codigoCurso ||
-                                                            ""
-                                                            }__${curso.tituloCurso ||
-                                                            ""
-                                                            }`;
+                                        <div className="matricula-table-scroll">
+                                            <table className="styled-table-seccion">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Curso</th>
+                                                        <th>Secciones / Turnos</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {cursosAgrupados.map((curso) => {
+                                                        const key = `${curso.codigoCurso || ""}__${curso.tituloCurso || ""}`;
                                                         const turnosUnicos = [
                                                             ...new Set(
                                                                 curso.secciones.map(
-                                                                    (s) =>
-                                                                        s.turno
+                                                                    (s) => s.turno
                                                                 )
                                                             ),
                                                         ];
 
                                                         return (
-                                                            <React.Fragment
-                                                                key={key}
-                                                            >
+                                                            <React.Fragment key={key}>
                                                                 <tr>
                                                                     <td>
                                                                         <div className="curso-info">
                                                                             <strong>
-                                                                                {
-                                                                                    curso.codigoCurso
-                                                                                }
+                                                                                {curso.codigoCurso}
                                                                             </strong>
                                                                             <span>
-                                                                                {
-                                                                                    curso.tituloCurso
-                                                                                }
+                                                                                {curso.tituloCurso}
                                                                             </span>
                                                                         </div>
                                                                     </td>
                                                                     <td>
-                                                                        {
-                                                                            curso
-                                                                                .secciones
-                                                                                .length
-                                                                        }{" "}
-                                                                        secciones{" "}
+                                                                        {curso.secciones.length} secciones
                                                                         <br />
                                                                         <small>
-                                                                            Turnos:{" "}
-                                                                            {turnosUnicos.join(
-                                                                                ", "
-                                                                            )}
+                                                                            Turnos: {turnosUnicos.join(", ")}
                                                                         </small>
                                                                     </td>
                                                                     <td>
                                                                         <button
-                                                                            className="btn-course"
+                                                                            className="btn-course btn-course-sm"
                                                                             onClick={() =>
-                                                                                toggleCursoExpandido(
-                                                                                    key
-                                                                                )
+                                                                                toggleCursoExpandido(key)
                                                                             }
                                                                         >
-                                                                            {cursoExpandido ===
-                                                                                key
+                                                                            {cursoExpandido === key
                                                                                 ? "Ocultar horarios"
                                                                                 : "Ver horarios"}
                                                                         </button>
                                                                     </td>
                                                                 </tr>
 
-                                                                {cursoExpandido ===
-                                                                    key && (
-                                                                        <tr>
-                                                                            <td
-                                                                                colSpan={
-                                                                                    3
-                                                                                }
-                                                                            >
+                                                                {cursoExpandido === key && (
+                                                                    <tr className="matricula-inner-row">
+                                                                        <td colSpan={3}>
+                                                                            <div className="matricula-inner-table-wrapper">
                                                                                 <table className="styled-table-seccion inner-table">
                                                                                     <thead>
                                                                                         <tr>
-                                                                                            <th>
-                                                                                                Sección
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                Docente
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                Turno
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                Aula
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                Periodo
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                Cupo
-                                                                                            </th>
-                                                                                            <th>
-                                                                                                Acción
-                                                                                            </th>
+                                                                                            <th>Sección</th>
+                                                                                            <th>Docente</th>
+                                                                                            <th>Turno</th>
+                                                                                            <th>Aula</th>
+                                                                                            <th>Periodo</th>
+                                                                                            <th>Cupo</th>
+                                                                                            <th>Acción</th>
                                                                                         </tr>
                                                                                     </thead>
                                                                                     <tbody>
                                                                                         {curso.secciones.map(
-                                                                                            (
-                                                                                                seccion
-                                                                                            ) => {
+                                                                                            (seccion) => {
                                                                                                 const yaEnCarrito =
                                                                                                     seccionesSeleccionadas.some(
-                                                                                                        (
-                                                                                                            s
-                                                                                                        ) =>
-                                                                                                            s.id ===
-                                                                                                            seccion.id
+                                                                                                        (s) =>
+                                                                                                            s.id === seccion.id
                                                                                                     );
                                                                                                 const yaMatriculado =
                                                                                                     misMatriculas.some(
-                                                                                                        (
-                                                                                                            m
-                                                                                                        ) =>
+                                                                                                        (m) =>
                                                                                                             m.codigoCurso ===
                                                                                                             seccion.codigoCurso
                                                                                                     );
                                                                                                 const mismoCursoEnCarrito =
                                                                                                     seccionesSeleccionadas.some(
-                                                                                                        (
-                                                                                                            s
-                                                                                                        ) =>
+                                                                                                        (s) =>
                                                                                                             s.codigoCurso ===
                                                                                                             seccion.codigoCurso
                                                                                                     );
 
                                                                                                 return (
                                                                                                     <tr
-                                                                                                        key={
-                                                                                                            seccion.id
-                                                                                                        }
+                                                                                                        key={seccion.id}
                                                                                                     >
                                                                                                         <td>
-                                                                                                            {
-                                                                                                                seccion.nombre
-                                                                                                            }
+                                                                                                            {seccion.nombre}
                                                                                                         </td>
                                                                                                         <td>
-                                                                                                            {
-                                                                                                                seccion.nombreProfesor
-                                                                                                            }
+                                                                                                            {seccion.nombreProfesor}
                                                                                                         </td>
                                                                                                         <td>
-                                                                                                            {
-                                                                                                                seccion.turno
-                                                                                                            }
+                                                                                                            {seccion.turno}
                                                                                                         </td>
                                                                                                         <td>
-                                                                                                            {seccion.aula ||
-                                                                                                                "-"}
+                                                                                                            {seccion.aula || "-"}
                                                                                                         </td>
                                                                                                         <td>
                                                                                                             {formatoPeriodo(
@@ -777,7 +728,7 @@ export default function PantallaMatriculaAlumno() {
                                                                                                         </td>
                                                                                                         <td>
                                                                                                             <button
-                                                                                                                className="btn-course"
+                                                                                                                className="btn-course btn-course-sm"
                                                                                                                 onClick={() =>
                                                                                                                     agregarSeccionSeleccionada(
                                                                                                                         seccion
@@ -803,15 +754,16 @@ export default function PantallaMatriculaAlumno() {
                                                                                         )}
                                                                                     </tbody>
                                                                                 </table>
-                                                                            </td>
-                                                                        </tr>
-                                                                    )}
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                )}
                                                             </React.Fragment>
                                                         );
-                                                    }
-                                                )}
-                                            </tbody>
-                                        </table>
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     )}
                                 </div>
 
@@ -820,55 +772,37 @@ export default function PantallaMatriculaAlumno() {
                                     <h3>Cursos seleccionados para matriculación</h3>
 
                                     {seccionesSeleccionadas.length === 0 ? (
-                                        <p>
-                                            Aún no has seleccionado ninguna
-                                            sección.
+                                        <p className="matricula-empty-text">
+                                            Aún no has seleccionado ninguna sección.
                                         </p>
                                     ) : (
                                         <>
-                                            <table className="styled-table-seccion">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Curso</th>
-                                                        <th>Sección</th>
-                                                        <th>Docente</th>
-                                                        <th>Turno</th>
-                                                        <th>Aula</th>
-                                                        <th>Periodo</th>
-                                                        <th>Quitar</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {seccionesSeleccionadas.map(
-                                                        (s) => (
+                                            <div className="matricula-table-scroll">
+                                                <table className="styled-table-seccion">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Curso</th>
+                                                            <th>Sección</th>
+                                                            <th>Docente</th>
+                                                            <th>Turno</th>
+                                                            <th>Aula</th>
+                                                            <th>Periodo</th>
+                                                            <th>Quitar</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {seccionesSeleccionadas.map((s) => (
                                                             <tr key={s.id}>
                                                                 <td>
-
-
                                                                     <div className="curso-info">
-                                                                        <strong>
-                                                                            {
-                                                                                s.codigoCurso
-                                                                            }
-                                                                        </strong>
-                                                                        <span>
-                                                                            {
-                                                                                s.tituloCurso
-                                                                            }
-                                                                        </span>
+                                                                        <strong>{s.codigoCurso}</strong>
+                                                                        <span>{s.tituloCurso}</span>
                                                                     </div>
                                                                 </td>
                                                                 <td>{s.nombre}</td>
-                                                                <td>
-                                                                    {
-                                                                        s.nombreProfesor
-                                                                    }
-                                                                </td>
+                                                                <td>{s.nombreProfesor}</td>
                                                                 <td>{s.turno}</td>
-                                                                <td>
-                                                                    {s.aula ||
-                                                                        "-"}
-                                                                </td>
+                                                                <td>{s.aula || "-"}</td>
                                                                 <td>
                                                                     {formatoPeriodo(
                                                                         s.fechaInicio,
@@ -877,7 +811,7 @@ export default function PantallaMatriculaAlumno() {
                                                                 </td>
                                                                 <td>
                                                                     <button
-                                                                        className="btn-course"
+                                                                        className="btn-course btn-course-sm btn-course-danger"
                                                                         onClick={() =>
                                                                             quitarSeccionSeleccionada(
                                                                                 s.id
@@ -888,13 +822,13 @@ export default function PantallaMatriculaAlumno() {
                                                                     </button>
                                                                 </td>
                                                             </tr>
-                                                        )
-                                                    )}
-                                                </tbody>
-                                            </table>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
 
                                             <button
-                                                className="btn-course"
+                                                className="btn-course btn-course-confirm"
                                                 onClick={handleConfirmarMatricula}
                                                 disabled={confirmando}
                                             >
@@ -910,105 +844,72 @@ export default function PantallaMatriculaAlumno() {
                                 <div className="matricula-table-wrapper">
                                     <h3>Mis cursos matriculados</h3>
                                     {loadingMatriculas ? (
-                                        <p>
+                                        <p className="matricula-loading-text">
                                             Cargando tus cursos matriculados...
                                         </p>
                                     ) : misMatriculas.length === 0 ? (
-                                        <p>
-                                            Aún no estás matriculado en ningún
-                                            curso.
+                                        <p className="matricula-empty-text">
+                                            Aún no estás matriculado en ningún curso.
                                         </p>
                                     ) : (
-                                        <table className="styled-table-seccion">
-                                            <thead>
-                                                <tr>
-                                                    <th>Curso</th>
-                                                    <th>Sección</th>
-                                                    <th>Docente</th>
-                                                    <th>Turno</th>
-                                                    <th>Aula</th>
-                                                    <th>Periodo</th>
-                                                    <th>Acción</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {misMatriculas.map((mat) => (
-                                                    <tr key={mat.id}>
-                                                        <td>
-                                                            <div className="curso-info">
-                                                                <strong>
-                                                                    {
-                                                                        mat.codigoCurso
-                                                                    }
-                                                                </strong>
-                                                                <span>
-                                                                    {
-                                                                        mat.tituloCurso
-                                                                    }
-                                                                </span>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            {
-                                                                mat.nombreSeccion
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            {
-                                                                mat.nombreProfesor
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            {
-                                                                mat.turnoSeccion
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            {mat.aulaSeccion ||
-                                                                "-"}
-                                                        </td>
-                                                        <td>
-                                                            {formatoPeriodo(
-                                                                mat.fechaInicioSeccion,
-                                                                mat.fechaFinSeccion
-                                                            )}
-                                                        </td>
-                                                        <td>
-                                                            <button
-                                                                className="btn-delete"
-                                                                style={{
-                                                                    backgroundColor:
-                                                                        "#dc3545",
-                                                                    color: "white",
-                                                                    border: "none",
-                                                                    padding:
-                                                                        "5px 10px",
-                                                                    borderRadius:
-                                                                        "4px",
-                                                                    cursor: "pointer",
-                                                                }}
-                                                                onClick={() =>
-                                                                    handleRetirarCurso(
-                                                                        mat.seccionId,
-                                                                        mat.tituloCurso
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    retirando
-                                                                }
-                                                                title="Retirarse del curso"
-                                                            >
-                                                                <FontAwesomeIcon
-                                                                    icon={
-                                                                        faTrashCan
-                                                                    }
-                                                                />
-                                                            </button>
-                                                        </td>
+                                        <div className="matricula-table-scroll">
+                                            <table className="styled-table-seccion">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Curso</th>
+                                                        <th>Sección</th>
+                                                        <th>Docente</th>
+                                                        <th>Turno</th>
+                                                        <th>Aula</th>
+                                                        <th>Periodo</th>
+                                                        <th>Acción</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    {misMatriculas.map((mat) => (
+                                                        <tr key={mat.id}>
+                                                            <td>
+                                                                <div className="curso-info">
+                                                                    <strong>
+                                                                        {mat.codigoCurso}
+                                                                    </strong>
+                                                                    <span>
+                                                                        {mat.tituloCurso}
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                            <td>{mat.nombreSeccion}</td>
+                                                            <td>{mat.nombreProfesor}</td>
+                                                            <td>{mat.turnoSeccion}</td>
+                                                            <td>{mat.aulaSeccion || "-"}</td>
+                                                            <td>
+                                                                {formatoPeriodo(
+                                                                    mat.fechaInicioSeccion,
+                                                                    mat.fechaFinSeccion
+                                                                )}
+                                                            </td>
+                                                            <td>
+                                                                <button
+                                                                    className="btn-delete-matricula"
+                                                                    onClick={() =>
+                                                                        handleRetirarCurso(
+                                                                            mat.seccionId,
+                                                                            mat.tituloCurso
+                                                                        )
+                                                                    }
+                                                                    disabled={retirando}
+                                                                    title="Retirarse del curso"
+                                                                >
+                                                                    <FontAwesomeIcon
+                                                                        icon={faTrashCan}
+                                                                    />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     )}
                                 </div>
                             </>

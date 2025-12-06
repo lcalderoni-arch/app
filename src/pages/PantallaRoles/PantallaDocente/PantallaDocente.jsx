@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -11,7 +12,14 @@ import "../../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css"
 import { formatDateLocal, getDayOfWeek } from '../../../utils/dateUtils.js';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook, faCalendar, faChartLine, faBell, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import {
+    faBook,
+    faCalendar,
+    faChartLine,
+    faBell,
+    faUser,
+    faSpinner,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function PantallaDocente() {
     const navigate = useNavigate();
@@ -113,16 +121,16 @@ export default function PantallaDocente() {
                             </a>
                         </li>
                         <li>
-                            <a href="#horario">
+                            <Link to="/docente/horario">
                                 <FontAwesomeIcon icon={faCalendar} className='icon-text' />
                                 Horario
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="#progreso">
-                                <FontAwesomeIcon icon={faChartLine} className='icon-text' />
+                            <Link to="/docente/progreso">
+                                <FontAwesomeIcon icon={faChartLine} className="icon-text" />
                                 Progreso
-                            </a>
+                            </Link>
                         </li>
                         <li>
                             <a href="#notificaciones">
@@ -132,6 +140,19 @@ export default function PantallaDocente() {
                         </li>
                     </ul>
                 </nav>
+
+                <nav className="sidebar-menu">
+                    <h3>Cuenta</h3>
+                    <ul>
+                        <li>
+                            <Link to="/mi-perfil">
+                                <FontAwesomeIcon icon={faUser} className="icon-text" />
+                                Mi Perfil
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
+
             </aside>
 
             {/* ========== ÁREA DERECHA ========== */}
