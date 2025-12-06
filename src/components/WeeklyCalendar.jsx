@@ -83,19 +83,26 @@ export default function WeeklyCalendar({
                                 (ev) => ev.dayIndex === dayIndex
                             );
                             return (
-                                <div key={dayIndex} className="horario-day-column">
+                                <div
+                                    key={`day-col-${dayIndex}`}
+                                    className="horario-day-column"
+                                >
                                     {/* líneas de horas */}
                                     {hours.map((h) => (
-                                        <div key={h} className="horario-day-hour-line" />
+                                        <div
+                                            key={`line-${dayIndex}-${h}`}
+                                            className="horario-day-hour-line"
+                                        />
                                     ))}
 
                                     {/* eventos */}
                                     {dayEvents.map((ev) => (
                                         <div
-                                            key={ev.id}
+                                            key={`event-${ev.id}`}
                                             className="horario-event-card"
                                             style={{
-                                                top: ev._top, // 👈 solo controlamos posición vertical
+                                                top: ev._top,
+                                                height: ev._height,
                                             }}
                                         >
                                             <div className="event-time">

@@ -61,15 +61,30 @@ export default function PantallaHorarioAlumno() {
                 // Esperamos algo tipo: [{ id, diaSemana, horaInicio, horaFin, tituloCurso, codigoSeccion, aula }]
                 const data = response.data || [];
 
-                const mapped = data.map((sesion) => ({
-                    id: sesion.id,
-                    title: sesion.tituloCurso || sesion.nombreSeccion || "Sesión",
-                    subtitle: `${sesion.codigoSeccion || ""} ${sesion.nombreSeccion || ""}`.trim(),
-                    aula: sesion.aula || "",
-                    dayIndex: mapDiaSemanaToIndex(sesion.diaSemana),
-                    startTime: sesion.horaInicio, // "HH:mm"
-                    endTime: sesion.horaFin, // "HH:mm"
-                }));
+                const mapped = data.map((sesion, index) => {
+                    const id = sesion.sesionId ?? sesion.id ?? index;
+
+                    let dayIndex = 0;
+                    if (sesion.diaSemana) {
+                        dayIndex = mapDiaSemanaToIndex(sesion.diaSemana);
+                    } else if (sesion.fecha) {
+                        const d = new Date(sesion.fecha);
+                        dayIndex = d.getDay();
+                    }
+
+                    const startTime = sesion.horaInicio || "08:00";
+                    const endTime = sesion.horaFin || "10:00";
+
+                    return {
+                        id,
+                        title: sesion.tituloCurso || sesion.nombreSeccion || "Sesión",
+                        subtitle: `${sesion.codigoSeccion || ""} ${sesion.nombreSeccion || ""}`.trim(),
+                        aula: sesion.aula || "",
+                        dayIndex,
+                        startTime,
+                        endTime,
+                    };
+                });
 
                 setEventos(mapped);
             } catch (err) {

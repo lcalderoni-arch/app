@@ -58,17 +58,37 @@ export default function PantallaHorarioDocente() {
 
                 const data = response.data || [];
 
-                const mapped = data.map((sesion) => ({
-                    id: sesion.id,
-                    title: sesion.tituloCurso || sesion.nombreSeccion || "Sesión",
-                    subtitle: sesion.nombreSeccion
-                        ? `${sesion.codigoSeccion || ""} - ${sesion.nombreSeccion}`.trim()
-                        : sesion.codigoSeccion || "",
-                    aula: sesion.aula || "",
-                    dayIndex: mapDiaSemanaToIndex(sesion.diaSemana),
-                    startTime: sesion.horaInicio,
-                    endTime: sesion.horaFin,
-                }));
+                const mapped = data.map((sesion, index) => {
+                    // 1) ID estable
+                    const id = sesion.sesionId ?? sesion.id ?? index;
+
+                    // 2) Calcular dayIndex
+                    let dayIndex = 0;
+                    if (sesion.diaSemana) {
+                        dayIndex = mapDiaSemanaToIndex(sesion.diaSemana);
+                    } else if (sesion.fecha) {
+                        // fecha: "2025-12-06"
+                        const d = new Date(sesion.fecha);
+                        // JS: 0=Dom, 1=Lun, ..., 6=Sáb (nos calza perfecto)
+                        dayIndex = d.getDay();
+                    }
+
+                    // 3) Horas por defecto
+                    const startTime = sesion.horaInicio || "08:00";
+                    const endTime = sesion.horaFin || "10:00";
+
+                    return {
+                        id,
+                        title: sesion.tituloCurso || sesion.nombreSeccion || "Sesión",
+                        subtitle: sesion.nombreSeccion
+                            ? `${sesion.codigoSeccion || ""} - ${sesion.nombreSeccion}`.trim()
+                            : sesion.codigoSeccion || "",
+                        aula: sesion.aula || "",
+                        dayIndex,
+                        startTime,
+                        endTime,
+                    };
+                });
 
                 setEventos(mapped);
             } catch (err) {
