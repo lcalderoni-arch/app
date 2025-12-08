@@ -1,5 +1,5 @@
 // src/config/api.js
-const isDevelopment = false; // ⚠️ Cambia a false temporalmente
+const isDevelopment = false;
 
 export const API_BASE_URL = isDevelopment
     ? 'http://localhost:8081/api'
@@ -11,5 +11,7 @@ export const API_ENDPOINTS = {
     alumnos: `${API_BASE_URL}/alumnos`,
     profesores: `${API_BASE_URL}/profesores`,
     cursos: `${API_BASE_URL}/cursos`,
-    secciones: `${API_BASE_URL}/secciones`
+    secciones: `${API_BASE_URL}/secciones`,
+    dataQuality: `${API_BASE_URL}/data-quality`,
+    eventos: `${API_BASE_URL}/eventos`,          // 👈 NUEVO
 };

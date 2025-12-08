@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../../config/api.js";
 import icon from "../../assets/logo.png";
 
+import HistorialMatriculasAlumno from "../../components/alumno/HistorialMatriculasAlumno.jsx";
+
 import "../../styles/RolesStyle/Perfil/MiPerfil.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -292,6 +294,8 @@ function PantallaMiPerfil() {
                                     </span>
                                 </div>
 
+
+
                                 <div className="perfil-item">
                                     <span className="label">Nivel</span>
                                     <span className="value">
@@ -324,6 +328,12 @@ function PantallaMiPerfil() {
                                     </span>
                                 </div>
                             </div>
+                        </section>
+                    )}
+
+                    {esAlumno && (
+                        <section className="perfil-card">
+                            <HistorialMatriculasAlumno />
                         </section>
                     )}
 

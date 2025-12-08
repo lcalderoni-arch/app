@@ -8,6 +8,8 @@ import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 import { API_BASE_URL } from "../../../config/api";
 
+
+import { registrarEvento } from "../../../services/eventosService";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faBook,
@@ -105,6 +107,12 @@ export default function PantallaEstudiante() {
 
         cargarMisCursos();
     }, [token]);
+
+    useEffect(() => {
+        registrarEvento("VER_PANTALLA_ESTUDIANTE", {
+            origen: "PantallaEstudiante",
+        });
+    }, []);
 
     return (
         <div className='student-layout'>

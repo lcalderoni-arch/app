@@ -65,6 +65,11 @@ function GestionUsuarios() {
   const [filtroDni, setFiltroDni] = React.useState("");
   const [isFiltroRolOpen, setIsFiltroRolOpen] = React.useState(false);
 
+  // --- ETL ---
+  const [etlFile, setEtlFile] = React.useState(null);
+  const [etlResult, setEtlResult] = React.useState(null);
+  const [loadingETL, setLoadingETL] = React.useState(false);
+
   const API_URL = API_ENDPOINTS.usuarios;
 
   // --- Cargar usuarios ---
@@ -539,6 +544,40 @@ function GestionUsuarios() {
     return cumpleNombre && cumpleRol && cumpleEmail && cumpleDni;
   });
 
+  const handleETLUpload = async () => {
+    if (!etlFile) return;
+
+    setLoadingETL(true);
+    setEtlResult(null);
+
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const formData = new FormData();
+      formData.append("file", etlFile);
+
+      const response = await axios.post(
+        `${API_BASE_URL}/etl/usuarios`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setEtlResult(response.data);
+      alert("ETL completado");
+      fetchUsuarios(); // recargar lista
+    } catch (err) {
+      console.error(err);
+      alert("Error procesando Excel");
+    } finally {
+      setLoadingETL(false);
+    }
+  };
+
   return (
     <div className="general-box-gestionusuarios">
       <div className="header-firstpage-admin">
@@ -554,6 +593,64 @@ function GestionUsuarios() {
           </h2>
         </div>
         <p>Administra los usuarios registrados en la plataforma.</p>
+
+        {/* =======================
+    ETL: Subir archivo Excel
+   ======================= */}
+        <div className="etl-upload-box">
+          <label className="etl-upload-label">
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={(e) => setEtlFile(e.target.files[0])}
+              className="etl-input"
+            />
+            📁 Seleccionar archivo Excel
+          </label>
+
+          <button
+            className="etl-upload-btn"
+            disabled={!etlFile || loadingETL}
+            onClick={handleETLUpload}
+          >
+            {loadingETL ? "Procesando..." : "Cargar Usuarios (ETL)"}
+          </button>
+        </div>
+
+        {etlResult && (
+          <div className="etl-result-box">
+            <h3>📊 Resultados del ETL</h3>
+
+            <div className="etl-stats">
+              <div className="etl-stat">Procesados: <strong>{etlResult.procesados}</strong></div>
+              <div className="etl-stat">Exitosos: <strong>{etlResult.exitosos}</strong></div>
+              <div className="etl-stat">Fallidos: <strong>{etlResult.fallidos}</strong></div>
+            </div>
+
+            {/* TABLA DE ERRORES */}
+            {etlResult.errores.length > 0 && (
+              <div className="etl-error-table">
+                <h4>❗ Errores detectados</h4>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fila</th>
+                      <th>Mensaje</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {etlResult.errores.map((e, i) => (
+                      <tr key={i}>
+                        <td>{e.fila}</td>
+                        <td>{e.mensaje}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
 
         {error && <p style={{ color: "red" }}>Error: {error}</p>}
         {loading && <p>Actualizando lista...</p>}

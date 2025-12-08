@@ -11,6 +11,7 @@ import LogoutButton from '../../../components/login/LogoutButton.jsx';
 import "../../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css"
 import { formatDateLocal, getDayOfWeek } from '../../../utils/dateUtils.js';
 
+import { registrarEvento } from "../../../services/eventosService";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faBook,
@@ -101,6 +102,13 @@ export default function PantallaDocente() {
             state: { seccion }, // enviamos el objeto completo
         });
     };
+
+    useEffect(() => {
+        registrarEvento("VER_PANTALLA_DOCENTE", {
+            origen: "PantallaDocente",
+        });
+    }, []);
+
 
     return (
         <div className='docente-layout'>

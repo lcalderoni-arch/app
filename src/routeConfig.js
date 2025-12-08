@@ -12,6 +12,7 @@ import GestionSecciones from "./pages/AdminCode/GestionSecciones.jsx";
 import GestionMatricula from "./pages/AdminCode/GestionMatricula.jsx";
 import PantallaMonitorAsistencias from "./pages/AdminCode/PantallaMonitorAsistencias.jsx";
 import PantallaMonitorDetalleAsistencias from "./pages/AdminCode/PantallaMonitorDetalleAsistencias.jsx";
+import PantallaCalidadDatos from "./pages/AdminCode/PantallaCalidadDatos.jsx";
 
 import PantallaMiPerfil from "./pages/PantallaRoles/PantallaMiPerfil.jsx";
 
@@ -104,6 +105,14 @@ const routeConfig = [
         element: (
           <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
             <PantallaMonitorDetalleAsistencias />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "calidad-datos",  // 👈 NUEVA RUTA
+        element: (
+          <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
+            <PantallaCalidadDatos />
           </ProtectedRoute>
         ),
       },

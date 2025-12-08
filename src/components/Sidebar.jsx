@@ -74,7 +74,7 @@ export default function Sidebar({ isOpen, onClose }) {
                         <Link to="/dashboard-admin/secciones" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faChalkboard} />Gestión de Secciones</Link>
                         <Link to="/dashboard-admin/matriculas" className='text-nav' onClick={onClose}><FontAwesomeIcon icon={faPenToSquare} className='icon-nav' />Gestión de Matrículas</Link>
                         <Link to="/dashboard-admin/monitor-asistencias" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faCalendar} />Apartado de Asistencias</Link>
-                        
+                        <Link to="calidad-datos" className='text-nav' onClick={onClose}><FontAwesomeIcon className='icon-nav' icon={faCalendar} />Gestion Datos</Link>
                     </>
                 )}
 

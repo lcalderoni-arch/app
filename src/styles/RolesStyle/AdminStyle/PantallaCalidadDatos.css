@@ -1,0 +1,72 @@
+.calidad-datos-container {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.calidad-datos-titulo {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.calidad-datos-descripcion {
+    margin-bottom: 1.5rem;
+    color: #555;
+}
+
+.calidad-datos-boton {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: #2563eb;
+    /* azul suave */
+    color: white;
+}
+
+.calidad-datos-boton:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+.calidad-datos-resultado {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    background-color: #f3f4f6;
+}
+
+.calidad-datos-alerta.error {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.calidad-datos-nota {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-left: 4px solid #2563eb;
+    background-color: #f9fafb;
+}
+
+.calidad-datos-nota h2 {
+    margin-bottom: 0.5rem;
+}
+
+.calidad-datos-nota ul {
+    margin-left: 1.2rem;
+}
+
+.calidad-datos-resumen {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    background-color: #eef2ff;
+}
+
+.calidad-datos-resumen-detalle ul {
+    margin-left: 1.2rem;
+}

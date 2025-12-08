@@ -246,11 +246,26 @@ function GestionMatricula() {
         try {
             setReiniciando(true);
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.post(`${API_BASE_URL}/matriculas/reset-ciclo`, {}, config);
-            alert("Ciclo reiniciado y matrículas archivadas exitosamente.");
-            cargarEstudiantes();
+            const resp = await axios.post(
+                `${API_BASE_URL}/matriculas/reset-ciclo`,
+                {},
+                config
+            );
+
+            console.log("RESPUESTA RESET-CICLO:", resp.data);
+
+            alert("Ciclo reiniciado, matrículas archivadas y permisos bloqueados.");
+
+            // 👇 Muy importante: recargar estado global y alumnos
+            await Promise.all([
+                cargarConfiguracion(), // vuelve a leer matriculaHabilitada
+                cargarEstudiantes(),   // vuelve a leer habilitadoMatricula de cada alumno
+            ]);
         } catch (error) {
             console.error("Error reiniciando ciclo:", error);
+            if (error.response) {
+                console.error("Respuesta del backend:", error.response.data);
+            }
             alert("Error al reiniciar el ciclo.");
         } finally {
             setReiniciando(false);
