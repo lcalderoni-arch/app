@@ -1,0 +1,113 @@
+.historial-matriculas {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.historial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.historial-subtitle {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.historial-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.historial-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.historial-select {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #d6d6d6;
+    outline: none;
+    min-width: 220px;
+    background: #fff;
+}
+
+.historial-grupos {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.historial-grupo {
+    border: 1px solid #e8e8e8;
+    border-radius: 14px;
+    padding: 12px;
+    background: #fff;
+}
+
+.historial-grupo-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.historial-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f3f3f3;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.historial-count {
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.estado-pill {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid #e2e2e2;
+    background: #fafafa;
+}
+
+.estado-activa {
+    background: #eaf7ee;
+    border-color: #bfe3c7;
+}
+
+.estado-retirada {
+    background: #fff1f1;
+    border-color: #f0c2c2;
+}
+
+.estado-completada {
+    background: #eef3ff;
+    border-color: #c8d7ff;
+}
+
+.historial-warning {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px dashed #d6a100;
+    background: #fff9e6;
+    font-size: 13px;
+}

@@ -41,6 +41,13 @@ function GestionMatricula() {
     const [filtroNombre, setFiltroNombre] = useState("");
     const [reiniciando, setReiniciando] = useState(false);
 
+
+    // --- Ciclo / Año escolar ---
+    const [cicloActual, setCicloActual] = useState("");
+    const [nuevoCiclo, setNuevoCiclo] = useState("");
+    const [actualizandoCiclo, setActualizandoCiclo] = useState(false);
+
+
     // ================================
     //   CARGA DE CONFIGURACIÓN
     // ================================
@@ -61,6 +68,8 @@ function GestionMatricula() {
                 // Si el backend devuelve "2025-10-23" (LocalDate), esto ya funciona bien
                 setFechaInicio(response.data.fechaInicio || "");
                 setFechaFin(response.data.fechaFin || "");
+                // Ciclo actual si viene del backend
+                setCicloActual(response.data.cicloActual || "");
 
                 // Leemos el flag global si viene del backend
                 if (typeof response.data.matriculaHabilitada === "boolean") {
@@ -196,6 +205,38 @@ function GestionMatricula() {
             alert("No se pudo cambiar el permiso global de matrícula.");
         } finally {
             setCambiandoPermisoGlobal(false);
+        }
+    };
+
+    const handleActualizarCiclo = async () => {
+        const valor = (nuevoCiclo || "").trim();
+
+        if (!valor) {
+            alert("Escribe el nuevo Año escolar / Periodo. Ej: 2026 o 2026-I");
+            return;
+        }
+
+        if (!window.confirm(`¿Seguro que deseas cambiar el ciclo actual a: ${valor}?`)) return;
+
+        try {
+            setActualizandoCiclo(true);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+
+            await axios.put(
+                `${API_BASE_URL}/configuracion/matricula/ciclo`,
+                { cicloActual: valor },
+                config
+            );
+
+            setCicloActual(valor);
+            setNuevoCiclo("");
+
+            alert("Ciclo/Año escolar actualizado correctamente.");
+        } catch (error) {
+            console.error("Error actualizando ciclo:", error);
+            alert("No se pudo actualizar el ciclo. Revisa backend / endpoint.");
+        } finally {
+            setActualizandoCiclo(false);
         }
     };
 
@@ -426,6 +467,38 @@ function GestionMatricula() {
                         </>
                     )}
                 </div>
+
+                {/* BLOQUE: CICLO ACTUAL + CAMBIO DE CICLO */}
+                <div className="box-ciclo-actual">
+                    <div className="box-ciclo-header">
+                        <h4>Año escolar / Periodo actual</h4>
+                        <span className="ciclo-pill">{cicloActual || "-"}</span>
+                    </div>
+
+                    <p className="box-ciclo-desc">
+                        En colegios es común manejar <strong>Año escolar</strong> (ej. 2025 / 2026).
+                        Si tu institución lo maneja por periodos, puedes usar 2025-I / 2025-II.
+                    </p>
+
+                    <div className="box-ciclo-actions">
+                        <input
+                            type="text"
+                            placeholder="Ej: 2026 o 2026-I"
+                            value={nuevoCiclo}
+                            onChange={(e) => setNuevoCiclo(e.target.value)}
+                        />
+                        <button
+                            onClick={handleActualizarCiclo}
+                            disabled={actualizandoCiclo}
+                            className="btn-create"
+                            style={{ border: "none", color: "white", backgroundColor: "#333" }}
+                        >
+                            {actualizandoCiclo ? "Actualizando..." : "Actualizar Año/Periodo"}
+                        </button>
+                    </div>
+                </div>
+
+
             </div>
 
             {/* SECCIÓN 2: CAMBIO DE CICLO */}

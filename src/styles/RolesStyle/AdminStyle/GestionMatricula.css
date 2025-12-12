@@ -164,8 +164,10 @@
     cursor: pointer;
 
     transition: background-color 0.5s ease;
-    display: block;      /* para que respete bien el width: 100% */
+    display: block;
+    /* para que respete bien el width: 100% */
 }
+
 .auth-form-gestionmatricula-area-form .btn-create:hover {
     background-color: #737373;
     color: #fff;
@@ -179,4 +181,56 @@
 .form-buttons .btn-create {
     width: 100%;
     max-width: 700px;
+}
+
+.box-ciclo-actual {
+    margin-top: 15px;
+    padding: 14px;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.box-ciclo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.box-ciclo-header h4 {
+    margin: 0;
+}
+
+.ciclo-pill {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f3f3f3;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+.box-ciclo-desc {
+    margin: 8px 0 12px 0;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.box-ciclo-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.box-ciclo-actions input {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d6d6d6;
+    outline: none;
 }
