@@ -20,7 +20,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function GestionMatricula() {
-    // 👇 OJO: tú usabas "authToken"
     const token = localStorage.getItem("authToken");
 
     // --- Estados de configuración ---
@@ -29,7 +28,7 @@ function GestionMatricula() {
     const [loadingConfig, setLoadingConfig] = useState(false);
     const [errorConfig, setErrorConfig] = useState(null);
 
-    // 👉 Estado global de "matrícula habilitada / bloqueada"
+    // Estado global de "matrícula habilitada / bloqueada"
     const [matriculaHabilitada, setMatriculaHabilitada] = useState(null);
     const [cambiandoPermisoGlobal, setCambiandoPermisoGlobal] = useState(false);
 
@@ -191,7 +190,7 @@ function GestionMatricula() {
 
             await axios.put(
                 `${API_BASE_URL}/configuracion/matricula/permiso-matricula`,
-                { habilitado: nuevoEstado },   // 👈 CAMBIAR A "habilitado"
+                { habilitado: nuevoEstado },   // CAMBIAR A "habilitado"
                 config
             );
 
@@ -297,7 +296,7 @@ function GestionMatricula() {
 
             alert("Ciclo reiniciado, matrículas archivadas y permisos bloqueados.");
 
-            // 👇 Muy importante: recargar estado global y alumnos
+            // Muy importante: recargar estado global y alumnos
             await Promise.all([
                 cargarConfiguracion(), // vuelve a leer matriculaHabilitada
                 cargarEstudiantes(),   // vuelve a leer habilitadoMatricula de cada alumno

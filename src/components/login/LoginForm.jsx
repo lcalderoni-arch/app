@@ -16,14 +16,14 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ✅ NUEVO: Estado para mostrar/ocultar contraseña
+  // NUEVO: Estado para mostrar/ocultar contraseña
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     emailRef.current?.focus();
   }, []);
 
-  // ✅ NUEVO: Función para toggle de contraseña
+  // NUEVO: Función para toggle de contraseña
   const togglePasswordVisibility = () => {
     setShowPassword(prev => !prev);
   };
@@ -40,7 +40,7 @@ export default function LoginForm() {
     try {
       const response = await axios.post(url, payload);
 
-      // ⭐ CORREGIDO: Renombrar variables para evitar conflicto
+      //  CORREGIDO: Renombrar variables para evitar conflicto
       const {
         token,
         nombre,
@@ -57,11 +57,11 @@ export default function LoginForm() {
       localStorage.setItem("userEmail", userEmail || "");
       localStorage.setItem("userDni", userDni || "");
 
-      // ⭐ NUEVO:
+      //  NUEVO:
       localStorage.setItem("userNivel", nivelAlumno || "");
       localStorage.setItem("userGrado", gradoAlumno || "");
 
-      console.log("✅ Datos guardados en localStorage:", {
+      console.log("Datos guardados en localStorage:", {
         nombre,
         rol,
         email: userEmail,
@@ -157,9 +157,9 @@ export default function LoginForm() {
               ¿Olvidaste tu contraseña?
             </button>
           </div>
-          <div style={{ position: 'relative' }}> {/* ✅ NUEVO: Wrapper para el toggle */}
+          <div style={{ position: 'relative' }}> {/* NUEVO: Wrapper para el toggle */}
             <input
-              type={showPassword ? "text" : "password"} // ✅ NUEVO: Cambia tipo según estado
+              type={showPassword ? "text" : "password"} // NUEVO: Cambia tipo según estado
               id="input-password"
               className='input-password'
               placeholder="Ingresa tu contraseña"
@@ -168,7 +168,7 @@ export default function LoginForm() {
               required
               disabled={loading}
             />
-            {/* ✅ NUEVO: Botón toggle de contraseña */}
+            {/* NUEVO: Botón toggle de contraseña */}
             <button
               type="button"
               onClick={togglePasswordVisibility}

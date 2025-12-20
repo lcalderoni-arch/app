@@ -44,7 +44,7 @@ const obtenerHorario = (turno) => {
     return horarios[turno] || "Horario no definido";
 };
 
-// 🔹 Calcula el estado de la matrícula en base a fechas de la sección
+// Calcula el estado de la matrícula en base a fechas de la sección
 const obtenerEstadoMatricula = (matricula) => {
     const hoy = new Date();
 
@@ -282,7 +282,7 @@ export default function PantallaEstudiante() {
                                                 </div>
                                             </div>
 
-                                            {/* ⭐ BOTÓN ACTIVO PARA IR A LA SECCIÓN */}
+                                            {/* BOTÓN ACTIVO PARA IR A LA SECCIÓN */}
                                             <button
                                                 className='btn-course'
                                                 style={{ justifyContent: 'center', width: '100%', cursor: 'pointer' }}

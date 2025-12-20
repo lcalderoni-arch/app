@@ -109,7 +109,7 @@ const routeConfig = [
         ),
       },
       {
-        path: "calidad-datos",  // 👈 NUEVA RUTA
+        path: "calidad-datos",  // NUEVA RUTA
         element: (
           <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
             <PantallaCalidadDatos />
@@ -144,7 +144,7 @@ const routeConfig = [
       </ProtectedRoute>
     ),
   },
-  // ⭐ NUEVA RUTA PARA VER EL CONTENIDO DE LA SECCIÓN
+  // NUEVA RUTA PARA VER EL CONTENIDO DE LA SECCIÓN
   {
     path: "/pantalla-estudiante/seccion/:seccionId",
     element: (

@@ -52,7 +52,6 @@ export default function PantallaHorarioDocente() {
                     headers: { Authorization: `Bearer ${token}` },
                 };
 
-                // 🔁 AJUSTA ESTA URL A TU ENDPOINT REAL
                 const url = `${API_BASE_URL}/docente/horario`;
                 const response = await axios.get(url, config);
 

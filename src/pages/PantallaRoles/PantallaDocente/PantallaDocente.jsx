@@ -26,7 +26,7 @@ export default function PantallaDocente() {
     const navigate = useNavigate();
     const userName = localStorage.getItem('userName');
     const userEmail = localStorage.getItem('userEmail');
-    const userDni = localStorage.getItem('userDni'); // ⭐ NECESARIO para buscar secciones
+    const userDni = localStorage.getItem('userDni'); // NECESARIO para buscar secciones
 
     const [secciones, setSecciones] = useState([]);
     const [loading, setLoading] = useState(true);

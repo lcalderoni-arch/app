@@ -13,7 +13,7 @@ import {
   faMagnifyingGlass,
   faSquarePlus,
   faEye,
-  faEyeSlash,      // 👈 AÑADIR
+  faEyeSlash,      // AÑADIR
 } from "@fortawesome/free-solid-svg-icons";
 
 function GestionUsuarios() {

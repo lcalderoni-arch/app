@@ -9,6 +9,7 @@ import { formatDateLocal } from '../../../utils/dateUtils';
 
 import icon from "../../../assets/logo.png";
 import icon2 from "../../../assets/logo2.png";
+import image from "../../../assets/imagetarea.png";
 
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
@@ -25,10 +26,13 @@ import {
     faEnvelope,
     faDownload,
     faUpRightFromSquare,
-    faUser
+    faUser,
+    faMessage,
+    faHighlighter,
+    faComment
 } from '@fortawesome/free-solid-svg-icons';
 
-// 🔹 Igual que en PantallaSeccionDocente
+// Igual que en PantallaSeccionDocente
 const buildFileUrl = (path) => {
     if (!path) return null;
     if (path.startsWith("http")) return path;
@@ -572,9 +576,12 @@ export default function PantallaSeccionEstudiante() {
                         </div>
 
                         <div className="modal-body">
-                            {recursoSeleccionado.descripcion && (
-                                <p className="modal-tarea-desc">{recursoSeleccionado.descripcion}</p>
-                            )}
+                            <div className="modal-tarea-desc-area">
+                                <h4><FontAwesomeIcon icon={faMessage} className="icon-title" />Descripción:</h4>
+                                {recursoSeleccionado.descripcion && (
+                                    <p className="modal-tarea-desc">{recursoSeleccionado.descripcion}</p>
+                                )}
+                            </div>
 
                             {(() => {
                                 const url = buildFileUrl(recursoSeleccionado.archivoUrl);
@@ -688,16 +695,35 @@ export default function PantallaSeccionEstudiante() {
                 <div className="modal-backdrop" onClick={cerrarModalTarea}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h3>{tareaSeleccionada.titulo}</h3>
-                            <button className="modal-close" onClick={cerrarModalTarea}>✕</button>
+                            <div>
+                                <img className="icon-class" src={icon2} alt="Logo Campus" />
+                                <h3>{seccion.nombre}</h3>
+                            </div>
+                            <button className="modal-close" onClick={cerrarModalTarea}>
+                                ✕
+                            </button>
                         </div>
 
                         <div className="modal-body">
-                            {tareaSeleccionada.descripcion && (
-                                <p className="modal-tarea-desc">{tareaSeleccionada.descripcion}</p>
-                            )}
+                            <div className="modal-body-description">
+                                <div>
+                                    <h4 className="title"><FontAwesomeIcon icon={faHighlighter} className="icon-title" />Título:</h4>
+                                    <h4 className="title-text">{tareaSeleccionada.titulo}</h4>
+                                </div>
+                                <img className="icon-class" src={image} alt="Imagen de entrega de tarea" />
+                            </div>
+
+                            <div className="description-area">
+                                <h4><FontAwesomeIcon icon={faComment} className="icon-title" />Descripción:</h4>
+                                {tareaSeleccionada.descripcion && (
+                                    <p className="modal-tarea-desc">
+                                        {tareaSeleccionada.descripcion}
+                                    </p>
+                                )}
+                            </div>
 
                             <div className="modal-tarea-meta">
+                                <h4><FontAwesomeIcon icon={faCalendar} className="icon" />Fecha:</h4>
                                 {tareaSeleccionada.fechaInicioEntrega && (
                                     <p>
                                         <strong>Inicio de entrega:</strong>{" "}
@@ -713,44 +739,74 @@ export default function PantallaSeccionEstudiante() {
                             </div>
 
                             <form className="modal-form" onSubmit={handleEnviarEntrega}>
-                                <label>
-                                    Título de tu entrega (opcional)
-                                    <input
-                                        type="text"
-                                        value={tituloEntrega}
-                                        onChange={(e) => setTituloEntrega(e.target.value)}
-                                    />
-                                </label>
+                                <div className="modal-form-grid">
 
-                                <label>
-                                    Comentario / descripción (opcional)
-                                    <textarea
-                                        rows={3}
-                                        value={descripcionEntrega}
-                                        onChange={(e) => setDescripcionEntrega(e.target.value)}
-                                    />
-                                </label>
+                                    {/* Título */}
+                                    <div className="form-field">
+                                        <label className="field-label" htmlFor="tituloEntrega">Título de tu entrega</label>
+                                        <input
+                                            id="tituloEntrega"
+                                            type="text"
+                                            className="field-input"
+                                            value={tituloEntrega}
+                                            onChange={(e) => setTituloEntrega(e.target.value)}
+                                            placeholder="Ej: Tarea Semana 3 - Investigación"
+                                        />
+                                    </div>
 
-                                <label>
-                                    Archivo a subir
-                                    <input
-                                        type="file"
-                                        onChange={(e) => setArchivoEntrega(e.target.files[0] || null)}
-                                    />
-                                </label>
+                                    {/* Descripción */}
+                                    <div className="form-field">
+                                        <label className="field-label" htmlFor="descripcionEntrega">Comentario / descripción</label>
+                                        <textarea
+                                            id="descripcionEntrega"
+                                            className="field-textarea"
+                                            rows={4}
+                                            value={descripcionEntrega}
+                                            onChange={(e) => setDescripcionEntrega(e.target.value)}
+                                            placeholder="Escribe un comentario breve sobre tu entrega…"
+                                        />
+                                    </div>
 
-                                <p className="modal-note">
-                                    Solo se acepta <strong>un archivo</strong> (PDF, Word, video, ZIP, RAR, etc.).
-                                </p>
+                                    {/* Archivo (con botón bonito y nombre del archivo) */}
+                                    <div className="form-field">
+                                        <span className="field-label">Archivo a subir</span>
 
-                                <button
-                                    type="submit"
-                                    className="modal-submit-btn"
-                                    disabled={enviandoEntrega}
-                                >
-                                    {enviandoEntrega ? "Enviando..." : "Enviar tarea"}
-                                </button>
+                                        <div className="file-row">
+                                            <input
+                                                id="archivoEntrega"
+                                                type="file"
+                                                className="file-input"
+                                                onChange={(e) => setArchivoEntrega(e.target.files?.[0] ?? null)}
+                                            />
+
+                                            <label htmlFor="archivoEntrega" className="file-btn">
+                                                Seleccionar archivo
+                                            </label>
+
+                                            <span className="file-filename">
+                                                {archivoEntrega ? archivoEntrega.name : "Ningún archivo seleccionado"}
+                                            </span>
+                                        </div>
+
+                                        <div className="helper-note">
+                                            Solo se acepta <strong>un archivo</strong> (PDF, Word, video, ZIP, RAR, etc.).
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                {/* Acciones */}
+                                <div className="modal-form-actions">
+                                    <button
+                                        type="submit"
+                                        className="modal-submit-btn modal-submit-btn--wide"
+                                        disabled={enviandoEntrega}
+                                    >
+                                        {enviandoEntrega ? "Enviando..." : "Enviar tarea"}
+                                    </button>
+                                </div>
                             </form>
+
                         </div>
                     </div>
                 </div>

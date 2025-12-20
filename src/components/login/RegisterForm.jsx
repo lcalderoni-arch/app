@@ -11,8 +11,8 @@ export default function RegisterForm({ openLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [dni, setDni] = useState(''); // ✅ NUEVO
-  const [grado, setGrado] = useState(''); // ✅ NUEVO
+  const [dni, setDni] = useState(''); // NUEVO
+  const [grado, setGrado] = useState(''); // NUEVO
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -52,7 +52,7 @@ export default function RegisterForm({ openLogin }) {
   localStorage.setItem("userGrado", grado);
 
   try {
-    // ✅ CORRECCIÓN: Eliminar "config" porque no está definido
+    // CORRECCIÓN: Eliminar "config" porque no está definido
     // Este endpoint debe ser público (sin autenticación)
     await axios.post(url, payload);  // ← SIN "config"
 
@@ -112,7 +112,7 @@ export default function RegisterForm({ openLogin }) {
           />
         </label>
 
-        {/* ✅ NUEVO: Campo DNI */}
+        {/* NUEVO: Campo DNI */}
         <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           DNI*
           <input
@@ -126,7 +126,7 @@ export default function RegisterForm({ openLogin }) {
           />
         </label>
 
-        {/* ✅ NUEVO: Campo Grado */}
+        {/* NUEVO: Campo Grado */}
         <label style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           Grado/Nivel*
           <input

@@ -13,5 +13,5 @@ export const API_ENDPOINTS = {
     cursos: `${API_BASE_URL}/cursos`,
     secciones: `${API_BASE_URL}/secciones`,
     dataQuality: `${API_BASE_URL}/data-quality`,
-    eventos: `${API_BASE_URL}/eventos`,          // 👈 NUEVO
+    eventos: `${API_BASE_URL}/eventos`,          // NUEVO
 };

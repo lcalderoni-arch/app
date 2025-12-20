@@ -49,7 +49,6 @@ export default function CreateSeccionModal({ isOpen, onClose, onSeccionCreated }
     const cargarCursos = async () => {
         setLoadingCursos(true);
         try {
-            // ⭐ CAMBIAR ESTO:
             const token = localStorage.getItem('authToken');
             if (!token) throw new Error('No estás autenticado.');
 
@@ -107,7 +106,7 @@ export default function CreateSeccionModal({ isOpen, onClose, onSeccionCreated }
         }
 
         try {
-            // ⭐ AGREGAR TOKEN
+            // AGREGAR TOKEN
             const token = localStorage.getItem('authToken');
             if (!token) throw new Error('Sesión expirada.');
 

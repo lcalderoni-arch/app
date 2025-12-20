@@ -25,14 +25,14 @@ function GestionCursos() {
     const [isNivelOpen, setIsNivelOpen] = useState(false);
     const nivelSelectRef = useRef(null);
 
-    // --- ⭐ Estados del formulario (crear / editar) ---
+    // --- Estados del formulario (crear / editar) ---
     const [titulo, setTitulo] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [nivelDestino, setNivelDestino] = useState("");
     const [formError, setFormError] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
-    // --- ⭐ Modo edición ---
+    // --- Modo edición ---
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingCurso, setEditingCurso] = useState(null); // guarda el curso original
     const formRef = useRef(null);
@@ -150,7 +150,7 @@ function GestionCursos() {
         );
     };
 
-    // --- ⭐ Limpiar formulario (y salir de modo edición) ---
+    // --- Limpiar formulario (y salir de modo edición) ---
     const limpiarFormularioCurso = () => {
         setTitulo("");
         setDescripcion("");
@@ -160,7 +160,7 @@ function GestionCursos() {
         setEditingCurso(null);
     };
 
-    // --- ⭐ Enviar formulario: Crear o Editar ---
+    // --- Enviar formulario: Crear o Editar ---
     const handleSubmitCurso = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -189,7 +189,7 @@ function GestionCursos() {
                 },
             };
 
-            // 🔹 MODO CREAR
+            // MODO CREAR
             if (!isEditMode) {
                 const url = `${API_BASE_URL}/cursos`;
                 const response = await axios.post(url, payload, config);
@@ -198,7 +198,7 @@ function GestionCursos() {
                 alert(`Curso "${response.data.titulo}" creado correctamente.`);
                 limpiarFormularioCurso();
             }
-            // 🔹 MODO EDITAR
+            // MODO EDITAR
             else if (isEditMode && editingCurso) {
                 const url = `${API_BASE_URL}/cursos/${editingCurso.id}`;
 

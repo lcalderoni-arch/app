@@ -4,7 +4,7 @@ import "../styles/RolesStyle/Horario/HorarioSemanal.css";
 
 const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-// 🔧 SUBIMOS LA ALTURA POR HORA
+// SUBIMOS LA ALTURA POR HORA
 const HOUR_HEIGHT = 64; // antes 48
 
 function parseHoraToMinutes(horaStr) {

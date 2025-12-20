@@ -1,7 +1,7 @@
   // src/pages/Dashboard.jsx 
   import React, { useState } from 'react';
   import Sidebar from '../../components/Sidebar'; // Importa el Sidebar desde la carpeta components
-  import { Outlet } from 'react-router-dom'; // 🚨 1. IMPORTAMOS EL OUTLET
+  import { Outlet } from 'react-router-dom';
 
   // Estilos para el botón hamburguesa
   const hamburgerStyle = {

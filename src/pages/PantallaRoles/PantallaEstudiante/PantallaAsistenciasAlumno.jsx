@@ -31,7 +31,7 @@ export default function PantallaAsistenciasAlumno() {
                     `${API_BASE_URL}/asistencias/mis-asistencias`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
-                        params: { seccionId }, // 👈 AQUÍ VA EL seccionId
+                        params: { seccionId }, // AQUÍ VA EL seccionId
                     }
                 );
 

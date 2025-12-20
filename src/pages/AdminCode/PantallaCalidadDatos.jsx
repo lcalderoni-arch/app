@@ -60,7 +60,7 @@ const PantallaCalidadDatos = () => {
                 fecha: new Date().toLocaleString(),
             });
 
-            // 👇 Después de limpiar, recargamos el resumen
+            // Después de limpiar, recargamos el resumen
             await fetchResumen();
         } catch (e) {
             setError(e.message);

@@ -13,7 +13,7 @@ export default function Header() {
   const navigate = useNavigate(); // ✅ AGREGAR
   const location = useLocation(); // DETECTAR PAGINA IMPORTANTE (PARA DISEÑO TRANSPARENTE)
 
-  // ✅ Determinar si estamos en la página principal
+  // Determinar si estamos en la página principal
   const isHomePage = location.pathname === "/";
   
   const handleLogoClick = () => {
@@ -43,21 +43,20 @@ export default function Header() {
   };
 
   return (
-        <header className={`Encabezado ${isHomePage ? 'home' : 'subpage'}`}> {/* ✅ Clase condicional */}
+        <header className={`Encabezado ${isHomePage ? 'home' : 'subpage'}`}> {/* Clase condicional */}
       <nav className="nav-container">
         <div
           className="logo-name"
-          onClick={handleLogoClick} // ✅ CAMBIAR
+          onClick={handleLogoClick}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && handleLogoClick()} // ✅ CAMBIAR
+          onKeyDown={(e) => e.key === "Enter" && handleLogoClick()}
           style={{ cursor: "pointer" }}
         >
           <img className="icon" src={icon} alt="Logo de Reinvent ID Rímac" />
         </div>
 
         <div className="nav-links">
-          {/* ✅ Usar onClick en lugar de href */}
           <button 
             className="other-page" onClick={() => handleNavigateToSection("nosotros")}><FontAwesomeIcon icon={faPeopleGroup} className="icon-header"/>
             Nosotros

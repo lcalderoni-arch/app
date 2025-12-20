@@ -5,6 +5,7 @@ import axios from 'axios';
 
 import icon from "../../../assets/logo.png";
 import icon2 from "../../../assets/logo2.png";
+import image from "../../../assets/imagetarea.png";
 
 import { API_BASE_URL } from '../../../config/api';
 import LogoutButton from '../../../components/login/LogoutButton';
@@ -22,7 +23,10 @@ import {
     faEnvelope,
     faDownload,
     faUpRightFromSquare,
-    faUser
+    faUser,
+    faHighlighter,
+    faComment,
+    faMessage
 } from '@fortawesome/free-solid-svg-icons';
 
 // ---- Tipos de recurso disponibles ----
@@ -33,7 +37,7 @@ const opcionesTipoRecurso = [
     { value: "DOCUMENTO", label: "Documento" },
     { value: "ARCHIVO", label: "Archivo genérico" },
     { value: "IMAGEN", label: "Imagen" },
-    { value: "TAREA", label: "Tarea" },             // 🔹 nuevo tipo
+    { value: "TAREA", label: "Tarea" },             // nuevo tipo
     { value: "OTRO", label: "Otro" },
 ];
 
@@ -131,7 +135,7 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
 
                 onRecursoCreado && onRecursoCreado(response.data);
             } else {
-                // 👉 Archivos físicos: multipart/form-data
+                // Archivos físicos: multipart/form-data
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("titulo", titulo.trim());
@@ -227,14 +231,30 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
             )}
 
             {requiereArchivo && (
-                <label>
-                    Archivo
-                    <input
-                        type="file"
-                        onChange={(e) => setFile(e.target.files[0] || null)}
-                    />
-                </label>
+                <div className="file-field">
+                    <span className="file-label">Archivo</span>
+
+                    <div className="file-row">
+                        <input
+                            id="archivoTarea"
+                            type="file"
+                            className="file-input"
+                            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                        />
+
+                        {/* ESTE es el “botón” */}
+                        <label htmlFor="archivoTarea" className="file-btn">
+                            Seleccionar archivo
+                        </label>
+
+                        {/* ESTE texto queda normal (sin estilizarlo como botón) */}
+                        <span className="file-filename">
+                            {file ? file.name : "Ningún archivo seleccionado"}
+                        </span>
+                    </div>
+                </div>
             )}
+
 
             {esTarea && (
                 <>
@@ -242,31 +262,43 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
 
                     <p className="tarea-label-group">Configuración de la tarea</p>
 
-                    <label>
-                        Inicio de entrega
-                        <input
-                            type="datetime-local"
-                            value={fechaInicioEntrega}
-                            onChange={(e) => setFechaInicioEntrega(e.target.value)}
-                        />
+                    <label className="dt-field">
+                        <span className="dt-label">Inicio de entrega</span>
+
+                        <div className="dt-control">
+
+                            <input
+                                type="datetime-local"
+                                className="dt-input"
+                                value={fechaInicioEntrega}
+                                onChange={(e) => setFechaInicioEntrega(e.target.value)}
+                            />
+                        </div>
                     </label>
 
-                    <label>
-                        Fin de entrega
-                        <input
-                            type="datetime-local"
-                            value={fechaFinEntrega}
-                            onChange={(e) => setFechaFinEntrega(e.target.value)}
-                        />
+
+                    <label className="dt-field">
+                        <span className="dt-label">Fin de entrega</span>
+
+                        <div className="dt-control">
+
+                            <input
+                                type="datetime-local"
+                                className="dt-input"
+                                value={fechaFinEntrega}
+                                onChange={(e) => setFechaFinEntrega(e.target.value)}
+                            />
+                        </div>
                     </label>
 
                     <label className="tarea-checkbox-row">
+                        ¿Permitir que los alumnos envíen entregas?
                         <input
                             type="checkbox"
                             checked={permiteEntregas}
                             onChange={(e) => setPermiteEntregas(e.target.checked)}
                         />
-                        Permitir que los alumnos envíen entregas
+
                     </label>
                 </>
             )}
@@ -438,7 +470,7 @@ export default function PantallaSeccionDocente() {
                 },
             };
 
-            // 👉 Llama al endpoint del backend para listar entregas de esa tarea
+            // Llama al endpoint del backend para listar entregas de esa tarea
             const response = await axios.get(
                 `${API_BASE_URL}/tareas/${recurso.id}/entregas`,
                 config
@@ -774,7 +806,7 @@ export default function PantallaSeccionDocente() {
                     <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <Link to="/pantalla-docente"  className="active">
+                            <Link to="/pantalla-docente" className="active">
                                 <FontAwesomeIcon icon={faBook} className="icon-text" />
                                 Mis Cursos
                             </Link>
@@ -997,9 +1029,14 @@ export default function PantallaSeccionDocente() {
                         </div>
 
                         <div className="modal-body">
-                            {recursoSeleccionado.descripcion && (
-                                <p className="modal-tarea-desc">{recursoSeleccionado.descripcion}</p>
-                            )}
+
+                            <div className="modal-tarea-desc-area">
+                                <h4><FontAwesomeIcon icon={faMessage} className="icon-title" />Descripción:</h4>
+
+                                {recursoSeleccionado.descripcion && (
+                                    <p className="modal-tarea-desc">{recursoSeleccionado.descripcion}</p>
+                                )}
+                            </div>
 
                             {(() => {
                                 const url = buildFileUrl(recursoSeleccionado.archivoUrl);
@@ -1115,22 +1152,35 @@ export default function PantallaSeccionDocente() {
                 <div className="modal-backdrop" onClick={cerrarModalTareaDocente}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h3>Detalle de tarea</h3>
+                            <div>
+                                <img className="icon-class" src={icon2} alt="Logo Campus" />
+                                <h3>{seccion.nombre}</h3>
+                            </div>
                             <button className="modal-close" onClick={cerrarModalTareaDocente}>
                                 ✕
                             </button>
                         </div>
 
                         <div className="modal-body">
-                            <h4>{tareaSeleccionada.titulo}</h4>
+                            <div className="modal-body-description">
+                                <div>
+                                    <h4 className="title"><FontAwesomeIcon icon={faHighlighter} className="icon-title" />Título:</h4>
+                                    <h4 className="title-text">{tareaSeleccionada.titulo}</h4>
+                                </div>
+                                <img className="icon-class" src={image} alt="Imagen de entrega de tarea" />
+                            </div>
 
-                            {tareaSeleccionada.descripcion && (
-                                <p className="modal-tarea-desc">
-                                    {tareaSeleccionada.descripcion}
-                                </p>
-                            )}
+                            <div className="description-area">
+                                <h4><FontAwesomeIcon icon={faComment} className="icon-title" />Descripción:</h4>
+                                {tareaSeleccionada.descripcion && (
+                                    <p className="modal-tarea-desc">
+                                        {tareaSeleccionada.descripcion}
+                                    </p>
+                                )}
+                            </div>
 
                             <div className="modal-tarea-meta">
+                                <h4><FontAwesomeIcon icon={faCalendar} className="icon" />Fecha:</h4>
                                 {tareaSeleccionada.fechaInicioEntrega && (
                                     <p>
                                         <strong>Inicio de entrega:</strong>{" "}
@@ -1146,60 +1196,93 @@ export default function PantallaSeccionDocente() {
                             </div>
 
                             <hr />
+                            <div className="area-tarea">
+                                <h4>Entregas de los alumnos</h4>
 
-                            <h4>Entregas de los alumnos</h4>
+                                {loadingEntregas && <p>Cargando entregas...</p>}
+                                {errorEntregas && (
+                                    <p className="recurso-error">❌ {errorEntregas}</p>
+                                )}
 
-                            {loadingEntregas && <p>Cargando entregas...</p>}
-                            {errorEntregas && (
-                                <p className="recurso-error">❌ {errorEntregas}</p>
-                            )}
+                                {!loadingEntregas && !errorEntregas && entregasTarea.length === 0 && (
+                                    <p>No hay entregas registradas aún.</p>
+                                )}
 
-                            {!loadingEntregas && !errorEntregas && entregasTarea.length === 0 && (
-                                <p>No hay entregas registradas aún.</p>
-                            )}
+                                {!loadingEntregas && entregasTarea.length > 0 && (
+                                    <div className="tabla-entregas-wrap">
+                                        <table className="tabla-entregas">
+                                            <thead>
+                                                <tr>
+                                                    <th>Alumno</th>
+                                                    <th>Título</th>
+                                                    <th>Fecha entrega</th>
+                                                    <th>Archivo</th>
+                                                    <th>Nota</th>
+                                                    <th>Retroalimentación</th>
+                                                </tr>
+                                            </thead>
 
-                            {!loadingEntregas && entregasTarea.length > 0 && (
-                                <table className="tabla-entregas">
-                                    <thead>
-                                        <tr>
-                                            <th>Alumno</th>
-                                            <th>Título</th>
-                                            <th>Fecha entrega</th>
-                                            <th>Archivo</th>
-                                            <th>Nota</th>
-                                            <th>Retroalimentación</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {entregasTarea.map((e) => (
-                                            <tr key={e.id}>
-                                                <td>{e.alumnoNombre || `ID: ${e.alumnoId}`}</td>
-                                                <td>{e.titulo || "(sin título)"}</td>
-                                                <td>
-                                                    {e.fechaEntrega
-                                                        ? formatDateTimeLocal(e.fechaEntrega)
-                                                        : "-"}
-                                                </td>
-                                                <td>
-                                                    {e.archivoUrl ? (
-                                                        <a
-                                                            href={buildFileUrl(e.archivoUrl)}
-                                                            target="_blank"
-                                                            rel="noreferrer"
-                                                        >
-                                                            Ver archivo
-                                                        </a>
-                                                    ) : (
-                                                        "-"
-                                                    )}
-                                                </td>
-                                                <td>{e.nota != null ? e.nota : "-"}</td>
-                                                <td>{e.retroalimentacion || "-"}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
+                                            <tbody>
+                                                {entregasTarea.map((e) => (
+                                                    <tr key={e.id}>
+                                                        <td className="col-alumno">
+                                                            <div className="alumno-cell">
+                                                                <span className="alumno-nombre">
+                                                                    {e.alumnoNombre || `ID: ${e.alumnoId}`}
+                                                                </span>
+                                                                {e.alumnoId && <span className="alumno-id">#{e.alumnoId}</span>}
+                                                            </div>
+                                                        </td>
+
+                                                        <td className="col-titulo">
+                                                            <span className="text-clamp-1">{e.titulo || "(sin título)"}</span>
+                                                        </td>
+
+                                                        <td className="col-fecha">
+                                                            {e.fechaEntrega ? (
+                                                                <span className="pill pill-fecha">
+                                                                    {formatDateTimeLocal(e.fechaEntrega)}
+                                                                </span>
+                                                            ) : (
+                                                                "-"
+                                                            )}
+                                                        </td>
+
+                                                        <td className="col-archivo">
+                                                            {e.archivoUrl ? (
+                                                                <a
+                                                                    className="btn-link-file"
+                                                                    href={buildFileUrl(e.archivoUrl)}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                >
+                                                                    Ver archivo
+                                                                </a>
+                                                            ) : (
+                                                                <span className="muted">-</span>
+                                                            )}
+                                                        </td>
+
+                                                        <td className="col-nota">
+                                                            {e.nota != null ? (
+                                                                <span className={`badge-nota ${e.nota >= 11 ? "ok" : "bad"}`}>
+                                                                    {e.nota}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="muted">-</span>
+                                                            )}
+                                                        </td>
+
+                                                        <td className="col-retro">
+                                                            <span className="text-clamp-2">{e.retroalimentacion || "-"}</span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
