@@ -1,7 +1,7 @@
+// src/pages/AdminCode/GestionUsuarios.jsx
 import React, { useRef } from "react";
-import axios from "axios";
 
-import { API_ENDPOINTS, API_BASE_URL } from "../../config/api.js";
+import { api } from "../../api/api"; // ✅ usa tu instancia central (Bearer + refresh)
 import icon from "../../assets/logo.png";
 
 import "../../styles/RolesStyle/AdminStyle/GestionUsuarios.css";
@@ -13,7 +13,7 @@ import {
   faMagnifyingGlass,
   faSquarePlus,
   faEye,
-  faEyeSlash,      // AÑADIR
+  faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
 
 function GestionUsuarios() {
@@ -70,24 +70,18 @@ function GestionUsuarios() {
   const [etlResult, setEtlResult] = React.useState(null);
   const [loadingETL, setLoadingETL] = React.useState(false);
 
-  const API_URL = API_ENDPOINTS.usuarios;
-
-  // --- Cargar usuarios ---
+  // ✅ Cargar usuarios (ya NO usa localStorage authToken, ni axios directo)
   const fetchUsuarios = React.useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("No estás autenticado.");
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get(API_URL, config);
+      const response = await api.get("/usuarios"); // ✅ endpoint relativo
       setUsuarios(response.data);
     } catch (err) {
       console.error("Error al obtener usuarios:", err);
-      if (
-        err.response &&
-        (err.response.status === 401 || err.response.status === 403)
-      ) {
+      if (err.response?.status === 401) {
+        setError("Sesión expirada. Vuelve a iniciar sesión.");
+      } else if (err.response?.status === 403) {
         setError("No tienes permisos de Administrador.");
       } else {
         setError(err.message || "Error al cargar datos.");
@@ -95,7 +89,7 @@ function GestionUsuarios() {
     } finally {
       setLoading(false);
     }
-  }, [API_URL]);
+  }, []);
 
   React.useEffect(() => {
     fetchUsuarios();
@@ -106,16 +100,10 @@ function GestionUsuarios() {
       if (rolSelectRef.current && !rolSelectRef.current.contains(event.target)) {
         setIsOpen(false);
       }
-      if (
-        nivelSelectRef.current &&
-        !nivelSelectRef.current.contains(event.target)
-      ) {
+      if (nivelSelectRef.current && !nivelSelectRef.current.contains(event.target)) {
         setIsNivelOpen(false);
       }
-      if (
-        filtroRolSelectRef.current &&
-        !filtroRolSelectRef.current.contains(event.target)
-      ) {
+      if (filtroRolSelectRef.current && !filtroRolSelectRef.current.contains(event.target)) {
         setIsFiltroRolOpen(false);
       }
     };
@@ -136,20 +124,16 @@ function GestionUsuarios() {
     if (!window.confirm(`¿Eliminar a "${userName}"?`)) return;
     setError(null);
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("Sesión expirada.");
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`${API_URL}/eliminar/${userId}`, config);
+      await api.delete(`/usuarios/eliminar/${userId}`);
       setUsuarios((current) => current.filter((user) => user.id !== userId));
       alert(`Usuario "${userName}" eliminado.`);
     } catch (err) {
       console.error(`Error al eliminar ${userId}:`, err);
-      if (
-        err.response &&
-        (err.response.status === 401 || err.response.status === 403)
-      ) {
+      if (err.response?.status === 401) {
+        setError("Sesión expirada. Vuelve a iniciar sesión.");
+      } else if (err.response?.status === 403) {
         setError("No tienes permisos para eliminar.");
-      } else if (err.response && err.response.status === 404) {
+      } else if (err.response?.status === 404) {
         setError("El usuario ya no existe.");
         fetchUsuarios();
       } else {
@@ -214,13 +198,10 @@ function GestionUsuarios() {
     setShowConfirmPassword(false);
 
     if (user.rol === "ALUMNO") {
-      // Intentamos leer DNI, nivel y grado de varias formas
       const dniFromUser =
         user.dniAlumno || user.dni || (user.alumno && user.alumno.dni) || "";
-      const nivelFromUser =
-        (user.alumno && user.alumno.nivel) || user.nivel || "";
-      const gradoFromUser =
-        (user.alumno && user.alumno.grado) || user.grado || "";
+      const nivelFromUser = (user.alumno && user.alumno.nivel) || user.nivel || "";
+      const gradoFromUser = (user.alumno && user.alumno.grado) || user.grado || "";
 
       setDniAlumno(dniFromUser);
       setnumberPhoneAlumno(user.telefonoEmergencia || "");
@@ -236,18 +217,13 @@ function GestionUsuarios() {
 
       setDniProfesor(dniFromUser);
       setTelefono(user.telefono || "");
-      setExperiencia(
-        (user.profesor && user.profesor.experiencia) ||
-        user.experiencia ||
-        ""
-      );
+      setExperiencia((user.profesor && user.profesor.experiencia) || user.experiencia || "");
 
       setDniAlumno("");
       setnumberPhoneAlumno("");
       setNivel("");
       setGrado("");
     } else {
-      // ADMIN u otros
       setDniAlumno("");
       setnumberPhoneAlumno("");
       setNivel("");
@@ -282,8 +258,8 @@ function GestionUsuarios() {
     const payload = {
       nombre: nombre.trim(),
       email: email.trim(),
-      password: password,
-      rol: rol,
+      password,
+      rol,
     };
 
     if (rol === "ALUMNO") {
@@ -296,9 +272,7 @@ function GestionUsuarios() {
         return;
       }
       if (!/^\d{9}$/.test(numberPhoneAlumno)) {
-        setFormError(
-          "El teléfono de emergencia debe tener exactamente 9 dígitos."
-        );
+        setFormError("El teléfono de emergencia debe tener exactamente 9 dígitos.");
         return;
       }
 
@@ -317,9 +291,7 @@ function GestionUsuarios() {
       }
 
       if (telefono.trim() !== "" && !/^\d{9}$/.test(telefono)) {
-        setFormError(
-          "El teléfono debe tener exactamente 9 dígitos (o déjalo vacío)."
-        );
+        setFormError("El teléfono debe tener exactamente 9 dígitos (o déjalo vacío).");
         return;
       }
 
@@ -330,13 +302,7 @@ function GestionUsuarios() {
 
     console.log("📤 Enviando payload (crear):", payload);
 
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("Sesión expirada.");
-
-    const config = { headers: { Authorization: `Bearer ${token}` } };
-    const url = `${API_BASE_URL}/usuarios/crear`;
-    const response = await axios.post(url, payload, config);
-
+    const response = await api.post("/usuarios/crear", payload);
     setUsuarios((current) => [response.data, ...current]);
     alert(`Usuario "${response.data.nombre}" creado correctamente.`);
     limpiarFormulario();
@@ -356,40 +322,25 @@ function GestionUsuarios() {
         return;
       }
       if (password.length < 6) {
-        setFormError(
-          "La nueva contraseña debe tener al menos 6 caracteres."
-        );
+        setFormError("La nueva contraseña debe tener al menos 6 caracteres.");
         return;
       }
     }
 
     const payload = {};
 
-    if (nombre.trim() && nombre !== editingUser.nombre) {
-      payload.nombre = nombre.trim();
-    }
-    if (email.trim() && email !== editingUser.email) {
-      payload.email = email.trim();
-    }
-    if (password.trim()) {
-      payload.password = password.trim();
-    }
+    if (nombre.trim() && nombre !== editingUser.nombre) payload.nombre = nombre.trim();
+    if (email.trim() && email !== editingUser.email) payload.email = email.trim();
+    if (password.trim()) payload.password = password.trim();
 
-    // PERFIL ALUMNO
     if (editingUser.rol === "ALUMNO") {
       const dniOriginal =
         editingUser.dniAlumno ||
         editingUser.dni ||
         (editingUser.alumno && editingUser.alumno.dni) ||
         "";
-      const gradoOriginal =
-        (editingUser.alumno && editingUser.alumno.grado) ||
-        editingUser.grado ||
-        "";
-      const nivelOriginal =
-        (editingUser.alumno && editingUser.alumno.nivel) ||
-        editingUser.nivel ||
-        "";
+      const gradoOriginal = (editingUser.alumno && editingUser.alumno.grado) || editingUser.grado || "";
+      const nivelOriginal = (editingUser.alumno && editingUser.alumno.nivel) || editingUser.nivel || "";
       const telEmergOriginal = editingUser.telefonoEmergencia || "";
 
       if (dniAlumno.trim() && dniAlumno !== dniOriginal) {
@@ -397,22 +348,15 @@ function GestionUsuarios() {
           setFormError("El DNI debe tener exactamente 8 dígitos.");
           return;
         }
-        payload.dni = dniAlumno.trim(); // mismo campo que usaba tu modal
+        payload.dni = dniAlumno.trim();
       }
 
-      if (grado.trim() && grado !== gradoOriginal) {
-        payload.grado = grado.trim();
-      }
-
-      if (nivel && nivel !== nivelOriginal) {
-        payload.nivel = nivel;
-      }
+      if (grado.trim() && grado !== gradoOriginal) payload.grado = grado.trim();
+      if (nivel && nivel !== nivelOriginal) payload.nivel = nivel;
 
       if (numberPhoneAlumno.trim()) {
         if (!/^\d{9}$/.test(numberPhoneAlumno)) {
-          setFormError(
-            "El teléfono de emergencia debe tener exactamente 9 dígitos."
-          );
+          setFormError("El teléfono de emergencia debe tener exactamente 9 dígitos.");
           return;
         }
         if (numberPhoneAlumno !== telEmergOriginal) {
@@ -421,7 +365,6 @@ function GestionUsuarios() {
       }
     }
 
-    // PERFIL PROFESOR
     if (editingUser.rol === "PROFESOR") {
       const dniOriginal =
         editingUser.dniProfesor ||
@@ -430,9 +373,7 @@ function GestionUsuarios() {
         "";
       const telOriginal = editingUser.telefono || "";
       const expOriginal =
-        (editingUser.profesor && editingUser.profesor.experiencia) ||
-        editingUser.experiencia ||
-        "";
+        (editingUser.profesor && editingUser.profesor.experiencia) || editingUser.experiencia || "";
 
       if (dniProfesor.trim() && dniProfesor !== dniOriginal) {
         if (!validarDni(dniProfesor)) {
@@ -444,19 +385,13 @@ function GestionUsuarios() {
 
       if (telefono.trim()) {
         if (!/^\d{9}$/.test(telefono)) {
-          setFormError(
-            "El teléfono debe tener exactamente 9 dígitos (o déjalo vacío)."
-          );
+          setFormError("El teléfono debe tener exactamente 9 dígitos (o déjalo vacío).");
           return;
         }
-        if (telefono !== telOriginal) {
-          payload.telefono = telefono.trim();
-        }
+        if (telefono !== telOriginal) payload.telefono = telefono.trim();
       }
 
-      if (experiencia.trim() && experiencia !== expOriginal) {
-        payload.experiencia = experiencia.trim();
-      }
+      if (experiencia.trim() && experiencia !== expOriginal) payload.experiencia = experiencia.trim();
     }
 
     if (Object.keys(payload).length === 0) {
@@ -466,18 +401,10 @@ function GestionUsuarios() {
 
     console.log("📤 Enviando payload (editar):", payload);
 
-    const token = localStorage.getItem("authToken");
-    if (!token) throw new Error("Sesión expirada.");
-
-    const config = { headers: { Authorization: `Bearer ${token}` } };
-    const url = `${API_BASE_URL}/usuarios/editar/${editingUser.id}`;
-
-    const response = await axios.put(url, payload, config);
+    const response = await api.put(`/usuarios/editar/${editingUser.id}`, payload);
 
     setUsuarios((currentUsers) =>
-      currentUsers.map((user) =>
-        user.id === response.data.id ? response.data : user
-      )
+      currentUsers.map((user) => (user.id === response.data.id ? response.data : user))
     );
 
     alert(`Usuario "${response.data.nombre}" actualizado.`);
@@ -491,26 +418,18 @@ function GestionUsuarios() {
     setCreatingUser(true);
 
     try {
-      if (isEditMode) {
-        await editarUsuario();
-      } else {
-        await crearUsuario();
-      }
+      if (isEditMode) await editarUsuario();
+      else await crearUsuario();
     } catch (err) {
       console.error("❌ Error en el formulario de usuario:", err);
 
       if (err.response) {
-        if (err.response.status === 401 || err.response.status === 403) {
-          setFormError("No tienes permisos para esta acción.");
-        } else if (err.response.status === 400 && err.response.data?.message) {
-          setFormError(err.response.data.message);
-        } else if (err.response.status === 409 && err.response.data?.message) {
-          setFormError(err.response.data.message);
-        } else if (err.response.data?.message) {
-          setFormError(`Error: ${err.response.data.message}`);
-        } else {
-          setFormError(`Error del servidor (código ${err.response.status})`);
-        }
+        if (err.response.status === 401) setFormError("Sesión expirada. Vuelve a iniciar sesión.");
+        else if (err.response.status === 403) setFormError("No tienes permisos para esta acción.");
+        else if (err.response.status === 400 && err.response.data?.message) setFormError(err.response.data.message);
+        else if (err.response.status === 409 && err.response.data?.message) setFormError(err.response.data.message);
+        else if (err.response.data?.message) setFormError(`Error: ${err.response.data.message}`);
+        else setFormError(`Error del servidor (código ${err.response.status})`);
       } else if (err.request) {
         setFormError("No se pudo conectar al servidor.");
       } else if (err.message) {
@@ -523,27 +442,7 @@ function GestionUsuarios() {
     }
   };
 
-  if (loading && usuarios.length === 0)
-    return <p>Cargando lista de usuarios...</p>;
-  if (error && usuarios.length === 0)
-    return <p style={{ color: "red" }}>Error: {error}</p>;
-
-  const usuariosFiltrados = usuarios.filter((user) => {
-    const cumpleNombre =
-      filtroNombre === "" ||
-      user.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
-    const cumpleRol = filtroRol === "" || user.rol === filtroRol;
-    const cumpleEmail =
-      filtroEmail === "" ||
-      user.email.toLowerCase().includes(filtroEmail.toLowerCase());
-    const cumpleDni =
-      filtroDni === "" ||
-      (user.rol === "ALUMNO" && user.dniAlumno?.includes(filtroDni)) ||
-      (user.rol === "PROFESOR" && user.dniProfesor?.includes(filtroDni));
-
-    return cumpleNombre && cumpleRol && cumpleEmail && cumpleDni;
-  });
-
+  // --- ETL upload ---
   const handleETLUpload = async () => {
     if (!etlFile) return;
 
@@ -551,25 +450,16 @@ function GestionUsuarios() {
     setEtlResult(null);
 
     try {
-      const token = localStorage.getItem("authToken");
-
       const formData = new FormData();
       formData.append("file", etlFile);
 
-      const response = await axios.post(
-        `${API_BASE_URL}/etl/usuarios`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await api.post("/etl/usuarios", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       setEtlResult(response.data);
       alert("ETL completado");
-      fetchUsuarios(); // recargar lista
+      fetchUsuarios();
     } catch (err) {
       console.error(err);
       alert("Error procesando Excel");
@@ -577,6 +467,23 @@ function GestionUsuarios() {
       setLoadingETL(false);
     }
   };
+
+  if (loading && usuarios.length === 0) return <p>Cargando lista de usuarios...</p>;
+  if (error && usuarios.length === 0) return <p style={{ color: "red" }}>Error: {error}</p>;
+
+  const usuariosFiltrados = usuarios.filter((user) => {
+    const cumpleNombre =
+      filtroNombre === "" || user.nombre.toLowerCase().includes(filtroNombre.toLowerCase());
+    const cumpleRol = filtroRol === "" || user.rol === filtroRol;
+    const cumpleEmail =
+      filtroEmail === "" || user.email.toLowerCase().includes(filtroEmail.toLowerCase());
+    const cumpleDni =
+      filtroDni === "" ||
+      (user.rol === "ALUMNO" && user.dniAlumno?.includes(filtroDni)) ||
+      (user.rol === "PROFESOR" && user.dniProfesor?.includes(filtroDni));
+
+    return cumpleNombre && cumpleRol && cumpleEmail && cumpleDni;
+  });
 
   return (
     <div className="general-box-gestionusuarios">
@@ -594,9 +501,7 @@ function GestionUsuarios() {
         </div>
         <p>Administra los usuarios registrados en la plataforma.</p>
 
-        {/* =======================
-    ETL: Subir archivo Excel
-   ======================= */}
+        {/* ETL: Subir archivo Excel */}
         <div className="etl-upload-box">
           <label className="etl-upload-label">
             <input
@@ -608,11 +513,7 @@ function GestionUsuarios() {
             📁 Seleccionar archivo Excel
           </label>
 
-          <button
-            className="etl-upload-btn"
-            disabled={!etlFile || loadingETL}
-            onClick={handleETLUpload}
-          >
+          <button className="etl-upload-btn" disabled={!etlFile || loadingETL} onClick={handleETLUpload}>
             {loadingETL ? "Procesando..." : "Cargar Usuarios (ETL)"}
           </button>
         </div>
@@ -622,13 +523,18 @@ function GestionUsuarios() {
             <h3>📊 Resultados del ETL</h3>
 
             <div className="etl-stats">
-              <div className="etl-stat">Procesados: <strong>{etlResult.procesados}</strong></div>
-              <div className="etl-stat">Exitosos: <strong>{etlResult.exitosos}</strong></div>
-              <div className="etl-stat">Fallidos: <strong>{etlResult.fallidos}</strong></div>
+              <div className="etl-stat">
+                Procesados: <strong>{etlResult.procesados}</strong>
+              </div>
+              <div className="etl-stat">
+                Exitosos: <strong>{etlResult.exitosos}</strong>
+              </div>
+              <div className="etl-stat">
+                Fallidos: <strong>{etlResult.fallidos}</strong>
+              </div>
             </div>
 
-            {/* TABLA DE ERRORES */}
-            {etlResult.errores.length > 0 && (
+            {etlResult.errores?.length > 0 && (
               <div className="etl-error-table">
                 <h4>❗ Errores detectados</h4>
                 <table>
@@ -661,21 +567,12 @@ function GestionUsuarios() {
         <div className="centrar-tercer-titulo">
           <h3>
             <FontAwesomeIcon className="icon" icon={faSquarePlus} />
-            {isEditMode
-              ? `Editar Usuario (ID: ${editingUser?.id})`
-              : "Crear Nuevo Usuario"}
+            {isEditMode ? `Editar Usuario (ID: ${editingUser?.id})` : "Crear Nuevo Usuario"}
           </h3>
-          <p>
-            {isEditMode
-              ? "Modifica los datos del usuario seleccionado."
-              : "Elige y completa los campos del nuevo usuario."}
-          </p>
+          <p>{isEditMode ? "Modifica los datos del usuario seleccionado." : "Elige y completa los campos del nuevo usuario."}</p>
         </div>
 
-        <form
-          className="auth-form-gestionusuarios"
-          onSubmit={handleSubmitUser}
-        >
+        <form className="auth-form-gestionusuarios" onSubmit={handleSubmitUser}>
           <div className="auth-form-gestionusuarios-area-rol">
             <label className="rol-text">
               Rol de Usuario:
@@ -683,40 +580,31 @@ function GestionUsuarios() {
                 {isEditMode ? (
                   <div className="custom-select-trigger selected disabled-select">
                     <span>
-                      {rol === "ALUMNO"
-                        ? "Alumno"
-                        : rol === "PROFESOR"
-                          ? "Profesor"
-                          : "Administrador"}
+                      {rol === "ALUMNO" ? "Alumno" : rol === "PROFESOR" ? "Profesor" : "Administrador"}
                     </span>
                   </div>
                 ) : (
                   <>
                     <div
-                      className={`custom-select-trigger ${rol !== "" ? "selected" : ""
-                        }`}
+                      className={`custom-select-trigger ${rol !== "" ? "selected" : ""}`}
                       onClick={() => setIsOpen(!isOpen)}
                     >
                       <span>
                         {rol === ""
                           ? "Elige un rol..."
                           : rol === "ALUMNO"
-                            ? "Alumno"
-                            : rol === "PROFESOR"
-                              ? "Profesor"
-                              : "Administrador"}
+                          ? "Alumno"
+                          : rol === "PROFESOR"
+                          ? "Profesor"
+                          : "Administrador"}
                       </span>
-                      <FontAwesomeIcon
-                        className="icon-increment"
-                        icon={faAngleDown}
-                      />
+                      <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                     </div>
 
                     {isOpen && (
                       <div className="custom-select-dropdown">
                         <div
-                          className={`custom-select-option ${rol === "ADMINISTRADOR" ? "active" : ""
-                            }`}
+                          className={`custom-select-option ${rol === "ADMINISTRADOR" ? "active" : ""}`}
                           onClick={() => {
                             setRol("ADMINISTRADOR");
                             setIsOpen(false);
@@ -725,8 +613,7 @@ function GestionUsuarios() {
                           Administrador
                         </div>
                         <div
-                          className={`custom-select-option ${rol === "PROFESOR" ? "active" : ""
-                            }`}
+                          className={`custom-select-option ${rol === "PROFESOR" ? "active" : ""}`}
                           onClick={() => {
                             setRol("PROFESOR");
                             setIsOpen(false);
@@ -735,8 +622,7 @@ function GestionUsuarios() {
                           Profesor
                         </div>
                         <div
-                          className={`custom-select-option ${rol === "ALUMNO" ? "active" : ""
-                            }`}
+                          className={`custom-select-option ${rol === "ALUMNO" ? "active" : ""}`}
                           onClick={() => {
                             setRol("ALUMNO");
                             setIsOpen(false);
@@ -756,9 +642,7 @@ function GestionUsuarios() {
             {!isEditMode && rol === "" && (
               <div className="mensaje-sin-rol">
                 <p className="mensaje-sin-rol-titulo">No hay datos a ingresar</p>
-                <p className="mensaje-sin-rol-subtitulo">
-                  Primero selecciona un rol de usuario
-                </p>
+                <p className="mensaje-sin-rol-subtitulo">Primero selecciona un rol de usuario</p>
               </div>
             )}
 
@@ -795,11 +679,7 @@ function GestionUsuarios() {
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder={
-                          isEditMode
-                            ? "Ingresa una nueva contraseña (opcional)"
-                            : "Ingresa la contraseña"
-                        }
+                        placeholder={isEditMode ? "Ingresa una nueva contraseña (opcional)" : "Ingresa la contraseña"}
                         minLength={isEditMode ? 0 : 6}
                         className="input-password"
                       />
@@ -809,10 +689,7 @@ function GestionUsuarios() {
                         className="password-toggle-btn"
                         aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
-                        <FontAwesomeIcon
-                          icon={showPassword ? faEyeSlash : faEye}
-                          className="icon-see"
-                        />
+                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="icon-see" />
                       </button>
                     </div>
                     <small className="field-help">
@@ -830,11 +707,7 @@ function GestionUsuarios() {
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder={
-                          isEditMode
-                            ? "Repite la nueva contraseña"
-                            : "Repite la contraseña"
-                        }
+                        placeholder={isEditMode ? "Repite la nueva contraseña" : "Repite la contraseña"}
                         minLength={isEditMode ? 0 : 6}
                         className="input-password"
                       />
@@ -842,20 +715,13 @@ function GestionUsuarios() {
                         type="button"
                         onClick={() => setShowConfirmPassword((prev) => !prev)}
                         className="password-toggle-btn"
-                        aria-label={
-                          showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"
-                        }
+                        aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
-                        <FontAwesomeIcon
-                          icon={showConfirmPassword ? faEyeSlash : faEye}
-                          className="icon-see"
-                        />
+                        <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} className="icon-see" />
                       </button>
                     </div>
                     <small className="field-help">
-                      {isEditMode
-                        ? "Solo es necesario si vas a cambiar la contraseña."
-                        : "Debe coincidir con la contraseña anterior."}
+                      {isEditMode ? "Solo es necesario si vas a cambiar la contraseña." : "Debe coincidir con la contraseña anterior."}
                     </small>
                   </label>
                 </div>
@@ -891,13 +757,9 @@ function GestionUsuarios() {
 
                     <label>
                       <span>Nivel</span>
-                      <div
-                        className="student-select-container"
-                        ref={nivelSelectRef}
-                      >
+                      <div className="student-select-container" ref={nivelSelectRef}>
                         <div
-                          className={`student-select-trigger ${nivel !== "" ? "selected" : ""
-                            }`}
+                          className={`student-select-trigger ${nivel !== "" ? "selected" : ""}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsNivelOpen(!isNivelOpen);
@@ -907,22 +769,18 @@ function GestionUsuarios() {
                             {nivel === ""
                               ? "Elige un nivel..."
                               : nivel === "INICIAL"
-                                ? "Inicial"
-                                : nivel === "PRIMARIA"
-                                  ? "Primaria"
-                                  : "Secundaria"}
+                              ? "Inicial"
+                              : nivel === "PRIMARIA"
+                              ? "Primaria"
+                              : "Secundaria"}
                           </span>
-                          <FontAwesomeIcon
-                            className="icon-increment"
-                            icon={faAngleDown}
-                          />
+                          <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                         </div>
 
                         {isNivelOpen && (
                           <div className="student-select-dropdown">
                             <div
-                              className={`student-select-option ${nivel === "INICIAL" ? "active" : ""
-                                }`}
+                              className={`student-select-option ${nivel === "INICIAL" ? "active" : ""}`}
                               onClick={() => {
                                 setNivel("INICIAL");
                                 setIsNivelOpen(false);
@@ -931,8 +789,7 @@ function GestionUsuarios() {
                               Inicial
                             </div>
                             <div
-                              className={`student-select-option ${nivel === "PRIMARIA" ? "active" : ""
-                                }`}
+                              className={`student-select-option ${nivel === "PRIMARIA" ? "active" : ""}`}
                               onClick={() => {
                                 setNivel("PRIMARIA");
                                 setIsNivelOpen(false);
@@ -941,8 +798,7 @@ function GestionUsuarios() {
                               Primaria
                             </div>
                             <div
-                              className={`student-select-option ${nivel === "SECUNDARIA" ? "active" : ""
-                                }`}
+                              className={`student-select-option ${nivel === "SECUNDARIA" ? "active" : ""}`}
                               onClick={() => {
                                 setNivel("SECUNDARIA");
                                 setIsNivelOpen(false);
@@ -1026,25 +882,10 @@ function GestionUsuarios() {
                 )}
 
                 <div className="form-buttons">
-                  <button
-                    type="submit"
-                    className="btn-create"
-                    disabled={creatingUser}
-                  >
-                    {creatingUser
-                      ? isEditMode
-                        ? "Guardando..."
-                        : "Creando..."
-                      : isEditMode
-                        ? "Guardar Cambios"
-                        : "Añadir Usuario"}
+                  <button type="submit" className="btn-create" disabled={creatingUser}>
+                    {creatingUser ? (isEditMode ? "Guardando..." : "Creando...") : isEditMode ? "Guardar Cambios" : "Añadir Usuario"}
                   </button>
-                  <button
-                    type="button"
-                    className="btn-clear"
-                    onClick={limpiarFormulario}
-                    disabled={creatingUser}
-                  >
+                  <button type="button" className="btn-clear" onClick={limpiarFormulario} disabled={creatingUser}>
                     {isEditMode ? "Cancelar Edición" : "Limpiar Formulario"}
                   </button>
                 </div>
@@ -1086,30 +927,25 @@ function GestionUsuarios() {
             <label>Rol</label>
             <div className="filter-select-container" ref={filtroRolSelectRef}>
               <div
-                className={`filter-select-trigger ${filtroRol !== "" ? "selected" : ""
-                  }`}
+                className={`filter-select-trigger ${filtroRol !== "" ? "selected" : ""}`}
                 onClick={() => setIsFiltroRolOpen(!isFiltroRolOpen)}
               >
                 <span>
                   {filtroRol === ""
                     ? "Todos los roles"
                     : filtroRol === "ALUMNO"
-                      ? "Alumno"
-                      : filtroRol === "PROFESOR"
-                        ? "Profesor"
-                        : "Administrador"}
+                    ? "Alumno"
+                    : filtroRol === "PROFESOR"
+                    ? "Profesor"
+                    : "Administrador"}
                 </span>
-                <FontAwesomeIcon
-                  className="icon-increment"
-                  icon={faAngleDown}
-                />
+                <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
               </div>
 
               {isFiltroRolOpen && (
                 <div className="filter-select-dropdown">
                   <div
-                    className={`filter-select-option ${filtroRol === "" ? "active" : ""
-                      }`}
+                    className={`filter-select-option ${filtroRol === "" ? "active" : ""}`}
                     onClick={() => {
                       setFiltroRol("");
                       setIsFiltroRolOpen(false);
@@ -1118,8 +954,7 @@ function GestionUsuarios() {
                     Todos los roles
                   </div>
                   <div
-                    className={`filter-select-option ${filtroRol === "ADMINISTRADOR" ? "active" : ""
-                      }`}
+                    className={`filter-select-option ${filtroRol === "ADMINISTRADOR" ? "active" : ""}`}
                     onClick={() => {
                       setFiltroRol("ADMINISTRADOR");
                       setIsFiltroRolOpen(false);
@@ -1128,8 +963,7 @@ function GestionUsuarios() {
                     Administrador
                   </div>
                   <div
-                    className={`filter-select-option ${filtroRol === "PROFESOR" ? "active" : ""
-                      }`}
+                    className={`filter-select-option ${filtroRol === "PROFESOR" ? "active" : ""}`}
                     onClick={() => {
                       setFiltroRol("PROFESOR");
                       setIsFiltroRolOpen(false);
@@ -1138,8 +972,7 @@ function GestionUsuarios() {
                     Profesor
                   </div>
                   <div
-                    className={`filter-select-option ${filtroRol === "ALUMNO" ? "active" : ""
-                      }`}
+                    className={`filter-select-option ${filtroRol === "ALUMNO" ? "active" : ""}`}
                     onClick={() => {
                       setFiltroRol("ALUMNO");
                       setIsFiltroRolOpen(false);
@@ -1203,49 +1036,35 @@ function GestionUsuarios() {
                     <td>{user.id}</td>
                     <td>{user.nombre}</td>
                     <td>
-                      <span
-                        className={`badge-rol badge-${user.rol.toLowerCase()}`}
-                      >
-                        {user.rol}
-                      </span>
+                      <span className={`badge-rol badge-${user.rol.toLowerCase()}`}>{user.rol}</span>
                     </td>
                     <td>{user.email}</td>
                     <td>
                       {user.rol === "ALUMNO" && user.dniAlumno
                         ? user.dniAlumno
                         : user.rol === "PROFESOR" && user.dniProfesor
-                          ? user.dniProfesor
-                          : "-"}
+                        ? user.dniProfesor
+                        : "-"}
                     </td>
                     <td>
                       {user.rol === "ALUMNO" && user.telefonoEmergencia
                         ? user.telefonoEmergencia
                         : user.rol === "PROFESOR" && user.telefono
-                          ? user.telefono
-                          : "-"}
+                        ? user.telefono
+                        : "-"}
                     </td>
                     <td>
-                      {user.rol === "ALUMNO" &&
-                        user.alumno?.nivel &&
-                        user.alumno?.grado
+                      {user.rol === "ALUMNO" && user.alumno?.nivel && user.alumno?.grado
                         ? `${user.alumno.nivel} - ${user.alumno.grado}`
                         : user.rol === "PROFESOR" && user.profesor?.telefono
-                          ? user.profesor.telefono
-                          : "-"}
+                        ? user.profesor.telefono
+                        : "-"}
                     </td>
                     <td>
-                      <button
-                        className="btn-edit"
-                        onClick={() => handleEdit(user)}
-                      >
+                      <button className="btn-edit" onClick={() => handleEdit(user)}>
                         Editar
                       </button>
-                      <button
-                        className="btn-delete"
-                        onClick={() =>
-                          handleDelete(user.id, user.nombre)
-                        }
-                      >
+                      <button className="btn-delete" onClick={() => handleDelete(user.id, user.nombre)}>
                         Eliminar
                       </button>
                     </td>
@@ -1257,8 +1076,8 @@ function GestionUsuarios() {
                     {filtroNombre || filtroRol || filtroEmail || filtroDni
                       ? "No se encontraron usuarios con los filtros aplicados."
                       : error
-                        ? "Error al cargar usuarios."
-                        : "No hay usuarios registrados."}
+                      ? "Error al cargar usuarios."
+                      : "No hay usuarios registrados."}
                   </td>
                 </tr>
               )}

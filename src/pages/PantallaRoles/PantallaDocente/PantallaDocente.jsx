@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/Roles/Docente/PantallaDocente.jsx
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 import icon from "../../../assets/logo.png";
-
 import { API_BASE_URL } from "../../../config/api.js";
 
-import LogoutButton from '../../../components/login/LogoutButton.jsx';
-import "../../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css"
-import { formatDateLocal, getDayOfWeek } from '../../../utils/dateUtils.js';
+import LogoutButton from "../../../components/login/LogoutButton.jsx";
+import "../../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css";
+import { formatDateLocal, getDayOfWeek } from "../../../utils/dateUtils.js";
 
 import { registrarEvento } from "../../../services/eventosService";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import { api } from "../../../api/api"; // 
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faBook,
     faCalendar,
@@ -24,9 +26,10 @@ import {
 
 export default function PantallaDocente() {
     const navigate = useNavigate();
-    const userName = localStorage.getItem('userName');
-    const userEmail = localStorage.getItem('userEmail');
-    const userDni = localStorage.getItem('userDni'); // NECESARIO para buscar secciones
+
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
+    const userDni = localStorage.getItem("userDni"); // Para buscar secciones del profesor
 
     const [secciones, setSecciones] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -39,26 +42,27 @@ export default function PantallaDocente() {
             setError(null);
 
             try {
-                const token = localStorage.getItem('authToken');
-                if (!token) throw new Error("No estás autenticado.");
-
                 if (!userDni) {
                     throw new Error("No se encontró el DNI del profesor.");
                 }
 
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
-
-                const response = await axios.get(
-                    `${API_BASE_URL}/secciones/profesor/dni/${userDni}`,
-                    config
+                
+                // api ya adjunta Authorization automáticamente
+                const resp = await api.get(
+                    `${API_BASE_URL}/secciones/profesor/dni/${userDni}`
                 );
 
-                setSecciones(response.data);
+                setSecciones(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar secciones:", err);
-                setError(err.response?.data?.message || "No se pudieron cargar las secciones");
+
+                const msg =
+                    err.response?.data?.message ||
+                    err.response?.data?.error ||
+                    err.message ||
+                    "No se pudieron cargar las secciones.";
+
+                setError(msg);
             } finally {
                 setLoading(false);
             }
@@ -72,12 +76,12 @@ export default function PantallaDocente() {
         const horarios = {
             MAÑANA: "7:00 AM - 11:30 AM",
             TARDE: "12:00 PM - 4:30 PM",
-            NOCHE: "5:00 PM - 9:30 PM"
+            NOCHE: "5:00 PM - 9:30 PM",
         };
         return horarios[turno] || "Horario no definido";
     };
 
-    // --- Función para determinar si la sección está activa ---
+    // --- Determinar estado de sección ---
     const obtenerEstadoSeccion = (seccion) => {
         if (!seccion.activa) {
             return { texto: "Inactiva", clase: "estado-inactivo" };
@@ -87,28 +91,57 @@ export default function PantallaDocente() {
         const inicio = new Date(seccion.fechaInicio);
         const fin = new Date(seccion.fechaFin);
 
-        if (hoy < inicio) {
-            return { texto: "Próximamente", clase: "estado-proximamente" };
-        } else if (hoy > fin) {
-            return { texto: "Finalizado", clase: "estado-finalizado" };
-        } else {
-            return { texto: "Activo", clase: "estado-activo" };
-        }
+        if (hoy < inicio) return { texto: "Próximamente", clase: "estado-proximamente" };
+        if (hoy > fin) return { texto: "Finalizado", clase: "estado-finalizado" };
+
+        return { texto: "Activo", clase: "estado-activo" };
     };
 
-    // --- Función para manejar ingreso a sección ---
+    // --- Entrar a sección ---
     const handleIngresarSeccion = (seccion) => {
-        navigate(`/docente/seccion/${seccion.id}`, {
-            state: { seccion }, // enviamos el objeto completo
-        });
+        navigate(`/docente/seccion/${seccion.id}`, { state: { seccion } });
     };
 
+    // --- Evento analítico ---
     useEffect(() => {
-        registrarEvento("VER_PANTALLA_DOCENTE", {
-            origen: "PantallaDocente",
-        });
+        registrarEvento("VER_PANTALLA_DOCENTE", { origen: "PantallaDocente" });
     }, []);
 
+    // ✅ Render
+    if (loading) {
+        return (
+            <div className="docente-layout">
+                <div className="docente-right-area">
+                    <header className="docente-header">
+                        <h1>Cargando secciones...</h1>
+                    </header>
+                    <main className="docente-main">
+                        <p>
+                            <FontAwesomeIcon icon={faSpinner} spin /> Cargando...
+                        </p>
+                    </main>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="docente-layout">
+                <div className="docente-right-area">
+                    <header className="docente-header">
+                        <h1>Panel del Docente</h1>
+                    </header>
+                    <main className="docente-main">
+                        <p className="error-message">❌ {error}</p>
+                        <button className="btn-volver" onClick={() => navigate("/")}>
+                            Volver
+                        </button>
+                    </main>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='docente-layout'>

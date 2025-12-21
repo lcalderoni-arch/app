@@ -1,9 +1,10 @@
 // src/pages/AdminCode/PantallaMonitorAsistencias.jsx
-import React, { useEffect, useState, useMemo, useRef } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { api } from "../../api/api"; // ✅ axios centralizado
 import { API_BASE_URL } from "../../config/api.js";
 import icon from "../../assets/logo.png";
-import { useNavigate } from "react-router-dom";
 
 import "../../styles/RolesStyle/AdminStyle/GestionAsistencia.css";
 
@@ -36,55 +37,6 @@ export default function PantallaMonitorAsistencias() {
 
     const navigate = useNavigate();
 
-    const cargarMonitor = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
-
-            const url = `${API_BASE_URL}/monitor/asistencias/hoy`;
-            const response = await axios.get(url, config);
-            setResumen(response.data || []);
-        } catch (err) {
-            console.error("Error al cargar monitor:", err);
-            setError(
-                err.response?.data?.message ||
-                "No se pudo cargar el monitor de asistencias."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        cargarMonitor();
-        const interval = setInterval(() => {
-            cargarMonitor();
-        }, 60000);
-        return () => clearInterval(interval);
-    }, []);
-
-    // Cerrar dropdowns al hacer clic fuera
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (cursoSelectRef.current && !cursoSelectRef.current.contains(event.target)) {
-                setIsCursoOpen(false);
-            }
-            if (sesionSelectRef.current && !sesionSelectRef.current.contains(event.target)) {
-                setIsSesionOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
     const getClaseEstado = (estado) => {
         switch (estado) {
             case "ALERTA":
@@ -100,7 +52,59 @@ export default function PantallaMonitorAsistencias() {
         }
     };
 
-    // Lista de cursos únicos para el filtro
+    // ==============================
+    //   CARGAR MONITOR (HOY)
+    // ==============================
+    const cargarMonitor = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const url = `${API_BASE_URL}/monitor/asistencias/hoy`;
+            const response = await api.get(url);
+
+            setResumen(response.data || []);
+        } catch (err) {
+            console.error("Error al cargar monitor:", err);
+            setError(
+                err.response?.data?.message ||
+                "No se pudo cargar el monitor de asistencias."
+            );
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        cargarMonitor();
+
+        const interval = setInterval(() => {
+            cargarMonitor();
+        }, 60000);
+
+        return () => clearInterval(interval);
+    }, [cargarMonitor]);
+
+    // ==============================
+    //   CERRAR DROPDOWNS FUERA
+    // ==============================
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (cursoSelectRef.current && !cursoSelectRef.current.contains(event.target)) {
+                setIsCursoOpen(false);
+            }
+            if (sesionSelectRef.current && !sesionSelectRef.current.contains(event.target)) {
+                setIsSesionOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // ==============================
+    //   CURSOS DISPONIBLES (FILTRO)
+    // ==============================
     const cursosDisponibles = useMemo(() => {
         const setCursos = new Set();
         resumen.forEach((r) => {
@@ -109,7 +113,9 @@ export default function PantallaMonitorAsistencias() {
         return Array.from(setCursos);
     }, [resumen]);
 
-    // Aplicar filtro por curso
+    // ==============================
+    //   SESIONES FILTRADAS
+    // ==============================
     const sesionesFiltradas = useMemo(() => {
         if (!cursoFiltro) return resumen;
         return resumen.filter((r) => r.curso === cursoFiltro);
@@ -119,31 +125,9 @@ export default function PantallaMonitorAsistencias() {
     const sesionesDashboardOptions = useMemo(() => {
         return sesionesFiltradas.map((r) => ({
             sesionId: r.sesionId,
-            label: `${r.nombreSeccion} ${r.horaInicio ? `- ${r.horaInicio}` : ""}`.trim(),
+            label: `${r.nombreSeccion}${r.horaInicio ? ` - ${r.horaInicio}` : ""}`.trim(),
         }));
     }, [sesionesFiltradas]);
-
-    const pieData = useMemo(() => {
-        if (!stats) return [];
-
-        const total = stats.total || 1;
-
-        const items = [
-            { key: "asistio", label: "Asistió", value: stats.asistio, color: "#22c55e" },
-            { key: "falta", label: "Falta", value: stats.falta, color: "#f97373" },
-            { key: "tardanza", label: "Tardanza", value: stats.tardanza, color: "#facc15" },
-            { key: "justificada", label: "Justificada", value: stats.justificada, color: "#6366f1" },
-            { key: "sinEstado", label: "Sin registro", value: stats.sinEstado, color: "#9ca3af" },
-        ];
-
-        return items
-            .filter((item) => item.value > 0)
-            .map((item) => ({
-                ...item,
-                percent: Math.round((item.value / total) * 100),
-            }));
-    }, [stats]);
-
 
     // Texto a mostrar en el trigger del select de sesión
     const sesionSeleccionadaLabel = useMemo(() => {
@@ -154,7 +138,9 @@ export default function PantallaMonitorAsistencias() {
         return found ? found.label : "Selecciona una sesión";
     }, [sesionDashboardId, sesionesDashboardOptions]);
 
-    // Cuando cambie la sesión seleccionada para el dashboard, cargamos sus asistencias
+    // ==============================
+    //   CARGAR STATS DE SESIÓN
+    // ==============================
     useEffect(() => {
         const cargarStatsSesion = async () => {
             if (!sesionDashboardId) {
@@ -167,15 +153,8 @@ export default function PantallaMonitorAsistencias() {
                 setLoadingStats(true);
                 setErrorStats(null);
 
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
-
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
-
                 const url = `${API_BASE_URL}/asistencias/sesion/${sesionDashboardId}`;
-                const response = await axios.get(url, config);
+                const response = await api.get(url);
                 const asistencias = response.data || [];
 
                 const total = asistencias.length;
@@ -208,9 +187,33 @@ export default function PantallaMonitorAsistencias() {
         cargarStatsSesion();
     }, [sesionDashboardId]);
 
+    // ==============================
+    //   PIE DATA
+    // ==============================
+    const pieData = useMemo(() => {
+        if (!stats) return [];
+
+        const total = stats.total || 1;
+
+        const items = [
+            { key: "asistio", label: "Asistió", value: stats.asistio, color: "#22c55e" },
+            { key: "falta", label: "Falta", value: stats.falta, color: "#f97373" },
+            { key: "tardanza", label: "Tardanza", value: stats.tardanza, color: "#facc15" },
+            { key: "justificada", label: "Justificada", value: stats.justificada, color: "#6366f1" },
+            { key: "sinEstado", label: "Sin registro", value: stats.sinEstado, color: "#9ca3af" },
+        ];
+
+        return items
+            .filter((item) => item.value > 0)
+            .map((item) => ({
+                ...item,
+                percent: Math.round((item.value / total) * 100),
+            }));
+    }, [stats]);
+
     return (
         <div className="general-box-gestionusuarios">
-            {/* Header igual al de Gestión de Usuarios */}
+            {/* Header */}
             <div className="header-firstpage-admin">
                 <img className="icon" src={icon} alt="Logo de Reinvent ID Rímac" />
                 <h1>Plataforma de Gestiones Reinvented Rimac</h1>
@@ -235,39 +238,27 @@ export default function PantallaMonitorAsistencias() {
                     <p>Vea los cursos y las asistencias de los estudiantes</p>
                 </div>
 
-                {/* Filtro por curso – CUSTOM SELECT */}
+                {/* Filtro por curso */}
                 <div className="auth-form-gestionasistencia">
                     <div className="auth-form-gestionusuarios-area-rol">
                         <label className="rol-text">
                             Curso:
-                            <div
-                                className="monitor-select-container"
-                                ref={cursoSelectRef}
-                            >
+                            <div className="monitor-select-container" ref={cursoSelectRef}>
                                 <div
-                                    className={`monitor-select-trigger ${cursoFiltro !== "" ? "selected" : ""
-                                        }`}
+                                    className={`monitor-select-trigger ${cursoFiltro !== "" ? "selected" : ""}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setIsCursoOpen(!isCursoOpen);
                                     }}
                                 >
-                                    <span>
-                                        {cursoFiltro === ""
-                                            ? "Todos los cursos"
-                                            : cursoFiltro}
-                                    </span>
-                                    <FontAwesomeIcon
-                                        className="icon-increment"
-                                        icon={faAngleDown}
-                                    />
+                                    <span>{cursoFiltro === "" ? "Todos los cursos" : cursoFiltro}</span>
+                                    <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                                 </div>
 
                                 {isCursoOpen && (
                                     <div className="custom-select-dropdown">
                                         <div
-                                            className={`monitor-select-option ${cursoFiltro === "" ? "active" : ""
-                                                }`}
+                                            className={`monitor-select-option ${cursoFiltro === "" ? "active" : ""}`}
                                             onClick={() => {
                                                 setCursoFiltro("");
                                                 setSesionDashboardId("");
@@ -277,11 +268,11 @@ export default function PantallaMonitorAsistencias() {
                                         >
                                             Todos los cursos
                                         </div>
+
                                         {cursosDisponibles.map((curso) => (
                                             <div
                                                 key={curso}
-                                                className={`monitor-select-option ${cursoFiltro === curso ? "active" : ""
-                                                    }`}
+                                                className={`monitor-select-option ${cursoFiltro === curso ? "active" : ""}`}
                                                 onClick={() => {
                                                     setCursoFiltro(curso);
                                                     setSesionDashboardId("");
@@ -306,71 +297,65 @@ export default function PantallaMonitorAsistencias() {
                     </div>
 
                     {!loading && !error && resumen.length === 0 && (
-                        <p>No hay sesiones programadas para hoy.</p>
+                        <p style={{
+                            padding:"10px 35px",
+                        }}>No hay sesiones programadas para hoy.</p>
                     )}
 
                     {!loading && !error && sesionesFiltradas.length > 0 && (
-                        <>
-                            {/* Tabla principal */}
-                            <div className="table-users-gestionusuarios">
-                                <table className="styled-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Sección</th>
-                                            <th>Curso</th>
-                                            <th>Grado</th>
-                                            <th>Nivel</th>
-                                            <th>Hora Inicio</th>
-                                            <th>Total</th>
-                                            <th>Con asistencia</th>
-                                            <th>Sin registrar</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
+                        <div className="table-users-gestionusuarios">
+                            <table className="styled-table">
+                                <thead>
+                                    <tr>
+                                        <th>Sección</th>
+                                        <th>Curso</th>
+                                        <th>Grado</th>
+                                        <th>Nivel</th>
+                                        <th>Hora Inicio</th>
+                                        <th>Total</th>
+                                        <th>Con asistencia</th>
+                                        <th>Sin registrar</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sesionesFiltradas.map((r) => (
+                                        <tr key={r.sesionId}>
+                                            <td>{r.nombreSeccion}</td>
+                                            <td>{r.curso}</td>
+                                            <td>{r.gradoSeccion}</td>
+                                            <td>{r.nivelSeccion}</td>
+                                            <td>{r.horaInicio}</td>
+                                            <td>{r.totalAlumnos}</td>
+                                            <td>{r.conAsistencia}</td>
+                                            <td>{r.sinAsistencia}</td>
+                                            <td>
+                                                <span className={`badge-estado ${getClaseEstado(r.estadoSemaforo)}`}>
+                                                    {r.estadoSemaforo}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className="btn-edit"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/dashboard-admin/monitor-asistencias/${r.seccionId}/${r.sesionId}`
+                                                        )
+                                                    }
+                                                >
+                                                    Ver detalle
+                                                </button>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {sesionesFiltradas.map((r) => (
-                                            <tr key={r.sesionId}>
-                                                <td>{r.nombreSeccion}</td>
-                                                <td>{r.curso}</td>
-                                                <td>{r.gradoSeccion}</td>
-                                                <td>{r.nivelSeccion}</td>
-                                                <td>{r.horaInicio}</td>
-                                                <td>{r.totalAlumnos}</td>
-                                                <td>{r.conAsistencia}</td>
-                                                <td>{r.sinAsistencia}</td>
-                                                <td>
-                                                    <span
-                                                        className={`badge-estado ${getClaseEstado(
-                                                            r.estadoSemaforo
-                                                        )}`}
-                                                    >
-                                                        {r.estadoSemaforo}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        className="btn-edit"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/dashboard-admin/monitor-asistencias/${r.seccionId}/${r.sesionId}`
-                                                            )
-                                                        }
-                                                    >
-                                                        Ver detalle
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
             </div>
 
-            {/* DASHBOARD POR SESIÓN */}
             {/* DASHBOARD POR SESIÓN */}
             <div className="box-formulario-gestionasistencia">
                 <div className="centrar-tercer-titulo">
@@ -382,30 +367,22 @@ export default function PantallaMonitorAsistencias() {
                     <div className="auth-form-gestionusuarios-area-rol">
                         <label className="rol-text">
                             Sesión (sección + hora):
-                            <div
-                                className="monitor-select-container"
-                                ref={sesionSelectRef}
-                            >
+                            <div className="monitor-select-container" ref={sesionSelectRef}>
                                 <div
-                                    className={`monitor-select-trigger ${sesionDashboardId !== "" ? "selected" : ""
-                                        }`}
+                                    className={`monitor-select-trigger ${sesionDashboardId !== "" ? "selected" : ""}`}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setIsSesionOpen(!isSesionOpen);
                                     }}
                                 >
                                     <span>{sesionSeleccionadaLabel}</span>
-                                    <FontAwesomeIcon
-                                        className="icon-increment"
-                                        icon={faAngleDown}
-                                    />
+                                    <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                                 </div>
 
                                 {isSesionOpen && (
                                     <div className="custom-select-dropdown">
                                         <div
-                                            className={`custom-select-option ${sesionDashboardId === "" ? "active" : ""
-                                                }`}
+                                            className={`custom-select-option ${sesionDashboardId === "" ? "active" : ""}`}
                                             onClick={() => {
                                                 setSesionDashboardId("");
                                                 setStats(null);
@@ -414,13 +391,11 @@ export default function PantallaMonitorAsistencias() {
                                         >
                                             Selecciona una sesión
                                         </div>
+
                                         {sesionesDashboardOptions.map((opt) => (
                                             <div
                                                 key={opt.sesionId}
-                                                className={`custom-select-option ${String(sesionDashboardId) === String(opt.sesionId)
-                                                        ? "active"
-                                                        : ""
-                                                    }`}
+                                                className={`custom-select-option ${String(sesionDashboardId) === String(opt.sesionId) ? "active" : ""}`}
                                                 onClick={() => {
                                                     setSesionDashboardId(opt.sesionId);
                                                     setIsSesionOpen(false);
@@ -436,14 +411,12 @@ export default function PantallaMonitorAsistencias() {
                     </div>
 
                     {loadingStats && <p>Cargando resumen de la sesión...</p>}
-                    {errorStats && (
-                        <p style={{ color: "red" }}>Error: {errorStats}</p>
-                    )}
+                    {errorStats && <p style={{ color: "red" }}>Error: {errorStats}</p>}
 
                     {stats && !loadingStats && !errorStats && (
                         <div className="sesion-dashboard-wrapper">
                             <div className="sesion-dashboard">
-                                {/* IZQUIERDA: GRÁFICO DE DONA */}
+                                {/* IZQUIERDA */}
                                 <div className="sesion-dashboard-chart-wrapper">
                                     <div className="donut-center-label">
                                         <span className="donut-total">{stats.total}</span>
@@ -465,16 +438,17 @@ export default function PantallaMonitorAsistencias() {
                                                 <Cell key={`cell-${index}`} fill={entry.color} />
                                             ))}
                                         </Pie>
+
                                         <Tooltip
                                             formatter={(value, name, props) => [
                                                 `${value} alumnos`,
-                                                props.payload.label,
+                                                props?.payload?.label || name,
                                             ]}
                                         />
                                     </PieChart>
                                 </div>
 
-                                {/* DERECHA: DETALLES EN TEXTO */}
+                                {/* DERECHA */}
                                 <div className="sesion-dashboard-details">
                                     <h4>Detalle de asistencias</h4>
                                     <p className="details-subtitle">
@@ -483,18 +457,13 @@ export default function PantallaMonitorAsistencias() {
 
                                     <ul className="sesion-dashboard-list">
                                         {pieData.map((item) => (
-                                            <li
-                                                key={item.key}
-                                                className="sesion-dashboard-list-item"
-                                            >
+                                            <li key={item.key} className="sesion-dashboard-list-item">
                                                 <span
                                                     className="sesion-dashboard-dot"
                                                     style={{ backgroundColor: item.color }}
                                                 />
                                                 <div className="sesion-dashboard-text">
-                                                    <span className="sesion-dashboard-label">
-                                                        {item.label}
-                                                    </span>
+                                                    <span className="sesion-dashboard-label">{item.label}</span>
                                                     <span className="sesion-dashboard-values">
                                                         {item.value} alumnos · {item.percent}%
                                                     </span>
@@ -508,6 +477,6 @@ export default function PantallaMonitorAsistencias() {
                     )}
                 </div>
             </div>
-            </div>
-            );
+        </div>
+    );
 }

@@ -1,6 +1,7 @@
 // src/pages/AdminCode/PantallaCalidadDatos.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { API_ENDPOINTS } from "../../config/api";
+import { api } from "../../api/api"; // ✅ axios centralizado (token + refresh cookie)
 import "../../styles/RolesStyle/AdminStyle/PantallaCalidadDatos.css";
 
 const PantallaCalidadDatos = () => {
@@ -9,61 +10,53 @@ const PantallaCalidadDatos = () => {
     const [error, setError] = useState(null);
     const [resumen, setResumen] = useState(null);
 
-    const fetchResumen = async () => {
+    const fetchResumen = useCallback(async () => {
         try {
-            const token = localStorage.getItem("authToken");
-            const resp = await fetch(`${API_ENDPOINTS.dataQuality}/resumen`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                },
-            });
-            if (!resp.ok) {
-                throw new Error("Error al obtener el resumen de calidad");
-            }
-            const data = await resp.json();
-            setResumen(data);
-        } catch (e) {
-            console.error(e);
-            setError(e.message);
+            setError(null);
+            const resp = await api.get(`${API_ENDPOINTS.dataQuality}/resumen`);
+            setResumen(resp.data);
+        } catch (err) {
+            console.error(err);
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                err.message ||
+                "Error al obtener el resumen de calidad";
+            setError(msg);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchResumen();
-    }, []);
+    }, [fetchResumen]);
 
     const ejecutarLimpieza = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            const token = localStorage.getItem("authToken");
-
-            const resp = await fetch(
+            const resp = await api.post(
                 `${API_ENDPOINTS.dataQuality}/limpiar-eventos`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
+                {} // body vacío (por si tu backend espera JSON)
             );
 
-            if (!resp.ok) {
-                throw new Error("Error al ejecutar la limpieza");
-            }
+            const data = resp.data || {};
 
-            const data = await resp.json();
             setResultado({
-                eventosProcesados: data.eventosProcesados,
+                eventosProcesados: data.eventosProcesados ?? 0,
                 fecha: new Date().toLocaleString(),
             });
 
             // Después de limpiar, recargamos el resumen
             await fetchResumen();
-        } catch (e) {
-            setError(e.message);
+        } catch (err) {
+            console.error(err);
+            const msg =
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                err.message ||
+                "Error al ejecutar la limpieza";
+            setError(msg);
         } finally {
             setLoading(false);
         }
@@ -118,13 +111,11 @@ const PantallaCalidadDatos = () => {
                         <div className="calidad-datos-resumen-detalle">
                             <h3>Detalle por calidad</h3>
                             <ul>
-                                {Object.entries(resumen.detalleCalidad).map(
-                                    ([clave, valor]) => (
-                                        <li key={clave}>
-                                            <strong>{clave}:</strong> {valor}
-                                        </li>
-                                    )
-                                )}
+                                {Object.entries(resumen.detalleCalidad).map(([clave, valor]) => (
+                                    <li key={clave}>
+                                        <strong>{clave}:</strong> {valor}
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                     )}
@@ -143,6 +134,5 @@ const PantallaCalidadDatos = () => {
         </div>
     );
 };
-
 
 export default PantallaCalidadDatos;

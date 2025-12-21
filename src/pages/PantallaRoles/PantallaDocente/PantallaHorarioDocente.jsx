@@ -1,5 +1,5 @@
+// src/pages/Roles/Docente/Horario/PantallaHorarioDocente.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 
 import { API_BASE_URL } from "../../../config/api.js";
@@ -7,8 +7,11 @@ import icon from "../../../assets/logo.png";
 
 import "../../../styles/RolesStyle/Horario/HorarioSemanal.css";
 
-import LogoutButton from '../../../components/login/LogoutButton.jsx';
+import LogoutButton from "../../../components/login/LogoutButton.jsx";
 import WeeklyCalendar from "../../../components/WeeklyCalendar.jsx";
+
+import { api } from "../../../api/api"; // ✅ axios centralizado (Bearer + refresh cookie)
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faBook,
@@ -38,22 +41,18 @@ export default function PantallaHorarioDocente() {
     const [eventos, setEventos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const userName = localStorage.getItem('userName');
+
+    const userName = localStorage.getItem("userName");
 
     useEffect(() => {
         const fetchHorario = async () => {
             setLoading(true);
             setError(null);
+
             try {
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
-
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
-
+                // ✅ SIN token manual: api se encarga
                 const url = `${API_BASE_URL}/docente/horario`;
-                const response = await axios.get(url, config);
+                const response = await api.get(url);
 
                 const data = response.data || [];
 
@@ -66,10 +65,10 @@ export default function PantallaHorarioDocente() {
                     if (sesion.diaSemana) {
                         dayIndex = mapDiaSemanaToIndex(sesion.diaSemana);
                     } else if (sesion.fecha) {
-                        // fecha: "2025-12-06"
-                        const d = new Date(sesion.fecha);
-                        // JS: 0=Dom, 1=Lun, ..., 6=Sáb (nos calza perfecto)
-                        dayIndex = d.getDay();
+                        // ✅ Parse local (evita que cambie de día por UTC)
+                        const [y, m, d] = sesion.fecha.split("-").map(Number);
+                        const localDate = new Date(y, m - 1, d); // <- LOCAL
+                        dayIndex = localDate.getDay();
                     }
 
                     // 3) Horas por defecto
@@ -92,8 +91,13 @@ export default function PantallaHorarioDocente() {
                 setEventos(mapped);
             } catch (err) {
                 console.error("Error al cargar horario del docente:", err);
-                if (err.response?.data?.message) {
-                    setError(err.response.data.message);
+
+                // ✅ manejo estándar
+                if (err.response) {
+                    const msg = err.response.data?.message || "Error en el servidor";
+                    setError(`Error ${err.response.status}: ${msg}`);
+                } else if (err.request) {
+                    setError("No se pudo conectar al servidor.");
                 } else {
                     setError(err.message || "Error al cargar horario.");
                 }

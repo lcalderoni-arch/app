@@ -1,11 +1,11 @@
+// src/pages/AdminCode/GestionSecciones.jsx
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import axios from 'axios';
 
-import { API_ENDPOINTS, API_BASE_URL } from "../../config/api.js";
+import { api } from "../../api/api"; // ✅ instancia central (Bearer + refresh)
 import icon from "../../assets/logo.png";
 
 import "../../styles/RolesStyle/AdminStyle/GestionSecciones.css";
-import { formatDateLocal } from '../../utils/dateUtils';
+import { formatDateLocal } from "../../utils/dateUtils";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -62,8 +62,6 @@ function GestionSecciones() {
     const turnoSelectRef = useRef(null);
     const cursoSelectRef = useRef(null);
 
-    const API_URL = API_ENDPOINTS.secciones;
-
     // --- useEffect para cerrar dropdowns al hacer click fuera ---
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -87,19 +85,16 @@ function GestionSecciones() {
         setLoading(true);
         setError(null);
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
-
-            const response = await axios.get(API_URL, config);
+            const response = await api.get("/secciones");
             setSecciones(response.data);
         } catch (err) {
             console.error("Error al cargar secciones:", err);
 
-            if (err.response) {
+            if (err.response?.status === 401) {
+                setError("Sesión expirada. Vuelve a iniciar sesión.");
+            } else if (err.response?.status === 403) {
+                setError("No tienes permisos para gestionar secciones.");
+            } else if (err.response) {
                 const msgBackend = err.response.data?.message || "Error en el servidor";
                 setError(`Error ${err.response.status}: ${msgBackend}`);
             } else if (err.request) {
@@ -110,7 +105,7 @@ function GestionSecciones() {
         } finally {
             setLoading(false);
         }
-    }, [API_URL]);
+    }, []);
 
     useEffect(() => {
         cargarSecciones();
@@ -120,14 +115,7 @@ function GestionSecciones() {
     const cargarCursos = useCallback(async () => {
         setLoadingCursos(true);
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
-
-            const response = await axios.get(`${API_BASE_URL}/cursos`, config);
+            const response = await api.get("/cursos");
             setCursos(response.data);
         } catch (err) {
             console.error("Error al cargar cursos:", err);
@@ -169,7 +157,6 @@ function GestionSecciones() {
 
             const diffTime = Math.abs(fin - inicio);
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
             const weeks = Math.floor(diffDays / 7) + 1;
 
             setSemanasCalculadas(weeks);
@@ -180,7 +167,6 @@ function GestionSecciones() {
         }
     }, [fechaInicio, fechaFin]);
 
-    // LLAMAR AL CALCULAR CUANDO CAMBIEN LAS FECHAS:
     useEffect(() => {
         calcularSemanas();
     }, [calcularSemanas]);
@@ -189,29 +175,8 @@ function GestionSecciones() {
     const obtenerDiaSemana = (fechaString) => {
         if (!fechaString) return "";
 
-        const diasSemana = [
-            "Domingo",
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado",
-        ];
-        const meses = [
-            "Ene",
-            "Feb",
-            "Mar",
-            "Abr",
-            "May",
-            "Jun",
-            "Jul",
-            "Ago",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dic",
-        ];
+        const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
         const [year, month, day] = fechaString.split("-");
         const fecha = new Date(year, month - 1, day);
@@ -230,7 +195,6 @@ function GestionSecciones() {
         setSubmittingSeccion(true);
         setFormError(null);
 
-        // Validaciones comunes
         if (
             !nombre.trim() ||
             !nivelSeccion ||
@@ -253,7 +217,6 @@ function GestionSecciones() {
             return;
         }
 
-        // Validación de semanas solo para creación (la edición ya tiene dato en backend)
         if (!isEditMode) {
             if (numeroSemanas < 1 || numeroSemanas > 52) {
                 setFormError("El número de semanas debe estar entre 1 y 52");
@@ -262,50 +225,31 @@ function GestionSecciones() {
             }
         }
 
-        // Payload base (sin numeroSemanas)
         const payloadBase = {
             nombre: nombre.trim(),
-            nivelSeccion: nivelSeccion,
+            nivelSeccion,
             gradoSeccion: gradoSeccion.trim(),
-            turno: turno,
+            turno,
             aula: aula.trim(),
             capacidad: capacidadNum,
-            fechaInicio: fechaInicio,
-            fechaFin: fechaFin,
+            fechaInicio,
+            fechaFin,
             cursoId: parseInt(cursoId),
             profesorDni: profesorDni.trim(),
         };
 
-        // Para creación SÍ enviamos numeroSemanas
-        const payload = !isEditMode
-            ? { ...payloadBase, numeroSemanas: numeroSemanas }
-            : payloadBase;
+        const payload = !isEditMode ? { ...payloadBase, numeroSemanas } : payloadBase;
 
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("Sesión expirada.");
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            };
-
             // --- CREAR ---
             if (!isEditMode) {
-                const url = `${API_BASE_URL}/secciones`;
-                const response = await axios.post(url, payload, config);
-
+                const response = await api.post("/secciones", payload);
                 setSecciones((current) => [response.data, ...current]);
                 alert(`Sección "${response.data.nombre}" creada correctamente.`);
                 limpiarFormularioSeccion();
             }
             // --- EDITAR ---
             else if (isEditMode && editingSeccion) {
-                const url = `${API_BASE_URL}/secciones/${editingSeccion.id}`;
-
-                // Evitar peticiones sin cambios (opcional)
                 const sinCambios =
                     payloadBase.nombre === (editingSeccion.nombre || "") &&
                     payloadBase.nivelSeccion === editingSeccion.nivelSeccion &&
@@ -324,11 +268,8 @@ function GestionSecciones() {
                     return;
                 }
 
-                const response = await axios.put(url, payload, config);
-
-                setSecciones((current) =>
-                    current.map((s) => (s.id === response.data.id ? response.data : s))
-                );
+                const response = await api.put(`/secciones/${editingSeccion.id}`, payload);
+                setSecciones((current) => current.map((s) => (s.id === response.data.id ? response.data : s)));
                 alert(`Sección "${response.data.nombre}" actualizada correctamente.`);
                 limpiarFormularioSeccion();
             }
@@ -339,23 +280,14 @@ function GestionSecciones() {
                 const status = err.response.status;
                 const errorData = err.response.data;
 
-                if (status === 401) {
-                    setFormError(
-                        "No estás autenticado. Por favor, inicia sesión nuevamente."
-                    );
-                } else if (status === 403) {
-                    setFormError("No tienes permisos para gestionar secciones.");
-                } else if (status === 400 && errorData?.message) {
-                    setFormError(errorData.message);
-                } else if (status === 500) {
-                    const errorMsg =
-                        errorData?.message || errorData?.error || "Error interno del servidor";
+                if (status === 401) setFormError("No estás autenticado. Por favor, inicia sesión nuevamente.");
+                else if (status === 403) setFormError("No tienes permisos para gestionar secciones.");
+                else if (status === 400 && errorData?.message) setFormError(errorData.message);
+                else if (status === 500) {
+                    const errorMsg = errorData?.message || errorData?.error || "Error interno del servidor";
                     setFormError(`Error del servidor: ${errorMsg}`);
-                } else if (errorData?.message) {
-                    setFormError(errorData.message);
-                } else {
-                    setFormError(`Error del servidor (código ${status})`);
-                }
+                } else if (errorData?.message) setFormError(errorData.message);
+                else setFormError(`Error del servidor (código ${status})`);
             } else if (err.request) {
                 setFormError("No se pudo conectar al servidor.");
             } else {
@@ -368,18 +300,17 @@ function GestionSecciones() {
 
     // --- Filtrar secciones ---
     const seccionesFiltradas = secciones.filter((seccion) => {
-        const coincideNivel =
-            filtroNivel === "TODOS" || seccion.nivelSeccion === filtroNivel;
-        const coincideTurno =
-            filtroTurno === "TODOS" || seccion.turno === filtroTurno;
+        const coincideNivel = filtroNivel === "TODOS" || seccion.nivelSeccion === filtroNivel;
+        const coincideTurno = filtroTurno === "TODOS" || seccion.turno === filtroTurno;
         const coincideActiva =
-            filtroActiva === "TODOS" ||
-            (filtroActiva === "ACTIVA" ? seccion.activa : !seccion.activa);
+            filtroActiva === "TODOS" || (filtroActiva === "ACTIVA" ? seccion.activa : !seccion.activa);
+
+        const term = searchTerm.toLowerCase();
         const coincideBusqueda =
-            seccion.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            seccion.codigo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            seccion.tituloCurso.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            seccion.nombreProfesor.toLowerCase().includes(searchTerm.toLowerCase());
+            (seccion.nombre || "").toLowerCase().includes(term) ||
+            (seccion.codigo || "").toLowerCase().includes(term) ||
+            (seccion.tituloCurso || "").toLowerCase().includes(term) ||
+            (seccion.nombreProfesor || "").toLowerCase().includes(term);
 
         return coincideNivel && coincideTurno && coincideActiva && coincideBusqueda;
     });
@@ -399,78 +330,47 @@ function GestionSecciones() {
         setFechaFin(seccion.fechaFin || "");
         setNumeroSemanas(seccion.numeroSemanas || 0);
         setSemanasCalculadas(seccion.numeroSemanas || 0);
-        setCursoId(
-            seccion.cursoId != null ? seccion.cursoId.toString() : ""
-        );
+        setCursoId(seccion.cursoId != null ? seccion.cursoId.toString() : "");
         setProfesorDni(seccion.dniProfesor || "");
         setFormError(null);
 
-        if (formRef.current) {
-            formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("¿Estás seguro de eliminar esta sección?")) {
-            return;
-        }
+        if (!window.confirm("¿Estás seguro de eliminar esta sección?")) return;
 
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("Sesión expirada.");
-
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
-
-            await axios.delete(`${API_URL}/${id}`, config);
-            setSecciones(secciones.filter((s) => s.id !== id));
+            await api.delete(`/secciones/${id}`);
+            setSecciones((prev) => prev.filter((s) => s.id !== id));
             alert("Sección eliminada exitosamente");
 
-            if (isEditMode && editingSeccion && editingSeccion.id === id) {
-                limpiarFormularioSeccion();
-            }
+            if (isEditMode && editingSeccion?.id === id) limpiarFormularioSeccion();
         } catch (err) {
             console.error("Error al eliminar sección:", err);
-            const errorMsg =
-                err.response?.data?.message || "No se pudo eliminar la sección";
+            const errorMsg = err.response?.data?.message || "No se pudo eliminar la sección";
             alert(errorMsg);
         }
     };
 
     const handleToggleActiva = async (seccion) => {
         const accion = seccion.activa ? "desactivar" : "activar";
-        if (!window.confirm(`¿Estás seguro de ${accion} esta sección?`)) {
-            return;
-        }
+        if (!window.confirm(`¿Estás seguro de ${accion} esta sección?`)) return;
 
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("Sesión expirada.");
-
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
-
             const endpoint = seccion.activa ? "desactivar" : "activar";
-            await axios.patch(`${API_URL}/${seccion.id}/${endpoint}`, {}, config);
-
-            setSecciones(
-                secciones.map((s) =>
-                    s.id === seccion.id ? { ...s, activa: !s.activa } : s
-                )
-            );
-
+            await api.patch(`/secciones/${seccion.id}/${endpoint}`, {});
+            setSecciones((prev) => prev.map((s) => (s.id === seccion.id ? { ...s, activa: !s.activa } : s)));
             alert(`Sección ${accion}da exitosamente`);
         } catch (err) {
             console.error(`Error al ${accion} sección:`, err);
-            const errorMsg =
-                err.response?.data?.message || `No se pudo ${accion} la sección`;
+            const errorMsg = err.response?.data?.message || `No se pudo ${accion} la sección`;
             alert(errorMsg);
         }
     };
 
     if (loading && secciones.length === 0) return <p>Cargando secciones...</p>;
+    if (error && secciones.length === 0) return <p style={{ color: "red" }}>Error: {error}</p>;
 
     return (
         <div className="general-box-gestionsecciones">

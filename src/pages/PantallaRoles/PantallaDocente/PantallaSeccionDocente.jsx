@@ -1,17 +1,17 @@
-// frontend/PantallaSeccionDocente.jsx
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import axios from 'axios';
 
 import icon from "../../../assets/logo.png";
 import icon2 from "../../../assets/logo2.png";
 import image from "../../../assets/imagetarea.png";
 
-import { API_BASE_URL } from '../../../config/api';
-import LogoutButton from '../../../components/login/LogoutButton';
-import { formatDateLocal } from '../../../utils/dateUtils';
+import { API_BASE_URL } from "../../../config/api";
+import LogoutButton from "../../../components/login/LogoutButton";
+import { formatDateLocal } from "../../../utils/dateUtils";
 
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
+
+import { api } from "../../../api/api"; // ✅ axios centralizado (Bearer + refresh cookie)
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -37,15 +37,16 @@ const opcionesTipoRecurso = [
     { value: "DOCUMENTO", label: "Documento" },
     { value: "ARCHIVO", label: "Archivo genérico" },
     { value: "IMAGEN", label: "Imagen" },
-    { value: "TAREA", label: "Tarea" },             // nuevo tipo
+    { value: "TAREA", label: "Tarea" },
     { value: "OTRO", label: "Otro" },
 ];
 
+// Construye URL pública para descargar/ver archivo
 const buildFileUrl = (path) => {
     if (!path) return null;
-    if (path.startsWith("http")) return path; // ya es absoluta (Azure, etc.)
+    if (path.startsWith("http")) return path;
 
-    // Quitamos /api del final del API_BASE_URL (http://localhost:8081/api -> http://localhost:8081)
+    // Quita /api del final del API_BASE_URL (http://localhost:8081/api -> http://localhost:8081)
     const apiRoot = API_BASE_URL.replace(/\/api\/?$/, "");
     return `${apiRoot}${path}`;
 };
@@ -70,31 +71,19 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
 
     const esTarea = tipo === "TAREA";
     const esTipoLink = tipo === "LINK" || tipo === "VIDEO";
-    const requiereArchivo = !esTipoLink && !esTarea; // las tareas no suben archivo el docente
+    const requiereArchivo = !esTipoLink && !esTarea; // tareas no suben archivo por docente
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!sesionId) {
-            alert("No se encontró la sesión actual.");
-            return;
-        }
-
-        if (!titulo.trim()) {
-            alert("El título es obligatorio.");
-            return;
-        }
-
-        if (requiereArchivo && !file) {
-            alert("Debes seleccionar un archivo para este tipo de recurso.");
-            return;
-        }
+        if (!sesionId) return alert("No se encontró la sesión actual.");
+        if (!titulo.trim()) return alert("El título es obligatorio.");
+        if (requiereArchivo && !file)
+            return alert("Debes seleccionar un archivo para este tipo de recurso.");
 
         if (esTarea) {
-            // Para tareas, validamos fechas mínimas
             if (!fechaInicioEntrega || !fechaFinEntrega) {
-                alert("Para una tarea debes indicar fecha de inicio y fin de entrega.");
-                return;
+                return alert("Para una tarea debes indicar fecha de inicio y fin de entrega.");
             }
         }
 
@@ -102,61 +91,40 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
             setSaving(true);
             setError(null);
 
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
-            // 👉 LINK / VIDEO / TAREA usan JSON
+            // ✅ LINK / VIDEO / TAREA => JSON
             if (esTipoLink || esTarea) {
                 const payload = {
                     sesionId,
                     titulo: titulo.trim(),
                     descripcion: descripcion.trim() || null,
-                    momento,             // ANTES / DURANTE / DESPUES
-                    tipo,                // LINK / VIDEO / TAREA
+                    momento, // ANTES / DURANTE / DESPUES
+                    tipo, // LINK / VIDEO / TAREA
                     linkVideo: esTipoLink ? (linkVideo.trim() || null) : null,
                     archivoUrl: null,
 
-                    // 🔹 datos extra para tareas (el backend los puede ignorar si no es TAREA)
+                    // datos extra para tareas
                     fechaInicioEntrega: esTarea && fechaInicioEntrega ? fechaInicioEntrega : null,
                     fechaFinEntrega: esTarea && fechaFinEntrega ? fechaFinEntrega : null,
-                    permiteEntregas: esTarea ? permiteEntregas : false,
+                    permiteEntregas: esTarea ? !!permiteEntregas : false,
                 };
 
-                const response = await axios.post(
-                    `${API_BASE_URL}/recursos/crear`,
-                    payload,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-
-                onRecursoCreado && onRecursoCreado(response.data);
+                const resp = await api.post(`${API_BASE_URL}/recursos/crear`, payload);
+                onRecursoCreado && onRecursoCreado(resp.data);
             } else {
-                // Archivos físicos: multipart/form-data
+                // ✅ Archivos físicos => multipart/form-data
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("titulo", titulo.trim());
-                if (descripcion.trim()) {
-                    formData.append("descripcion", descripcion.trim());
-                }
-                formData.append("momento", momento);       // ANTES / DURANTE / DESPUES
-                formData.append("tipoRecurso", tipo);      // PDF / DOCUMENTO / ARCHIVO / etc.
+                if (descripcion.trim()) formData.append("descripcion", descripcion.trim());
+                formData.append("momento", momento);
+                formData.append("tipoRecurso", tipo);
 
-                const response = await axios.post(
+                const resp = await api.post(
                     `${API_BASE_URL}/recursos/sesion/${sesionId}/archivo`,
-                    formData,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            // axios setea automáticamente el Content-Type
-                        },
-                    }
+                    formData
                 );
 
-                onRecursoCreado && onRecursoCreado(response.data);
+                onRecursoCreado && onRecursoCreado(resp.data);
             }
 
             // Limpiar formulario
@@ -170,10 +138,7 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
             setPermiteEntregas(false);
         } catch (err) {
             console.error("Error al crear recurso:", err);
-            setError(
-                err.response?.data?.message ||
-                "No se pudo crear el recurso."
-            );
+            setError(err.response?.data?.message || "No se pudo crear el recurso.");
         } finally {
             setSaving(false);
         }
@@ -205,10 +170,7 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
 
             <label>
                 Tipo de recurso
-                <select
-                    value={tipo}
-                    onChange={(e) => setTipo(e.target.value)}
-                >
+                <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
                     <option value="">Selecciona tipo</option>
                     {opcionesTipoRecurso.map((op) => (
                         <option key={op.value} value={op.value}>
@@ -236,18 +198,14 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
 
                     <div className="file-row">
                         <input
-                            id="archivoTarea"
+                            id={`archivo_${momento}`}
                             type="file"
                             className="file-input"
                             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                         />
-
-                        {/* ESTE es el “botón” */}
-                        <label htmlFor="archivoTarea" className="file-btn">
+                        <label htmlFor={`archivo_${momento}`} className="file-btn">
                             Seleccionar archivo
                         </label>
-
-                        {/* ESTE texto queda normal (sin estilizarlo como botón) */}
                         <span className="file-filename">
                             {file ? file.name : "Ningún archivo seleccionado"}
                         </span>
@@ -255,18 +213,14 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
                 </div>
             )}
 
-
             {esTarea && (
                 <>
                     <div className="tarea-fields-divider" />
-
                     <p className="tarea-label-group">Configuración de la tarea</p>
 
                     <label className="dt-field">
                         <span className="dt-label">Inicio de entrega</span>
-
                         <div className="dt-control">
-
                             <input
                                 type="datetime-local"
                                 className="dt-input"
@@ -276,12 +230,9 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
                         </div>
                     </label>
 
-
                     <label className="dt-field">
                         <span className="dt-label">Fin de entrega</span>
-
                         <div className="dt-control">
-
                             <input
                                 type="datetime-local"
                                 className="dt-input"
@@ -298,7 +249,6 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
                             checked={permiteEntregas}
                             onChange={(e) => setPermiteEntregas(e.target.checked)}
                         />
-
                     </label>
                 </>
             )}
@@ -320,8 +270,8 @@ export default function PantallaSeccionDocente() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const userName = localStorage.getItem('userName');
-    const userEmail = localStorage.getItem('userEmail');
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
 
     const seccionDesdeState = location.state?.seccion || null;
 
@@ -342,14 +292,14 @@ export default function PantallaSeccionDocente() {
     const [loadingRecursos, setLoadingRecursos] = useState(false);
     const [errorRecursos, setErrorRecursos] = useState(null);
 
-    // 🔹 Modal detalle tarea (DOCENTE)
+    // Modal detalle tarea (Docente)
     const [tareaSeleccionada, setTareaSeleccionada] = useState(null);
     const [entregasTarea, setEntregasTarea] = useState([]);
     const [showModalTarea, setShowModalTarea] = useState(false);
     const [loadingEntregas, setLoadingEntregas] = useState(false);
     const [errorEntregas, setErrorEntregas] = useState(null);
 
-    // 🔹 Modal vista previa recurso (PDF / IMAGEN / DOC / ARCHIVO)
+    // Modal vista previa recurso
     const [recursoSeleccionado, setRecursoSeleccionado] = useState(null);
     const [showModalRecurso, setShowModalRecurso] = useState(false);
 
@@ -363,7 +313,6 @@ export default function PantallaSeccionDocente() {
         setRecursoSeleccionado(null);
     };
 
-    // --- helpers de estado de recursos ---
     const handleRecursoActualizado = (recursoActualizado) => {
         setRecursos((prev) =>
             prev.map((r) => (r.id === recursoActualizado.id ? recursoActualizado : r))
@@ -374,7 +323,7 @@ export default function PantallaSeccionDocente() {
         setRecursos((prev) => prev.filter((r) => r.id !== id));
     };
 
-    // --- editar recurso (simple con prompt) ---
+    // --- Editar recurso (prompt simple) ---
     const handleEditarRecurso = async (recurso) => {
         try {
             const nuevoTitulo = window.prompt("Nuevo título:", recurso.titulo);
@@ -388,15 +337,9 @@ export default function PantallaSeccionDocente() {
 
             let nuevoLink = recurso.linkVideo || "";
             if (recurso.tipo === "LINK" || recurso.tipo === "VIDEO" || recurso.linkVideo) {
-                nuevoLink = window.prompt(
-                    "URL (YouTube / página web):",
-                    recurso.linkVideo || ""
-                );
+                nuevoLink = window.prompt("URL (YouTube / página web):", recurso.linkVideo || "");
                 if (nuevoLink === null) return;
             }
-
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
 
             const payload = {
                 titulo: nuevoTitulo.trim(),
@@ -406,30 +349,18 @@ export default function PantallaSeccionDocente() {
                 momento: recurso.momento,
                 sesionId: recurso.sesionId,
                 archivoUrl: recurso.archivoUrl || null,
-                // si tu backend también permite editar fechas de tarea, aquí las enviarías
                 fechaInicioEntrega: recurso.fechaInicioEntrega || null,
                 fechaFinEntrega: recurso.fechaFinEntrega || null,
                 permiteEntregas: recurso.permiteEntregas || false,
             };
 
-            const response = await axios.put(
-                `${API_BASE_URL}/recursos/${recurso.id}`,
-                payload,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            const resp = await api.put(`${API_BASE_URL}/recursos/${recurso.id}`, payload);
 
-            handleRecursoActualizado(response.data);
+            handleRecursoActualizado(resp.data);
             alert("Recurso actualizado correctamente.");
         } catch (err) {
             console.error("Error al actualizar recurso:", err);
-            alert(
-                err.response?.data?.message || "No se pudo actualizar el recurso."
-            );
+            alert(err.response?.data?.message || "No se pudo actualizar el recurso.");
         }
     };
 
@@ -437,15 +368,7 @@ export default function PantallaSeccionDocente() {
         if (!window.confirm("¿Seguro que deseas eliminar este recurso?")) return;
 
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
-            await axios.delete(`${API_BASE_URL}/recursos/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
+            await api.delete(`${API_BASE_URL}/recursos/${id}`);
             handleRecursoEliminado(id);
             alert("Recurso eliminado.");
         } catch (err) {
@@ -461,27 +384,12 @@ export default function PantallaSeccionDocente() {
             setLoadingEntregas(true);
             setErrorEntregas(null);
 
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-
-            // Llama al endpoint del backend para listar entregas de esa tarea
-            const response = await axios.get(
-                `${API_BASE_URL}/tareas/${recurso.id}/entregas`,
-                config
-            );
-
-            setEntregasTarea(response.data || []);
+            const resp = await api.get(`${API_BASE_URL}/tareas/${recurso.id}/entregas`);
+            setEntregasTarea(resp.data || []);
         } catch (err) {
             console.error("Error al cargar entregas de la tarea:", err);
             setErrorEntregas(
-                err.response?.data?.message ||
-                "No se pudieron cargar las entregas de esta tarea."
+                err.response?.data?.message || "No se pudieron cargar las entregas de esta tarea."
             );
             setEntregasTarea([]);
         } finally {
@@ -496,7 +404,6 @@ export default function PantallaSeccionDocente() {
         setErrorEntregas(null);
     };
 
-
     // --- Cargar sesiones ---
     useEffect(() => {
         const cargarSesiones = async () => {
@@ -504,17 +411,8 @@ export default function PantallaSeccionDocente() {
                 setLoadingSesiones(true);
                 setErrorSesiones(null);
 
-                const token = localStorage.getItem('authToken');
-                if (!token) throw new Error("No estás autenticado.");
-
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                const response = await axios.get(
-                    `${API_BASE_URL}/sesiones/seccion/${seccionId}`,
-                    config
-                );
-
-                setSesiones(response.data || []);
+                const resp = await api.get(`${API_BASE_URL}/sesiones/seccion/${seccionId}`);
+                setSesiones(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar sesiones:", err);
                 setErrorSesiones(
@@ -525,9 +423,7 @@ export default function PantallaSeccionDocente() {
             }
         };
 
-        if (seccionId) {
-            cargarSesiones();
-        }
+        if (seccionId) cargarSesiones();
     }, [seccionId]);
 
     // --- Cargar sección si no llegó por state ---
@@ -539,18 +435,9 @@ export default function PantallaSeccionDocente() {
                 setLoading(true);
                 setError(null);
 
-                const token = localStorage.getItem('authToken');
-                if (!token) throw new Error("No estás autenticado.");
-
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                const response = await axios.get(
-                    `${API_BASE_URL}/secciones/${seccionId}`,
-                    config
-                );
-
-                setSeccion(response.data);
-                setSemanaSeleccionada(response.data.semanaActual || 1);
+                const resp = await api.get(`${API_BASE_URL}/secciones/${seccionId}`);
+                setSeccion(resp.data);
+                setSemanaSeleccionada(resp.data.semanaActual || 1);
             } catch (err) {
                 console.error("Error al cargar la sección:", err);
                 setError(err.response?.data?.message || "No se pudo cargar la sección");
@@ -582,22 +469,12 @@ export default function PantallaSeccionDocente() {
                 setLoadingRecursos(true);
                 setErrorRecursos(null);
 
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
-
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                const response = await axios.get(
-                    `${API_BASE_URL}/recursos/sesion/${sesionActualId}`,
-                    config
-                );
-
-                setRecursos(response.data || []);
+                const resp = await api.get(`${API_BASE_URL}/recursos/sesion/${sesionActualId}`);
+                setRecursos(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar recursos:", err);
                 setErrorRecursos(
-                    err.response?.data?.message ||
-                    "No se pudieron cargar los recursos de la sesión."
+                    err.response?.data?.message || "No se pudieron cargar los recursos de la sesión."
                 );
                 setRecursos([]);
             } finally {
@@ -646,9 +523,7 @@ export default function PantallaSeccionDocente() {
     const semanas = Array.from({ length: numeroSemanas }, (_, i) => i + 1);
     const semanaActual = seccion.semanaActual || 1;
 
-    const handleClickSemana = (numSemana) => {
-        setSemanaSeleccionada(numSemana);
-    };
+    const handleClickSemana = (numSemana) => setSemanaSeleccionada(numSemana);
 
     const handleTomarAsistencia = () => {
         if (!sesiones || sesiones.length === 0) {
@@ -690,14 +565,6 @@ export default function PantallaSeccionDocente() {
                     const isFile = !!r.archivoUrl;
                     const isTarea = r.tipo === "TAREA";
 
-                    const botonTexto = isLink
-                        ? "Abrir enlace"
-                        : isFile
-                            ? "Ver recurso"
-                            : isTarea
-                                ? "Ver detalle"
-                                : "Ver recurso";
-
                     return (
                         <article key={r.id} className="recurso-card">
                             <header className="recurso-card-header">
@@ -706,37 +573,27 @@ export default function PantallaSeccionDocente() {
 
                             <h5 className="recurso-card-title">{r.titulo}</h5>
 
-                            {r.descripcion && (
-                                <p className="recurso-card-desc">{r.descripcion}</p>
-                            )}
+                            {r.descripcion && <p className="recurso-card-desc">{r.descripcion}</p>}
 
                             {isTarea && (
                                 <div className="recurso-tarea-meta">
                                     {r.fechaInicioEntrega && (
                                         <p>
-                                            <strong>Inicio:</strong>{" "}
-                                            {formatDateTimeLocal(r.fechaInicioEntrega)}
+                                            <strong>Inicio:</strong> {formatDateTimeLocal(r.fechaInicioEntrega)}
                                         </p>
                                     )}
                                     {r.fechaFinEntrega && (
                                         <p>
-                                            <strong>Fin:</strong>{" "}
-                                            {formatDateTimeLocal(r.fechaFinEntrega)}
+                                            <strong>Fin:</strong> {formatDateTimeLocal(r.fechaFinEntrega)}
                                         </p>
                                     )}
-                                    <span
-                                        className={
-                                            r.permiteEntregas ? "pill pill-green" : "pill pill-gray"
-                                        }
-                                    >
-                                        {r.permiteEntregas
-                                            ? "Entregas habilitadas"
-                                            : "Entregas deshabilitadas"}
+                                    <span className={r.permiteEntregas ? "pill pill-green" : "pill pill-gray"}>
+                                        {r.permiteEntregas ? "Entregas habilitadas" : "Entregas deshabilitadas"}
                                     </span>
                                 </div>
                             )}
 
-                            {/* Links simples (YouTube / web) siguen igual */}
+                            {/* Link */}
                             {isLink && !isTarea && (
                                 <a
                                     href={r.linkVideo}
@@ -744,22 +601,22 @@ export default function PantallaSeccionDocente() {
                                     rel="noreferrer"
                                     className="recurso-card-btn"
                                 >
-                                    {botonTexto}
+                                    Abrir enlace <FontAwesomeIcon icon={faUpRightFromSquare} />
                                 </a>
                             )}
 
-                            {/* Archivos físicos (PDF, DOCUMENTO, IMAGEN, ARCHIVO genérico) → modal */}
+                            {/* Archivo */}
                             {isFile && !isTarea && (
                                 <button
                                     type="button"
                                     className="recurso-card-btn"
                                     onClick={() => abrirModalRecurso(r)}
                                 >
-                                    {botonTexto}
+                                    Ver recurso <FontAwesomeIcon icon={faDownload} />
                                 </button>
                             )}
 
-                            {/* TAREA → modal de detalle de tarea (cuando lo integres) */}
+                            {/* Tarea */}
                             {isTarea && (
                                 <button
                                     type="button"
@@ -771,18 +628,10 @@ export default function PantallaSeccionDocente() {
                             )}
 
                             <div className="recurso-card-actions">
-                                <button
-                                    type="button"
-                                    className="btn-recurso-edit"
-                                    onClick={() => handleEditarRecurso(r)}
-                                >
+                                <button type="button" className="btn-recurso-edit" onClick={() => handleEditarRecurso(r)}>
                                     Editar
                                 </button>
-                                <button
-                                    type="button"
-                                    className="btn-recurso-delete"
-                                    onClick={() => handleEliminarRecurso(r.id)}
-                                >
+                                <button type="button" className="btn-recurso-delete" onClick={() => handleEliminarRecurso(r.id)}>
                                     Eliminar
                                 </button>
                             </div>
