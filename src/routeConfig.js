@@ -42,10 +42,16 @@ import PantallaSeccionDocente from "./pages/PantallaRoles/PantallaDocente/Pantal
 
 import ProtectedRoute from "./security/ProtectedRoute.jsx";
 
+import GuestRoute from "./security/GuestRoute.jsx"; 
+
 const routeConfig = [
   {
     path: "/",
-    element: <HomePage />,
+    element: (
+      <GuestRoute>
+        <HomePage />
+      </GuestRoute>
+    ),
   },
   {
     path: "/nosotros",

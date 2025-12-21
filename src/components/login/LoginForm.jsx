@@ -12,7 +12,8 @@ export default function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading] = useState(false);
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Mostrar/ocultar contraseña
@@ -28,40 +29,56 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
       const payload = { email, password };
 
       // LOGIN SIN cookies
       const res = await api.post("/auth/login", payload);
-      setAccessToken(res.data.token);
 
-      // datos de UI (OK en localStorage)
-      localStorage.setItem("userName", res.data.nombre);
-      localStorage.setItem("userRole", res.data.rol);
+      const token = res.data.token;
+      const rol = res.data.rol;
+
+      if (!token || !rol) {
+        throw new Error("Respuesta de login incompleta (token/rol).");
+      }
+
+      // Token en memoria (axios)
+      setAccessToken(token);
+
+      // ✅ Persistencia para GuestRoute / ProtectedRoute
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("userRol", rol);
+
+      // datos de UI
+      localStorage.setItem("userName", res.data.nombre || "");
       localStorage.setItem("userEmail", res.data.email || "");
       localStorage.setItem("userDni", res.data.dni || "");
       localStorage.setItem("userNivel", res.data.nivelAlumno || "");
       localStorage.setItem("userGrado", res.data.gradoAlumno || "");
 
       // redirección por rol
-      switch (res.data.rol) {
+      switch ((rol || "").toUpperCase()) {
         case "ADMINISTRADOR":
-          navigate("/dashboard-admin");
+          navigate("/dashboard-admin", { replace: true });
           break;
         case "ALUMNO":
-          navigate("/pantalla-estudiante");
+          navigate("/pantalla-estudiante", { replace: true });
           break;
         case "PROFESOR":
-          navigate("/pantalla-docente");
+          navigate("/pantalla-docente", { replace: true });
           break;
         default:
-          alert("Rol no reconocido");
+          navigate("/", { replace: true });
+          break;
       }
-
     } catch (err) {
       console.error("Error login:", err);
       setError("❌ Email o contraseña incorrectos");
+    } finally {
+      setLoading(false);
     }
   };
 
