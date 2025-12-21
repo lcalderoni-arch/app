@@ -1,11 +1,10 @@
 // src/pages/GestionCursos.jsx
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import axios from "axios";
 
 import { API_ENDPOINTS, API_BASE_URL } from "../../config/api.js";
+import { api } from "../../api/api"; // ✅ NUEVO
 import icon from "../../assets/logo.png";
 
-// Importa los estilos CSS
 import "../../styles/RolesStyle/AdminStyle/GestionCursos.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -34,7 +33,7 @@ function GestionCursos() {
 
     // --- Modo edición ---
     const [isEditMode, setIsEditMode] = useState(false);
-    const [editingCurso, setEditingCurso] = useState(null); // guarda el curso original
+    const [editingCurso, setEditingCurso] = useState(null);
     const formRef = useRef(null);
 
     const API_URL = API_ENDPOINTS.cursos;
@@ -42,40 +41,27 @@ function GestionCursos() {
     // --- Cerrar dropdown al hacer click fuera ---
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (
-                nivelSelectRef.current &&
-                !nivelSelectRef.current.contains(event.target)
-            ) {
+            if (nivelSelectRef.current && !nivelSelectRef.current.contains(event.target)) {
                 setIsNivelOpen(false);
             }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     // --- 1. Fetch de Cursos ---
     const fetchCursos = useCallback(async () => {
         setLoading(true);
         setError(null);
+
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
-
-            const response = await axios.get(API_URL, config);
+            const response = await api.get(API_URL);
             setCursos(response.data);
         } catch (err) {
             console.error("Error al obtener cursos:", err);
-            if (
-                err.response &&
-                (err.response.status === 401 || err.response.status === 403)
-            ) {
+
+            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                 setError("No tienes permisos para ver los cursos.");
             } else {
                 setError(err.message || "Error al cargar datos.");
@@ -92,34 +78,24 @@ function GestionCursos() {
     // --- 2. Eliminar Curso ---
     const handleDelete = async (cursoId, cursoTitulo) => {
         if (!window.confirm(`¿Eliminar el curso "${cursoTitulo}"?`)) return;
-        setError(null);
-        try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("Sesión expirada.");
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
 
-            await axios.delete(`${API_URL}/${cursoId}`, config);
+        setError(null);
+
+        try {
+            await api.delete(`${API_URL}/${cursoId}`);
+
             setCursos((current) => current.filter((curso) => curso.id !== cursoId));
             alert(`Curso "${cursoTitulo}" eliminado.`);
 
-            // Si estabas editando este curso, resetea el formulario
             if (isEditMode && editingCurso && editingCurso.id === cursoId) {
                 limpiarFormularioCurso();
             }
         } catch (err) {
             console.error(`Error al eliminar ${cursoId}:`, err);
-            if (
-                err.response &&
-                (err.response.status === 401 || err.response.status === 403)
-            ) {
+
+            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
                 setError("No tienes permisos para eliminar cursos.");
-            } else if (
-                err.response &&
-                err.response.data &&
-                err.response.data.message
-            ) {
+            } else if (err.response?.data?.message) {
                 setError(err.response.data.message);
             } else {
                 setError(err.message || "Error al eliminar.");
@@ -136,7 +112,6 @@ function GestionCursos() {
         setNivelDestino(curso.nivelDestino || "");
         setFormError(null);
 
-        // Scroll suave hacia el formulario
         if (formRef.current) {
             formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
         }
@@ -144,9 +119,7 @@ function GestionCursos() {
 
     const handleCursoActualizadoEnLista = (cursoActualizado) => {
         setCursos((currentCursos) =>
-            currentCursos.map((c) =>
-                c.id === cursoActualizado.id ? cursoActualizado : c
-            )
+            currentCursos.map((c) => (c.id === cursoActualizado.id ? cursoActualizado : c))
         );
     };
 
@@ -179,20 +152,10 @@ function GestionCursos() {
         };
 
         try {
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("Sesión expirada.");
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            };
-
             // MODO CREAR
             if (!isEditMode) {
-                const url = `${API_BASE_URL}/cursos`;
-                const response = await axios.post(url, payload, config);
+                const url = `${API_BASE_URL}/cursos`; // este endpoint lo dejas tal cual lo tenías
+                const response = await api.post(url, payload);
 
                 setCursos((current) => [response.data, ...current]);
                 alert(`Curso "${response.data.titulo}" creado correctamente.`);
@@ -202,7 +165,6 @@ function GestionCursos() {
             else if (isEditMode && editingCurso) {
                 const url = `${API_BASE_URL}/cursos/${editingCurso.id}`;
 
-                // Opcional: evitar llamada si no hay cambios
                 if (
                     payload.titulo === (editingCurso.titulo || "") &&
                     payload.descripcion === (editingCurso.descripcion || "") &&
@@ -213,7 +175,7 @@ function GestionCursos() {
                     return;
                 }
 
-                const response = await axios.put(url, payload, config);
+                const response = await api.put(url, payload);
 
                 handleCursoActualizadoEnLista(response.data);
                 alert(`Curso "${response.data.titulo}" actualizado correctamente.`);
@@ -227,20 +189,13 @@ function GestionCursos() {
                 const errorData = err.response.data;
 
                 if (status === 401) {
-                    setFormError(
-                        "No estás autenticado. Por favor, inicia sesión nuevamente."
-                    );
+                    setFormError("No estás autenticado. Por favor, inicia sesión nuevamente.");
                 } else if (status === 403) {
-                    setFormError(
-                        "No tienes permisos de Administrador para gestionar cursos."
-                    );
+                    setFormError("No tienes permisos de Administrador para gestionar cursos.");
                 } else if (status === 400 && errorData?.message) {
                     setFormError(errorData.message);
                 } else if (status === 500) {
-                    const errorMsg =
-                        errorData?.message ||
-                        errorData?.error ||
-                        "Error interno del servidor";
+                    const errorMsg = errorData?.message || errorData?.error || "Error interno del servidor";
                     setFormError(`Error del servidor: ${errorMsg}`);
                 } else if (errorData?.message) {
                     setFormError(errorData.message);
@@ -259,8 +214,7 @@ function GestionCursos() {
 
     // --- Renderizado Principal ---
     if (loading && cursos.length === 0) return <p>Cargando lista de cursos...</p>;
-    if (error && cursos.length === 0)
-        return <p style={{ color: "red" }}>Error: {error}</p>;
+    if (error && cursos.length === 0) return <p style={{ color: "red" }}>Error: {error}</p>;
 
     return (
         <div className="general-box-gestionusuarios">
@@ -312,13 +266,12 @@ function GestionCursos() {
                                     />
                                 </label>
 
-                                {/* NIVEL DE DESTINO - DROPDOWN PERSONALIZADO */}
+                                {/* NIVEL DE DESTINO */}
                                 <label>
                                     Nivel
                                     <div className="nivel-select-container" ref={nivelSelectRef}>
                                         <div
-                                            className={`nivel-select-trigger ${nivelDestino !== "" ? "selected" : ""
-                                                }`}
+                                            className={`nivel-select-trigger ${nivelDestino !== "" ? "selected" : ""}`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setIsNivelOpen(!isNivelOpen);
@@ -333,17 +286,13 @@ function GestionCursos() {
                                                             ? "Primaria"
                                                             : "Secundaria"}
                                             </span>
-                                            <FontAwesomeIcon
-                                                className="icon-increment"
-                                                icon={faAngleDown}
-                                            />
+                                            <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                                         </div>
 
                                         {isNivelOpen && (
                                             <div className="nivel-select-dropdown">
                                                 <div
-                                                    className={`nivel-select-option ${nivelDestino === "INICIAL" ? "active" : ""
-                                                        }`}
+                                                    className={`nivel-select-option ${nivelDestino === "INICIAL" ? "active" : ""}`}
                                                     onClick={() => {
                                                         setNivelDestino("INICIAL");
                                                         setIsNivelOpen(false);
@@ -352,8 +301,7 @@ function GestionCursos() {
                                                     Inicial
                                                 </div>
                                                 <div
-                                                    className={`nivel-select-option ${nivelDestino === "PRIMARIA" ? "active" : ""
-                                                        }`}
+                                                    className={`nivel-select-option ${nivelDestino === "PRIMARIA" ? "active" : ""}`}
                                                     onClick={() => {
                                                         setNivelDestino("PRIMARIA");
                                                         setIsNivelOpen(false);
@@ -362,8 +310,7 @@ function GestionCursos() {
                                                     Primaria
                                                 </div>
                                                 <div
-                                                    className={`nivel-select-option ${nivelDestino === "SECUNDARIA" ? "active" : ""
-                                                        }`}
+                                                    className={`nivel-select-option ${nivelDestino === "SECUNDARIA" ? "active" : ""}`}
                                                     onClick={() => {
                                                         setNivelDestino("SECUNDARIA");
                                                         setIsNivelOpen(false);
@@ -374,12 +321,12 @@ function GestionCursos() {
                                             </div>
                                         )}
                                     </div>
+
                                     <small className="codigo-preview">
                                         {nivelDestino === "INICIAL" && "El código será: INI-XXX"}
                                         {nivelDestino === "PRIMARIA" && "El código será: PRI-XXX"}
                                         {nivelDestino === "SECUNDARIA" && "El código será: SEC-XXX"}
-                                        {nivelDestino === "" &&
-                                            "Selecciona un nivel para ver el código sugerido"}
+                                        {nivelDestino === "" && "Selecciona un nivel para ver el código sugerido"}
                                     </small>
                                 </label>
                             </div>
@@ -397,20 +344,10 @@ function GestionCursos() {
                                 </label>
                             </div>
 
-                            {/* Error del formulario */}
-                            {formError && (
-                                <p className="form-error-message">
-                                    {formError}
-                                </p>
-                            )}
+                            {formError && <p className="form-error-message">{formError}</p>}
 
-                            {/* BOTONES */}
                             <div className="form-buttons">
-                                <button
-                                    type="submit"
-                                    className="btn-create"
-                                    disabled={submitting}
-                                >
+                                <button type="submit" className="btn-create" disabled={submitting}>
                                     {submitting
                                         ? isEditMode
                                             ? "Guardando..."
@@ -419,6 +356,7 @@ function GestionCursos() {
                                             ? "Guardar Cambios"
                                             : "Crear Curso"}
                                 </button>
+
                                 <button
                                     type="button"
                                     className="btn-clear"
@@ -429,7 +367,6 @@ function GestionCursos() {
                                 </button>
                             </div>
 
-                            {/* Nota informativa */}
                             <div className="info-note">
                                 <p>
                                     <strong>Nota:</strong> El código del curso se genera automáticamente
@@ -469,35 +406,21 @@ function GestionCursos() {
                                         <td>{index + 1}</td>
                                         <td>{curso.id}</td>
                                         <td>
-                                            <span className="codigo-badge">
-                                                {curso.codigo}
-                                            </span>
+                                            <span className="codigo-badge">{curso.codigo}</span>
                                         </td>
                                         <td>
-                                            <span className="titulo-badge">
-                                                {curso.titulo}
-                                            </span>
+                                            <span className="titulo-badge">{curso.titulo}</span>
                                         </td>
                                         <td>
-                                            <span
-                                                className={`badge-rol badge-${curso.nivelDestino.toLowerCase()}`}
-                                            >
+                                            <span className={`badge-rol badge-${curso.nivelDestino.toLowerCase()}`}>
                                                 {curso.nivelDestino}
                                             </span>
                                         </td>
                                         <td>
-                                            <button
-                                                className="btn-edit"
-                                                onClick={() => handleEdit(curso)}
-                                            >
+                                            <button className="btn-edit" onClick={() => handleEdit(curso)}>
                                                 Editar
                                             </button>
-                                            <button
-                                                className="btn-delete"
-                                                onClick={() =>
-                                                    handleDelete(curso.id, curso.titulo)
-                                                }
-                                            >
+                                            <button className="btn-delete" onClick={() => handleDelete(curso.id, curso.titulo)}>
                                                 Eliminar
                                             </button>
                                         </td>

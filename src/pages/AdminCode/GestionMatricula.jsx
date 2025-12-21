@@ -1,6 +1,6 @@
 // src/pages/Roles/Admin/GestionMatricula.jsx
 import React, { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import { api } from "../../api/api";
 
 import { API_BASE_URL } from "../../config/api.js";
 import icon from "../../assets/logo.png";
@@ -20,7 +20,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function GestionMatricula() {
-    const token = localStorage.getItem("authToken");
+
+    const role = localStorage.getItem("userRole");
 
     // --- Estados de configuración ---
     const [fechaInicio, setFechaInicio] = useState("");
@@ -51,17 +52,12 @@ function GestionMatricula() {
     //   CARGA DE CONFIGURACIÓN
     // ================================
     const cargarConfiguracion = useCallback(async () => {
-        if (!token) return;
 
         setLoadingConfig(true);
         setErrorConfig(null);
 
         try {
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await axios.get(
-                `${API_BASE_URL}/configuracion/matricula`,
-                config
-            );
+            const response = await api.get(`${API_BASE_URL}/configuracion/matricula`);
 
             if (response && response.data) {
                 // Si el backend devuelve "2025-10-23" (LocalDate), esto ya funciona bien
@@ -88,23 +84,19 @@ function GestionMatricula() {
         } finally {
             setLoadingConfig(false);
         }
-    }, [token]);
+    }, []);
 
     // ================================
     //   CARGA DE ESTUDIANTES
     // ================================
     const cargarEstudiantes = useCallback(async () => {
-        if (!token) return;
 
         setLoadingEstudiantes(true);
         setErrorEstudiantes(null);
 
         try {
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await axios.get(
-                `${API_BASE_URL}/usuarios/alumnos`,
-                config
-            );
+            const response = await api.get(`${API_BASE_URL}/usuarios/alumnos`);
+
 
             if (Array.isArray(response.data)) {
                 setEstudiantes(response.data);
@@ -118,16 +110,15 @@ function GestionMatricula() {
         } finally {
             setLoadingEstudiantes(false);
         }
-    }, [token]);
+    }, []);
 
     // ================================
     //   EFECTO INICIAL
     // ================================
     useEffect(() => {
-        if (!token) return;
         cargarConfiguracion();
         cargarEstudiantes();
-    }, [token, cargarConfiguracion, cargarEstudiantes]);
+    }, [cargarConfiguracion, cargarEstudiantes]);
 
     // ================================
     //   GUARDAR FECHAS DE MATRÍCULA
@@ -148,13 +139,8 @@ function GestionMatricula() {
         }
 
         try {
-            const config = { headers: { Authorization: `Bearer ${token}` } };
             const payload = { fechaInicio, fechaFin };
-            await axios.post(
-                `${API_BASE_URL}/configuracion/matricula`,
-                payload,
-                config
-            );
+            await api.post(`${API_BASE_URL}/configuracion/matricula`, payload);
             alert("Fechas de matrícula actualizadas correctamente.");
             setErrorConfig(null);
         } catch (error) {
@@ -186,12 +172,10 @@ function GestionMatricula() {
 
         try {
             setCambiandoPermisoGlobal(true);
-            const config = { headers: { Authorization: `Bearer ${token}` } };
 
-            await axios.put(
+            await api.put(
                 `${API_BASE_URL}/configuracion/matricula/permiso-matricula`,
-                { habilitado: nuevoEstado },   // CAMBIAR A "habilitado"
-                config
+                { habilitado: nuevoEstado }
             );
 
             setMatriculaHabilitada(nuevoEstado);
@@ -219,13 +203,8 @@ function GestionMatricula() {
 
         try {
             setActualizandoCiclo(true);
-            const config = { headers: { Authorization: `Bearer ${token}` } };
 
-            await axios.put(
-                `${API_BASE_URL}/configuracion/matricula/ciclo`,
-                { cicloActual: valor },
-                config
-            );
+            await api.put(`${API_BASE_URL}/configuracion/matricula/ciclo`, { cicloActual: valor });
 
             setCicloActual(valor);
             setNuevoCiclo("");
@@ -253,12 +232,8 @@ function GestionMatricula() {
             return;
 
         try {
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.patch(
-                `${API_BASE_URL}/usuarios/${estudiante.id}/permiso-matricula`,
-                { habilitado: nuevoEstado },
-                config
-            );
+            await api.patch(`${API_BASE_URL}/usuarios/${estudiante.id}/permiso-matricula`, { habilitado: nuevoEstado });
+
 
             // Actualización optimista
             setEstudiantes((prev) =>
@@ -285,12 +260,8 @@ function GestionMatricula() {
 
         try {
             setReiniciando(true);
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const resp = await axios.post(
-                `${API_BASE_URL}/matriculas/reset-ciclo`,
-                {},
-                config
-            );
+            const resp = await api.post(`${API_BASE_URL}/matriculas/reset-ciclo`, {});
+
 
             console.log("RESPUESTA RESET-CICLO:", resp.data);
 
@@ -335,11 +306,11 @@ function GestionMatricula() {
     // ================================
     //   RENDER
     // ================================
-    if (!token) {
+    if (role !== "ADMINISTRADOR") {
         return (
             <div className="general-box-gestionmatricula">
                 <p style={{ color: "red", textAlign: "center", marginTop: "2rem" }}>
-                    No estás autenticado. Inicia sesión nuevamente.
+                    No tienes permisos para acceder a esta sección.
                 </p>
             </div>
         );

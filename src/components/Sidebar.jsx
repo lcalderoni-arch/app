@@ -1,8 +1,8 @@
-//src/components/Sidebar.jsx
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './Sidebar.css';
+// src/components/Sidebar.jsx
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./Sidebar.css";
+import { logoutBackend } from "../api/authActions"; // ajusta ruta si cambia
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
@@ -14,24 +14,18 @@ import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
 export default function Sidebar({ isOpen, onClose }) {
     const navigate = useNavigate();
-    const userRole = localStorage.getItem('userRole');
-    const userName = localStorage.getItem('userName');
+    const userRole = localStorage.getItem("userRole");
+    const userName = localStorage.getItem("userName");
 
     const handleLogout = async () => {
         console.warn("🔒 Cerrando sesión...");
+        await logoutBackend();
 
-        try {
-            await axios.post('/api/auth/logout');
-            console.log("Cookie del backend destruida.");
-        } catch (error) {
-            console.error("Error al cerrar sesión en el backend:", error);
-        }
-
-        localStorage.clear();
-        onClose();
-        navigate('/');
+        onClose?.();
+        navigate("/");
         window.location.reload();
     };
+
 
     return (
         <>
