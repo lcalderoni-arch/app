@@ -32,10 +32,8 @@ export default function LoginForm() {
     try {
       const payload = { email, password };
 
-      // ✅ LOGIN SIN cookies
+      // LOGIN SIN cookies
       const res = await api.post("/auth/login", payload);
-
-      // guarda access token
       setAccessToken(res.data.token);
 
       // datos de UI (OK en localStorage)

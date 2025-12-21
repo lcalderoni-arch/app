@@ -1,11 +1,9 @@
-// frontend/PantallaSeccionAlumno.jsx
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+// src/pages/PantallaRoles/PantallaEstudiante/PantallaSeccionEstudiante.jsx
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { API_BASE_URL } from '../../../config/api';
-import LogoutButton from '../../../components/login/LogoutButton';
-import { formatDateLocal } from '../../../utils/dateUtils';
+import LogoutButton from "../../../components/login/LogoutButton";
+import { formatDateLocal } from "../../../utils/dateUtils";
 
 import icon from "../../../assets/logo.png";
 import icon2 from "../../../assets/logo2.png";
@@ -14,7 +12,9 @@ import image from "../../../assets/imagetarea.png";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { api } from "../../../api/api";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faPenToSquare,
     faBook,
@@ -29,23 +29,25 @@ import {
     faUser,
     faMessage,
     faHighlighter,
-    faComment
-} from '@fortawesome/free-solid-svg-icons';
+    faComment,
+} from "@fortawesome/free-solid-svg-icons";
 
-// Igual que en PantallaSeccionDocente
+// ✅ buildFileUrl sin API_BASE_URL (usa el mismo origen que api)
 const buildFileUrl = (path) => {
     if (!path) return null;
     if (path.startsWith("http")) return path;
 
-    const apiRoot = API_BASE_URL.replace(/\/api\/?$/, "");
-    return `${apiRoot}${path}`;
+    const base = api?.defaults?.baseURL || "";
+    // base suele ser .../api  → queremos ... (sin /api)
+    const apiRoot = base.replace(/\/api\/?$/, "");
+    return `${apiRoot}${path.startsWith("/") ? path : `/${path}`}`;
 };
 
 export default function PantallaSeccionEstudiante() {
     const { seccionId } = useParams();
     const navigate = useNavigate();
 
-    const userName = localStorage.getItem('userName');
+    const userName = localStorage.getItem("userName");
 
     const [seccion, setSeccion] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -67,7 +69,7 @@ export default function PantallaSeccionEstudiante() {
     const [archivoEntrega, setArchivoEntrega] = useState(null);
     const [enviandoEntrega, setEnviandoEntrega] = useState(false);
 
-    // 🔹 Modal vista previa recurso (PDF / IMAGEN / DOC / ARCHIVO)
+    // Modal vista previa recurso
     const [recursoSeleccionado, setRecursoSeleccionado] = useState(null);
     const [showModalRecurso, setShowModalRecurso] = useState(false);
 
@@ -83,34 +85,41 @@ export default function PantallaSeccionEstudiante() {
 
     // --- cargar sección + sesiones ---
     useEffect(() => {
+        let alive = true;
+
         const cargarDatos = async () => {
             try {
                 setLoading(true);
-                const token = localStorage.getItem('authToken');
-                if (!token) throw new Error("No estás autenticado.");
-
-                const config = { headers: { Authorization: `Bearer ${token}` } };
+                setError(null);
 
                 const [seccionRes, sesionesRes] = await Promise.all([
-                    axios.get(`${API_BASE_URL}/secciones/${seccionId}`, config),
-                    axios.get(`${API_BASE_URL}/sesiones/seccion/${seccionId}`, config),
+                    api.get(`/secciones/${seccionId}`),
+                    api.get(`/sesiones/seccion/${seccionId}`),
                 ]);
+
+                if (!alive) return;
 
                 setSeccion(seccionRes.data);
                 setSesiones(sesionesRes.data || []);
 
-                if (seccionRes.data.semanaActual > 0) {
+                if (seccionRes.data?.semanaActual > 0) {
                     setSemanaSeleccionada(seccionRes.data.semanaActual);
                 }
             } catch (err) {
                 console.error("Error al cargar la sección:", err);
-                setError(err.response?.data?.message || "No se pudo cargar la información del curso.");
+                if (!alive) return;
+                setError(err?.response?.data?.message || "No se pudo cargar la información del curso.");
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         cargarDatos();
+
+        return () => {
+            alive = false;
+        };
     }, [seccionId]);
 
     // Sesión actual
@@ -122,8 +131,11 @@ export default function PantallaSeccionEstudiante() {
 
     // Cargar recursos de la sesión actual
     useEffect(() => {
+        let alive = true;
+
         const cargarRecursos = async () => {
             if (!sesionActualId) {
+                if (!alive) return;
                 setRecursos([]);
                 setErrorRecursos(null);
                 return;
@@ -133,30 +145,33 @@ export default function PantallaSeccionEstudiante() {
                 setLoadingRecursos(true);
                 setErrorRecursos(null);
 
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
+                const resp = await api.get(`/recursos/sesion/${sesionActualId}`);
 
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                const response = await axios.get(
-                    `${API_BASE_URL}/recursos/sesion/${sesionActualId}`,
-                    config
-                );
-
-                setRecursos(response.data || []);
+                if (!alive) return;
+                setRecursos(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar recursos:", err);
-                setErrorRecursos(
-                    err.response?.data?.message ||
-                    "No se pudieron cargar los recursos de la sesión."
-                );
-                setRecursos([]);
+                if (!alive) return;
+                if (err?.response?.status === 404) {
+                    setRecursos([]);
+                    setErrorRecursos(null);
+                } else {
+                    setErrorRecursos(
+                        err?.response?.data?.message || "No se pudieron cargar los recursos de la sesión."
+                    );
+                    setRecursos([]);
+                }
             } finally {
+                if (!alive) return;
                 setLoadingRecursos(false);
             }
         };
 
         cargarRecursos();
+
+        return () => {
+            alive = false;
+        };
     }, [sesionActualId]);
 
     const handleClickSemana = (numSemana) => {
@@ -203,6 +218,7 @@ export default function PantallaSeccionEstudiante() {
 
     const handleEnviarEntrega = async (e) => {
         e.preventDefault();
+
         if (!tareaSeleccionada || !archivoEntrega) {
             alert("Debes seleccionar un archivo para enviar tu tarea.");
             return;
@@ -210,32 +226,20 @@ export default function PantallaSeccionEstudiante() {
 
         try {
             setEnviandoEntrega(true);
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
 
             const formData = new FormData();
             formData.append("file", archivoEntrega);
             if (tituloEntrega.trim()) formData.append("titulo", tituloEntrega.trim());
             if (descripcionEntrega.trim()) formData.append("descripcion", descripcionEntrega.trim());
 
-            await axios.post(
-                `${API_BASE_URL}/tareas/${tareaSeleccionada.id}/entregar`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        // Content-Type lo maneja axios
-                    },
-                }
-            );
+            // ✅ apiClient: no necesitas token manual, y NO seteas Content-Type
+            await api.post(`/tareas/${tareaSeleccionada.id}/entregar`, formData);
 
             alert("Tarea enviada correctamente ✨");
             cerrarModalTarea();
         } catch (err) {
             console.error("Error al enviar tarea:", err);
-            alert(
-                err.response?.data?.message || "No se pudo enviar la tarea."
-            );
+            alert(err?.response?.data?.message || "No se pudo enviar la tarea.");
         } finally {
             setEnviandoEntrega(false);
         }
@@ -259,7 +263,9 @@ export default function PantallaSeccionEstudiante() {
                         ? "Abrir enlace"
                         : isFile
                             ? "Ver recurso"
-                            : (isTarea ? "Ver / responder" : "Ver recurso");
+                            : isTarea
+                                ? "Ver / responder"
+                                : "Ver recurso";
 
                     const entregasHabilitadas = isTarea && r.permiteEntregas && ahoraDentroDeRango(r);
 
@@ -271,62 +277,41 @@ export default function PantallaSeccionEstudiante() {
 
                             <h5 className="recurso-card-title">{r.titulo}</h5>
 
-                            {r.descripcion && (
-                                <p className="recurso-card-desc">{r.descripcion}</p>
-                            )}
+                            {r.descripcion && <p className="recurso-card-desc">{r.descripcion}</p>}
 
                             {isTarea && (
                                 <div className="recurso-tarea-meta">
                                     {r.fechaInicioEntrega && (
                                         <p>
-                                            <strong>Inicio:</strong>{" "}
-                                            {formatDateTimeLocal(r.fechaInicioEntrega)}
+                                            <strong>Inicio:</strong> {formatDateTimeLocal(r.fechaInicioEntrega)}
                                         </p>
                                     )}
                                     {r.fechaFinEntrega && (
                                         <p>
-                                            <strong>Fin:</strong>{" "}
-                                            {formatDateTimeLocal(r.fechaFinEntrega)}
+                                            <strong>Fin:</strong> {formatDateTimeLocal(r.fechaFinEntrega)}
                                         </p>
                                     )}
-                                    <span
-                                        className={
-                                            entregasHabilitadas
-                                                ? "pill pill-green"
-                                                : "pill pill-gray"
-                                        }
-                                    >
-                                        {entregasHabilitadas
-                                            ? "Entregas habilitadas"
-                                            : "Fuera de plazo o deshabilitada"}
+                                    <span className={entregasHabilitadas ? "pill pill-green" : "pill pill-gray"}>
+                                        {entregasHabilitadas ? "Entregas habilitadas" : "Fuera de plazo o deshabilitada"}
                                     </span>
                                 </div>
                             )}
 
-                            {/* LINK (YouTube / web) → abre nueva pestaña */}
+                            {/* LINK */}
                             {!isTarea && isLink && (
-                                <a
-                                    href={r.linkVideo}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="recurso-card-btn"
-                                >
+                                <a href={r.linkVideo} target="_blank" rel="noreferrer" className="recurso-card-btn">
                                     {botonTexto}
                                 </a>
                             )}
 
-                            {/* Archivos físicos → modal de vista previa */}
+                            {/* ARCHIVO */}
                             {!isTarea && isFile && fileUrl && (
-                                <button
-                                    type="button"
-                                    className="recurso-card-btn"
-                                    onClick={() => abrirModalRecurso(r)}
-                                >
+                                <button type="button" className="recurso-card-btn" onClick={() => abrirModalRecurso(r)}>
                                     {botonTexto}
                                 </button>
                             )}
 
-                            {/* TAREA → modal de entrega */}
+                            {/* TAREA */}
                             {isTarea && (
                                 <button
                                     type="button"
@@ -346,10 +331,10 @@ export default function PantallaSeccionEstudiante() {
 
     if (loading) {
         return (
-            <div className="student-layout" style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ textAlign: 'center', color: '#555' }}>
+            <div className="student-layout" style={{ justifyContent: "center", alignItems: "center" }}>
+                <div style={{ textAlign: "center", color: "#555" }}>
                     <FontAwesomeIcon icon={faSpinner} spin size="3x" />
-                    <p style={{ marginTop: '10px' }}>Cargando curso...</p>
+                    <p style={{ marginTop: "10px" }}>Cargando curso...</p>
                 </div>
             </div>
         );
@@ -357,11 +342,11 @@ export default function PantallaSeccionEstudiante() {
 
     if (error || !seccion) {
         return (
-            <div className="student-layout" style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h2 style={{ color: 'red' }}>Error</h2>
+            <div className="student-layout" style={{ justifyContent: "center", alignItems: "center" }}>
+                <div style={{ textAlign: "center" }}>
+                    <h2 style={{ color: "red" }}>Error</h2>
                     <p>{error || "Curso no encontrado"}</p>
-                    <button className="btn-course" onClick={() => navigate('/pantalla-estudiante')}>
+                    <button className="btn-course" onClick={() => navigate("/pantalla-estudiante")}>
                         Volver al inicio
                     </button>
                 </div>
@@ -372,48 +357,48 @@ export default function PantallaSeccionEstudiante() {
     return (
         <div className="student-layout">
             {/* SIDEBAR */}
-            <aside className='student-sidebar'>
-                <div className='sidebar-header'>
+            <aside className="student-sidebar">
+                <div className="sidebar-header">
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
-                    <span className='sidebar-role'>Estudiante</span>
+                    <span className="sidebar-role">Estudiante</span>
                 </div>
 
-                <nav className='sidebar-menu'>
+                <nav className="sidebar-menu">
                     <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <Link to="/pantalla-estudiante" className='active'>
-                                <FontAwesomeIcon icon={faBook} className='icon-text' />
+                            <Link to="/pantalla-estudiante" className="active">
+                                <FontAwesomeIcon icon={faBook} className="icon-text" />
                                 Mis Cursos
                             </Link>
                         </li>
                         <li>
                             <a href="#horario">
-                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                <FontAwesomeIcon icon={faCalendar} className="icon-text" />
                                 Horario
                             </a>
                         </li>
                         <li>
                             <a href="#progreso">
-                                <FontAwesomeIcon icon={faChartLine} className='icon-text' />
+                                <FontAwesomeIcon icon={faChartLine} className="icon-text" />
                                 Progreso
                             </a>
                         </li>
                         <li>
                             <a href="#notificaciones">
-                                <FontAwesomeIcon icon={faBell} className='icon-text' />
+                                <FontAwesomeIcon icon={faBell} className="icon-text" />
                                 Notificaciones
                             </a>
                         </li>
                     </ul>
                 </nav>
 
-                <nav className='sidebar-menu'>
+                <nav className="sidebar-menu">
                     <h3>Otros campos</h3>
                     <ul>
                         <li>
                             <Link to="/pantalla-alumno/matricula">
-                                <FontAwesomeIcon icon={faPenToSquare} className='icon-text' />
+                                <FontAwesomeIcon icon={faPenToSquare} className="icon-text" />
                                 Matricúlate Aquí
                             </Link>
                         </li>
@@ -429,37 +414,39 @@ export default function PantallaSeccionEstudiante() {
 
             {/* AREA PRINCIPAL */}
             <div className="docente-right-area">
-                {/* HEADER */}
                 <header className="docente-header">
-                    <div className='header-content'>
-                        <div className='name-header'>
-                            <p>Bienvenido, <strong>{userName}</strong></p>
+                    <div className="header-content">
+                        <div className="name-header">
+                            <p>
+                                Bienvenido, <strong>{userName}</strong>
+                            </p>
                             <h1>Campus Virtual</h1>
                         </div>
-                        <div className='header-right'>
+                        <div className="header-right">
                             <LogoutButton />
                         </div>
                     </div>
                 </header>
 
-                <div className='container-all'>
-                    <div className='second-container'>
+                <div className="container-all">
+                    <div className="second-container">
                         <div className="header-content-left">
-                            <div className='content-first'>
+                            <div className="content-first">
                                 <img className="icon-class" src={icon2} alt="Logo Campus" />
                                 <div>
                                     <h2>{seccion.nombre}</h2>
-                                    <p><strong>Sección</strong> {seccion.gradoSeccion}</p>
+                                    <p>
+                                        <strong>Sección</strong> {seccion.gradoSeccion}
+                                    </p>
                                 </div>
                             </div>
-                            <div className='content-second'>
+                            <div className="content-second">
                                 <p>
-                                    Nivel:
-                                    <strong>{seccion.nivelSeccion}</strong>
+                                    Nivel: <strong>{seccion.nivelSeccion}</strong>
                                 </p>
                             </div>
-                            <div className='content-third'>
-                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                            <div className="content-third">
+                                <FontAwesomeIcon icon={faCalendar} className="icon-text" />
                                 <div>
                                     <p>Inicio: {formatDateLocal(seccion.fechaInicio)}</p>
                                     <p>Fin: {formatDateLocal(seccion.fechaFin)}</p>
@@ -467,27 +454,27 @@ export default function PantallaSeccionEstudiante() {
                             </div>
                         </div>
 
-                        <div className='header-content-right'>
-                            <div className='content-first'>
-                                <FontAwesomeIcon icon={faCircleUser} className='icon-text' />
+                        <div className="header-content-right">
+                            <div className="content-first">
+                                <FontAwesomeIcon icon={faCircleUser} className="icon-text" />
                                 <h2>Docente</h2>
                             </div>
 
-                            <div className='content-second'>
+                            <div className="content-second">
                                 <div>
                                     <h3>NOMBRE</h3>
-                                    <p>{seccion.nombreProfesor || 'No registrado'}</p>
+                                    <p>{seccion.nombreProfesor || "No registrado"}</p>
                                 </div>
                             </div>
 
-                            <div className='content-third'>
-                                <FontAwesomeIcon icon={faEnvelope} className='icon-text' />
-                                <p>{seccion.correoProfesor || 'No registrado'}</p>
+                            <div className="content-third">
+                                <FontAwesomeIcon icon={faEnvelope} className="icon-text" />
+                                <p>{seccion.correoProfesor || "No registrado"}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className='content-body-seccion'>
+                    <div className="content-body-seccion">
                         <main className="docente-main">
                             {/* BARRA DE SEMANAS */}
                             <section className="semanas-section">
@@ -517,7 +504,7 @@ export default function PantallaSeccionEstudiante() {
                             {/* CONTENIDO DE LA SEMANA */}
                             <section className="contenido-semana-section-teacher">
                                 <div>
-                                    <h3 className='title-sesion'>
+                                    <h3 className="title-sesion">
                                         Sesión {semanaSeleccionada.toString().padStart(2, "0")}
                                         {semanaSeleccionada === semanaActual && " (ACTUAL)"}
                                     </h3>
@@ -533,27 +520,26 @@ export default function PantallaSeccionEstudiante() {
                                         className="btn-primary"
                                         onClick={() =>
                                             navigate("/pantalla-alumno/examenes", {
-                                                state: { seccionId },   // si tu pantalla de exámenes quiere filtrar por sección
+                                                state: { seccionId },
                                             })
                                         }
                                     >
                                         Ver notas de exámenes
                                     </button>
-
                                 </div>
 
                                 <p>Contenido del Curso:</p>
 
                                 <div className="contenido-semana-card-seccion">
-                                    <div className='area-explora'>
+                                    <div className="area-explora">
                                         <h4>EXPLORAMOS</h4>
                                         {renderListaRecursos(recursosExplora)}
                                     </div>
-                                    <div className='area-estudio'>
+                                    <div className="area-estudio">
                                         <h4>ESTUDIAMOS</h4>
                                         {renderListaRecursos(recursosEstudia)}
                                     </div>
-                                    <div className='area-aplica'>
+                                    <div className="area-aplica">
                                         <h4>APLICAMOS</h4>
                                         {renderListaRecursos(recursosAplica)}
                                     </div>
@@ -564,7 +550,7 @@ export default function PantallaSeccionEstudiante() {
                 </div>
             </div>
 
-            {/* MODAL VISTA PREVIA RECURSO (PDF / IMAGEN / DOC / ARCHIVO GENÉRICO) */}
+            {/* MODAL VISTA PREVIA RECURSO */}
             {showModalRecurso && recursoSeleccionado && (
                 <div className="modal-backdrop" onClick={cerrarModalRecurso}>
                     <div className="modal-content modal-preview" onClick={(e) => e.stopPropagation()}>
@@ -577,7 +563,10 @@ export default function PantallaSeccionEstudiante() {
 
                         <div className="modal-body">
                             <div className="modal-tarea-desc-area">
-                                <h4><FontAwesomeIcon icon={faMessage} className="icon-title" />Descripción:</h4>
+                                <h4>
+                                    <FontAwesomeIcon icon={faMessage} className="icon-title" />
+                                    Descripción:
+                                </h4>
                                 {recursoSeleccionado.descripcion && (
                                     <p className="modal-tarea-desc">{recursoSeleccionado.descripcion}</p>
                                 )}
@@ -587,68 +576,31 @@ export default function PantallaSeccionEstudiante() {
                                 const url = buildFileUrl(recursoSeleccionado.archivoUrl);
                                 const tipo = recursoSeleccionado.tipo;
 
-                                if (!url) {
-                                    return <p>No se encontró la URL del archivo.</p>;
-                                }
+                                if (!url) return <p>No se encontró la URL del archivo.</p>;
 
-                                // IMAGEN
                                 if (tipo === "IMAGEN") {
                                     return (
                                         <div className="preview-center">
-                                            <img
-                                                src={url}
-                                                alt={recursoSeleccionado.titulo}
-                                                className="preview-image"
-                                            />
+                                            <img src={url} alt={recursoSeleccionado.titulo} className="preview-image" />
                                         </div>
                                     );
                                 }
 
-                                // PDF → Google Viewer
-                                if (tipo === "PDF") {
+                                if (tipo === "PDF" || tipo === "DOCUMENTO") {
                                     const googleViewerUrl =
-                                        "https://docs.google.com/gview?embedded=true&url=" +
-                                        encodeURIComponent(url);
+                                        "https://docs.google.com/gview?embedded=true&url=" + encodeURIComponent(url);
 
                                     return (
                                         <div className="preview-frame-wrapper">
-                                            <iframe
-                                                src={googleViewerUrl}
-                                                title={recursoSeleccionado.titulo}
-                                                className="preview-frame"
-                                            />
+                                            <iframe src={googleViewerUrl} title={recursoSeleccionado.titulo} className="preview-frame" />
                                         </div>
                                     );
                                 }
 
-                                // DOCUMENTO (Word) → Google Viewer
-                                if (tipo === "DOCUMENTO") {
-                                    const googleViewerUrl =
-                                        "https://docs.google.com/gview?embedded=true&url=" +
-                                        encodeURIComponent(url);
-
-                                    return (
-                                        <div className="preview-frame-wrapper">
-                                            <iframe
-                                                src={googleViewerUrl}
-                                                title={recursoSeleccionado.titulo}
-                                                className="preview-frame"
-                                            />
-                                        </div>
-                                    );
-                                }
-
-                                // ARCHIVO genérico (ZIP, RAR, etc.)
                                 return (
                                     <div className="preview-center">
                                         <p>Este tipo de archivo no se puede previsualizar.</p>
-                                        <a
-                                            href={url}
-                                            download
-                                            className="btn-primary"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
+                                        <a href={url} download className="btn-primary" target="_blank" rel="noreferrer">
                                             Descargar archivo
                                         </a>
                                     </div>
@@ -656,7 +608,6 @@ export default function PantallaSeccionEstudiante() {
                             })()}
                         </div>
 
-                        {/* Barra de acciones (descargar / nueva ventana) */}
                         <div className="modal-footer-actions">
                             {recursoSeleccionado.archivoUrl && (
                                 <>
@@ -707,43 +658,48 @@ export default function PantallaSeccionEstudiante() {
                         <div className="modal-body">
                             <div className="modal-body-description">
                                 <div>
-                                    <h4 className="title"><FontAwesomeIcon icon={faHighlighter} className="icon-title" />Título:</h4>
+                                    <h4 className="title">
+                                        <FontAwesomeIcon icon={faHighlighter} className="icon-title" />
+                                        Título:
+                                    </h4>
                                     <h4 className="title-text">{tareaSeleccionada.titulo}</h4>
                                 </div>
                                 <img className="icon-class" src={image} alt="Imagen de entrega de tarea" />
                             </div>
 
                             <div className="description-area">
-                                <h4><FontAwesomeIcon icon={faComment} className="icon-title" />Descripción:</h4>
+                                <h4>
+                                    <FontAwesomeIcon icon={faComment} className="icon-title" />
+                                    Descripción:
+                                </h4>
                                 {tareaSeleccionada.descripcion && (
-                                    <p className="modal-tarea-desc">
-                                        {tareaSeleccionada.descripcion}
-                                    </p>
+                                    <p className="modal-tarea-desc">{tareaSeleccionada.descripcion}</p>
                                 )}
                             </div>
 
                             <div className="modal-tarea-meta">
-                                <h4><FontAwesomeIcon icon={faCalendar} className="icon" />Fecha:</h4>
+                                <h4>
+                                    <FontAwesomeIcon icon={faCalendar} className="icon" />
+                                    Fecha:
+                                </h4>
                                 {tareaSeleccionada.fechaInicioEntrega && (
                                     <p>
-                                        <strong>Inicio de entrega:</strong>{" "}
-                                        {formatDateTimeLocal(tareaSeleccionada.fechaInicioEntrega)}
+                                        <strong>Inicio de entrega:</strong> {formatDateTimeLocal(tareaSeleccionada.fechaInicioEntrega)}
                                     </p>
                                 )}
                                 {tareaSeleccionada.fechaFinEntrega && (
                                     <p>
-                                        <strong>Fin de entrega:</strong>{" "}
-                                        {formatDateTimeLocal(tareaSeleccionada.fechaFinEntrega)}
+                                        <strong>Fin de entrega:</strong> {formatDateTimeLocal(tareaSeleccionada.fechaFinEntrega)}
                                     </p>
                                 )}
                             </div>
 
                             <form className="modal-form" onSubmit={handleEnviarEntrega}>
                                 <div className="modal-form-grid">
-
-                                    {/* Título */}
                                     <div className="form-field">
-                                        <label className="field-label" htmlFor="tituloEntrega">Título de tu entrega</label>
+                                        <label className="field-label" htmlFor="tituloEntrega">
+                                            Título de tu entrega
+                                        </label>
                                         <input
                                             id="tituloEntrega"
                                             type="text"
@@ -754,9 +710,10 @@ export default function PantallaSeccionEstudiante() {
                                         />
                                     </div>
 
-                                    {/* Descripción */}
                                     <div className="form-field">
-                                        <label className="field-label" htmlFor="descripcionEntrega">Comentario / descripción</label>
+                                        <label className="field-label" htmlFor="descripcionEntrega">
+                                            Comentario / descripción
+                                        </label>
                                         <textarea
                                             id="descripcionEntrega"
                                             className="field-textarea"
@@ -767,7 +724,6 @@ export default function PantallaSeccionEstudiante() {
                                         />
                                     </div>
 
-                                    {/* Archivo (con botón bonito y nombre del archivo) */}
                                     <div className="form-field">
                                         <span className="field-label">Archivo a subir</span>
 
@@ -792,10 +748,8 @@ export default function PantallaSeccionEstudiante() {
                                             Solo se acepta <strong>un archivo</strong> (PDF, Word, video, ZIP, RAR, etc.).
                                         </div>
                                     </div>
-
                                 </div>
 
-                                {/* Acciones */}
                                 <div className="modal-form-actions">
                                     <button
                                         type="submit"
@@ -806,7 +760,6 @@ export default function PantallaSeccionEstudiante() {
                                     </button>
                                 </div>
                             </form>
-
                         </div>
                     </div>
                 </div>

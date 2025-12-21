@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
-import { API_BASE_URL } from "../../../config/api";
 import icon from "../../../assets/logo.png";
 import LogoutButton from "../../../components/login/LogoutButton";
 
 import "../../../styles/RolesStyle/Progreso/ProgresoAlumno.css";
+
+import { api } from "../../../api/api";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,14 +29,7 @@ import {
 } from "chart.js";
 import { Bar, Doughnut } from "react-chartjs-2";
 
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    ArcElement,
-    Tooltip,
-    Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 export default function PantallaProgresoAlumno() {
     const userName = localStorage.getItem("userName");
@@ -45,51 +38,42 @@ export default function PantallaProgresoAlumno() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const COLORS = [
-        "#f87171",
-        "#60a5fa",
-        "#34d399",
-        "#fbbf24",
-        "#a78bfa",
-        "#fb7185",
-        "#4ade80",
-    ]
-
+    const COLORS = ["#f87171", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#fb7185", "#4ade80"];
 
     useEffect(() => {
+        let alive = true;
+
         const cargarProgreso = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
+                const resp = await api.get("/alumno/progreso");
 
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                const resp = await axios.get(`${API_BASE_URL}/alumno/progreso`, config);
+                if (!alive) return;
                 setDataResumen(resp.data || null);
             } catch (err) {
                 console.error("Error al cargar progreso alumno:", err);
-                setError(
-                    err.response?.data?.message ||
-                    "No se pudo cargar tu progreso académico."
-                );
+                if (!alive) return;
+
+                setError(err?.response?.data?.message || "No se pudo cargar tu progreso académico.");
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         cargarProgreso();
+
+        return () => {
+            alive = false;
+        };
     }, []);
 
     const cursos = dataResumen?.cursos || [];
 
-    // === Gráfico: notas finales por curso ===
     const barDataNotas = {
-        labels: cursos.map(
-            (c) => c.cursoTitulo || c.seccionNombre || `Sección ${c.seccionId}`
-        ),
+        labels: cursos.map((c) => c.cursoTitulo || c.seccionNombre || `Sección ${c.seccionId}`),
         datasets: [
             {
                 label: "Nota final",
@@ -101,11 +85,8 @@ export default function PantallaProgresoAlumno() {
         ],
     };
 
-    // === Gráfico: avance por curso ===
     const barDataAvance = {
-        labels: cursos.map(
-            (c) => c.cursoTitulo || c.seccionNombre || `Sección ${c.seccionId}`
-        ),
+        labels: cursos.map((c) => c.cursoTitulo || c.seccionNombre || `Sección ${c.seccionId}`),
         datasets: [
             {
                 label: "Avance (%)",
@@ -117,19 +98,14 @@ export default function PantallaProgresoAlumno() {
         ],
     };
 
-    // === Donut: cursos aprobados / desaprobados / sin nota ===
     let aprobados = 0;
     let desaprobados = 0;
     let sinNota = 0;
 
     cursos.forEach((c) => {
-        if (c.notaFinal == null) {
-            sinNota++;
-        } else if (c.notaFinal >= 10.5) {
-            aprobados++;
-        } else {
-            desaprobados++;
-        }
+        if (c.notaFinal == null) sinNota++;
+        else if (c.notaFinal >= 10.5) aprobados++;
+        else desaprobados++;
     });
 
     const donutEstadoCursos = {
@@ -227,7 +203,6 @@ export default function PantallaProgresoAlumno() {
                             <>
                                 <h2 className="progreso-title">Resumen general</h2>
 
-                                {/* CARDS */}
                                 <div className="progreso-cards">
                                     <div className="progreso-card">
                                         <h3>Cursos activos</h3>
@@ -235,11 +210,7 @@ export default function PantallaProgresoAlumno() {
                                     </div>
                                     <div className="progreso-card">
                                         <h3>Nota promedio</h3>
-                                        <p>
-                                            {dataResumen.notaPromedio != null
-                                                ? dataResumen.notaPromedio.toFixed(2)
-                                                : "-"}
-                                        </p>
+                                        <p>{dataResumen.notaPromedio != null ? dataResumen.notaPromedio.toFixed(2) : "-"}</p>
                                     </div>
                                     <div className="progreso-card">
                                         <h3>Avance promedio</h3>
@@ -251,37 +222,23 @@ export default function PantallaProgresoAlumno() {
                                     </div>
                                 </div>
 
-                                {/* GRAFICOS */}
                                 <div className="progreso-charts">
                                     <div className="chart-box">
                                         <h4>Notas finales por curso</h4>
-                                        {cursos.length > 0 ? (
-                                            <Bar data={barDataNotas} />
-                                        ) : (
-                                            <p>Aún no tienes notas registradas.</p>
-                                        )}
+                                        {cursos.length > 0 ? <Bar data={barDataNotas} /> : <p>Aún no tienes notas registradas.</p>}
                                     </div>
 
                                     <div className="chart-box">
                                         <h4>Avance por curso</h4>
-                                        {cursos.length > 0 ? (
-                                            <Bar data={barDataAvance} />
-                                        ) : (
-                                            <p>Aún no hay información de avance.</p>
-                                        )}
+                                        {cursos.length > 0 ? <Bar data={barDataAvance} /> : <p>Aún no hay información de avance.</p>}
                                     </div>
 
                                     <div className="chart-box">
                                         <h4>Estado de mis cursos</h4>
-                                        {cursos.length > 0 ? (
-                                            <Doughnut data={donutEstadoCursos} />
-                                        ) : (
-                                            <p>No hay cursos para mostrar.</p>
-                                        )}
+                                        {cursos.length > 0 ? <Doughnut data={donutEstadoCursos} /> : <p>No hay cursos para mostrar.</p>}
                                     </div>
                                 </div>
 
-                                {/* TABLA DETALLE */}
                                 <div className="progreso-table">
                                     <h4>Detalle por curso</h4>
                                     <table>
@@ -297,25 +254,14 @@ export default function PantallaProgresoAlumno() {
                                         <tbody>
                                             {cursos.map((c) => {
                                                 let estado = "Sin nota";
-                                                if (c.notaFinal != null) {
-                                                    estado =
-                                                        c.notaFinal >= 10.5 ? "Aprobado" : "Desaprobado";
-                                                }
+                                                if (c.notaFinal != null) estado = c.notaFinal >= 10.5 ? "Aprobado" : "Desaprobado";
 
                                                 return (
                                                     <tr key={c.seccionId}>
                                                         <td>{c.cursoTitulo}</td>
                                                         <td>{c.seccionNombre}</td>
-                                                        <td>
-                                                            {c.notaFinal != null
-                                                                ? c.notaFinal.toFixed(2)
-                                                                : "-"}
-                                                        </td>
-                                                        <td>
-                                                            {c.avancePorcentaje != null
-                                                                ? `${c.avancePorcentaje.toFixed(0)}%`
-                                                                : "-"}
-                                                        </td>
+                                                        <td>{c.notaFinal != null ? c.notaFinal.toFixed(2) : "-"}</td>
+                                                        <td>{c.avancePorcentaje != null ? `${c.avancePorcentaje.toFixed(0)}%` : "-"}</td>
                                                         <td>{estado}</td>
                                                     </tr>
                                                 );

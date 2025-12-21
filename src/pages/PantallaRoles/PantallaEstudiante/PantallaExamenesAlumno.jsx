@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 
-import { API_BASE_URL } from "../../../config/api";
 import icon from "../../../assets/logo.png";
-
 import "../../../styles/RolesStyle/StudentStyle/ExamenesAlumno.css";
 
 import LogoutButton from "../../../components/login/LogoutButton";
@@ -18,6 +15,8 @@ import {
     faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { api } from "../../../api/api";
+
 export default function PantallaExamenesAlumno() {
     const [examenes, setExamenes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,34 +25,37 @@ export default function PantallaExamenesAlumno() {
     const userName = localStorage.getItem("userName");
 
     useEffect(() => {
+        let alive = true;
+
         const fetchExamenes = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
+                // Antes: axios + Bearer
+                const { data } = await api.get("/alumno/examenes");
 
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                const resp = await axios.get(
-                    `${API_BASE_URL}/alumno/examenes`,
-                    config
-                );
-
-                setExamenes(resp.data || []);
+                if (!alive) return;
+                setExamenes(data || []);
             } catch (err) {
                 console.error("Error al cargar exámenes del alumno:", err);
+
+                if (!alive) return;
                 setError(
-                    err.response?.data?.message ||
+                    err?.response?.data?.message ||
                     "No se pudieron cargar las notas de exámenes."
                 );
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         fetchExamenes();
+
+        return () => {
+            alive = false;
+        };
     }, []);
 
     const renderEstadoBadge = (estado) => {
@@ -64,6 +66,13 @@ export default function PantallaExamenesAlumno() {
             return <span className="badge-estado badge-desaprobado">Desaprobado</span>;
         }
         return <span className="badge-estado badge-pendiente">Pendiente</span>;
+    };
+
+    const formatFecha = (value) => {
+        if (!value) return "-";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleDateString("es-PE", { year: "numeric", month: "2-digit", day: "2-digit" });
     };
 
     return (
@@ -162,18 +171,16 @@ export default function PantallaExamenesAlumno() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {examenes.map((ex) => (
-                                    <tr key={ex.examenId}>
-                                        <td>{ex.cursoTitulo}</td>
-                                        <td>{ex.seccionNombre}</td>
-                                        <td>{ex.tituloExamen}</td>
-                                        <td>{ex.fecha || "-"}</td>
-                                        <td>{ex.pesoPorcentual}%</td>
+                                {examenes.map((ex, idx) => (
+                                    <tr key={ex.examenId ?? `${ex.seccionId ?? "s"}-${idx}`}>
+                                        <td>{ex.cursoTitulo || "-"}</td>
+                                        <td>{ex.seccionNombre || "-"}</td>
+                                        <td>{ex.tituloExamen || "-"}</td>
+                                        <td>{formatFecha(ex.fecha)}</td>
+                                        <td>{ex.pesoPorcentual != null ? `${ex.pesoPorcentual}%` : "-"}</td>
                                         <td>
                                             {ex.nota != null
-                                                ? `${ex.nota.toFixed(2)} / ${
-                                                    ex.notaMaxima ?? 20
-                                                }`
+                                                ? `${Number(ex.nota).toFixed(2)} / ${ex.notaMaxima ?? 20}`
                                                 : "-"}
                                         </td>
                                         <td>{renderEstadoBadge(ex.estado)}</td>

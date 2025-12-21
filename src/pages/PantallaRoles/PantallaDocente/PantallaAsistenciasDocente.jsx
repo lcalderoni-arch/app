@@ -1,9 +1,9 @@
 // src/pages/PantallaRoles/PantallaDocente/PantallaAsistenciasDocente.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 
-import { API_BASE_URL } from "../../../config/api";
+import { api } from "../../../api/api";
+
 import LogoutButton from "../../../components/login/LogoutButton";
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
@@ -29,13 +29,7 @@ export default function PantallaAsistenciasDocente() {
                 const token = localStorage.getItem("authToken");
                 if (!token) throw new Error("No estás autenticado.");
 
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
-
-                const url = `${API_BASE_URL}/asistencias/sesion/${sesionId}`;
-                const response = await axios.get(url, config);
-
+                const response = await api.get(`/asistencias/sesion/${sesionId}`);
                 setAsistencias(response.data || []);
             } catch (err) {
                 console.error("Error al cargar asistencias:", err);
@@ -83,13 +77,6 @@ export default function PantallaAsistenciasDocente() {
             const token = localStorage.getItem("authToken");
             if (!token) throw new Error("No estás autenticado.");
 
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            };
-
             const payload = {
                 sesionId: Number(sesionId),
                 registros: asistencias.map((a) => ({
@@ -99,8 +86,7 @@ export default function PantallaAsistenciasDocente() {
                 })),
             };
 
-            const url = `${API_BASE_URL}/asistencias/registrar-sesion`;
-            await axios.post(url, payload, config);
+            await api.post("/asistencias/registrar-sesion", payload);
 
             alert("✅ Asistencias guardadas correctamente.");
         } catch (err) {

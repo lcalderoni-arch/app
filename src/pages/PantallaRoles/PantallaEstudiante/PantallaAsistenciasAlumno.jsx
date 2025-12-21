@@ -1,13 +1,11 @@
-// src/pages/PantallaRoles/PantallaEstudiante/PantallaAsistenciasAlumno.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 
-import { API_BASE_URL } from "../../../config/api";
 import LogoutButton from "../../../components/login/LogoutButton";
 import icon from "../../../assets/logo.png";
-
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
+
+import { api } from "../../../api/api";
 
 export default function PantallaAsistenciasAlumno() {
     const { seccionId } = useParams();
@@ -19,35 +17,41 @@ export default function PantallaAsistenciasAlumno() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        let alive = true;
+
         const cargarAsistencias = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
+                const resp = await api.get("/asistencias/mis-asistencias", {
+                    params: { seccionId },
+                });
 
-                const response = await axios.get(
-                    `${API_BASE_URL}/asistencias/mis-asistencias`,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                        params: { seccionId }, // AQUÍ VA EL seccionId
-                    }
-                );
-
-                setAsistencias(response.data || []);
+                if (!alive) return;
+                setAsistencias(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar mis asistencias:", err);
-                setError(
-                    err.response?.data?.message ||
-                    "No se pudieron cargar tus asistencias."
-                );
+                if (!alive) return;
+
+                // Si tu backend usa 404 para "sin registros"
+                if (err?.response?.status === 404) {
+                    setAsistencias([]);
+                    setError(null);
+                } else {
+                    setError(err?.response?.data?.message || "No se pudieron cargar tus asistencias.");
+                }
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         cargarAsistencias();
+
+        return () => {
+            alive = false;
+        };
     }, [seccionId]);
 
     const traducirEstado = (estado) => {
@@ -78,9 +82,7 @@ export default function PantallaAsistenciasAlumno() {
                         <li>
                             <button
                                 className="link-sidebar"
-                                onClick={() =>
-                                    navigate(`/pantalla-estudiante/seccion/${seccionId}`)
-                                }
+                                onClick={() => navigate(`/pantalla-estudiante/seccion/${seccionId}`)}
                                 style={{
                                     background: "none",
                                     border: "none",
@@ -142,11 +144,7 @@ export default function PantallaAsistenciasAlumno() {
                                 <tbody>
                                     {asistencias.map((a, index) => (
                                         <tr key={index}>
-                                            <td>
-                                                {a.semanaNumero != null
-                                                    ? `Semana ${a.semanaNumero}`
-                                                    : "-"}
-                                            </td>
+                                            <td>{a.semanaNumero != null ? `Semana ${a.semanaNumero}` : "-"}</td>
                                             <td>{traducirEstado(a.estado)}</td>
                                         </tr>
                                     ))}

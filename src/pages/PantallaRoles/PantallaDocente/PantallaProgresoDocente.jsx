@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
-import { API_BASE_URL } from "../../../config/api";
+import { api } from "../../../api/api";
+
 import icon from "../../../assets/logo.png";
 import LogoutButton from "../../../components/login/LogoutButton";
 
@@ -64,9 +64,7 @@ export default function PantallaProgresoDocente() {
                 const token = localStorage.getItem("authToken");
                 if (!token) throw new Error("No estás autenticado.");
 
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-
-                const resp = await axios.get(`${API_BASE_URL}/docente/progreso`, config);
+                const resp = await api.get("/docente/progreso");
                 setDataResumen(resp.data || null);
             } catch (err) {
                 console.error("Error al cargar progreso docente:", err);

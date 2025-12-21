@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 
-import { API_BASE_URL } from "../../../config/api.js";
 import icon from "../../../assets/logo.png";
-
 import "../../../styles/RolesStyle/Horario/HorarioSemanal.css";
 
-import LogoutButton from '../../../components/login/LogoutButton';
+import LogoutButton from "../../../components/login/LogoutButton";
 import WeeklyCalendar from "../../../components/WeeklyCalendar.jsx";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faBook,
@@ -16,8 +14,10 @@ import {
     faChartLine,
     faBell,
     faPenToSquare,
-    faUser
+    faUser,
 } from "@fortawesome/free-solid-svg-icons";
+
+import { api } from "../../../api/api";
 
 function mapDiaSemanaToIndex(dia) {
     if (!dia) return 0;
@@ -32,7 +32,7 @@ function mapDiaSemanaToIndex(dia) {
         SABADO: 6,
         SÁBADO: 6,
     };
-    return map[dia.toUpperCase()] ?? 0;
+    return map[String(dia).toUpperCase()] ?? 0;
 }
 
 export default function PantallaHorarioAlumno() {
@@ -40,28 +40,22 @@ export default function PantallaHorarioAlumno() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const userName = localStorage.getItem('userName');
+    const userName = localStorage.getItem("userName");
 
     useEffect(() => {
+        let alive = true;
+
         const fetchHorario = async () => {
             setLoading(true);
             setError(null);
+
             try {
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
+                // Antes: axios + Bearer
+                const { data } = await api.get("/alumno/horario");
 
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
+                const raw = data || [];
 
-                // AJUSTA ESTA URL A TU ENDPOINT REAL
-                const url = `${API_BASE_URL}/alumno/horario`;
-                const response = await axios.get(url, config);
-
-                // Esperamos algo tipo: [{ id, diaSemana, horaInicio, horaFin, tituloCurso, codigoSeccion, aula }]
-                const data = response.data || [];
-
-                const mapped = data.map((sesion, index) => {
+                const mapped = raw.map((sesion, index) => {
                     const id = sesion.sesionId ?? sesion.id ?? index;
 
                     let dayIndex = 0;
@@ -69,7 +63,7 @@ export default function PantallaHorarioAlumno() {
                         dayIndex = mapDiaSemanaToIndex(sesion.diaSemana);
                     } else if (sesion.fecha) {
                         const d = new Date(sesion.fecha);
-                        dayIndex = d.getDay();
+                        dayIndex = Number.isNaN(d.getTime()) ? 0 : d.getDay();
                     }
 
                     const startTime = sesion.horaInicio || "08:00";
@@ -79,27 +73,31 @@ export default function PantallaHorarioAlumno() {
                         id,
                         title: sesion.tituloCurso || sesion.nombreSeccion || "Sesión",
                         subtitle: `${sesion.codigoSeccion || ""} ${sesion.nombreSeccion || ""}`.trim(),
-                        aula: sesion.aula || "",
+                        aula: sesion.aula || sesion.aulaSeccion || "",
                         dayIndex,
                         startTime,
                         endTime,
                     };
                 });
 
+                if (!alive) return;
                 setEventos(mapped);
             } catch (err) {
                 console.error("Error al cargar horario del alumno:", err);
-                if (err.response?.data?.message) {
-                    setError(err.response.data.message);
-                } else {
-                    setError(err.message || "Error al cargar horario.");
-                }
+                if (!alive) return;
+
+                setError(err?.response?.data?.message || err?.message || "Error al cargar horario.");
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         fetchHorario();
+
+        return () => {
+            alive = false;
+        };
     }, []);
 
     const weekLabel = "Horario semanal de clases";
@@ -165,12 +163,14 @@ export default function PantallaHorarioAlumno() {
             {/* COLUMNA DERECHA */}
             <div className="student-right-area">
                 <header className="docente-header">
-                    <div className='header-content'>
-                        <div className='name-header'>
-                            <p>Bienvenido, <strong>{userName}</strong></p>
+                    <div className="header-content">
+                        <div className="name-header">
+                            <p>
+                                Bienvenido, <strong>{userName}</strong>
+                            </p>
                             <h1>Campus Virtual</h1>
                         </div>
-                        <div className='header-right'>
+                        <div className="header-right">
                             <LogoutButton />
                         </div>
                     </div>
@@ -179,9 +179,7 @@ export default function PantallaHorarioAlumno() {
                 <main className="perfil-main">
                     {loading && <p>Cargando horario...</p>}
                     {error && <p style={{ color: "red" }}>Error: {error}</p>}
-                    {!loading && !error && (
-                        <WeeklyCalendar events={eventos} weekLabel={weekLabel} />
-                    )}
+                    {!loading && !error && <WeeklyCalendar events={eventos} weekLabel={weekLabel} />}
                 </main>
             </div>
         </div>

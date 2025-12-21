@@ -1,14 +1,13 @@
 // src/pages/PantallaRoles/PantallaMiPerfil.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 
-import { API_BASE_URL } from "../../config/api.js";
 import icon from "../../assets/logo.png";
-
 import HistorialMatriculasAlumno from "../../components/alumno/HistorialMatriculasAlumno.jsx";
 
 import "../../styles/RolesStyle/Perfil/MiPerfil.css";
+
+import { api } from "../../api/api";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -33,32 +32,34 @@ function PantallaMiPerfil() {
     const rol = perfil?.rol;
 
     useEffect(() => {
+        let alive = true;
+
         const fetchPerfil = async () => {
             setLoading(true);
             setError(null);
+
             try {
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
+                // Antes: axios + Bearer token
+                const { data } = await api.get("/usuarios/me");
 
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
-
-                const response = await axios.get(`${API_BASE_URL}/usuarios/me`, config);
-                setPerfil(response.data);
+                if (!alive) return;
+                setPerfil(data);
             } catch (err) {
                 console.error("Error al cargar perfil:", err);
-                if (err.response?.data?.message) {
-                    setError(err.response.data.message);
-                } else {
-                    setError(err.message || "Error al cargar perfil.");
-                }
+                if (!alive) return;
+
+                setError(err?.response?.data?.message || err?.message || "Error al cargar perfil.");
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         fetchPerfil();
+
+        return () => {
+            alive = false;
+        };
     }, []);
 
     if (loading) return <p>Cargando datos de tu perfil...</p>;
@@ -78,27 +79,16 @@ function PantallaMiPerfil() {
     const dniAlumno = perfil.dniAlumno || perfil.alumno?.dni || perfil.alumno?.dniAlumno;
     const nivelAlumno = perfil.nivel || perfil.alumno?.nivel;
     const gradoAlumno = perfil.grado || perfil.alumno?.grado;
-    const telEmergencia =
-        perfil.telefonoEmergencia || perfil.alumno?.telefonoEmergencia;
-    const codigoEstudiante =
-        perfil.codigoEstudiante || perfil.alumno?.codigoEstudiante;
+    const telEmergencia = perfil.telefonoEmergencia || perfil.alumno?.telefonoEmergencia;
+    const codigoEstudiante = perfil.codigoEstudiante || perfil.alumno?.codigoEstudiante;
 
     // Datos PROFESOR
-    const dniProfesor =
-        perfil.dniProfesor || perfil.profesor?.dni || perfil.profesor?.dniProfesor;
+    const dniProfesor = perfil.dniProfesor || perfil.profesor?.dni || perfil.profesor?.dniProfesor;
     const telefonoProfesor = perfil.telefono || perfil.profesor?.telefono;
     const experiencia = perfil.experiencia || perfil.profesor?.experiencia;
 
     return (
-        <div
-            className={
-                esAlumno
-                    ? "student-layout"
-                    : esProfesor
-                        ? "docente-layout"
-                        : "perfil-layout" // por si algún otro rol raro
-            }
-        >
+        <div className={esAlumno ? "student-layout" : esProfesor ? "docente-layout" : "perfil-layout"}>
             {/* ===== SIDEBAR IZQUIERDO SEGÚN ROL ===== */}
             {esAlumno && (
                 <aside className="student-sidebar">
@@ -118,7 +108,7 @@ function PantallaMiPerfil() {
                             </li>
                             <li>
                                 <Link to="/pantalla-alumno/horario">
-                                    <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                    <FontAwesomeIcon icon={faCalendar} className="icon-text" />
                                     Horario
                                 </Link>
                             </li>
@@ -175,7 +165,7 @@ function PantallaMiPerfil() {
                             </li>
                             <li>
                                 <Link to="/docente/horario">
-                                    <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                    <FontAwesomeIcon icon={faCalendar} className="icon-text" />
                                     Horario
                                 </Link>
                             </li>
@@ -208,10 +198,9 @@ function PantallaMiPerfil() {
                 </aside>
             )}
 
-            {/* ===== COLUMNA DERECHA: HEADER + CONTENIDO ===== */}
+            {/* ===== COLUMNA DERECHA ===== */}
             <div className={esAlumno ? "student-right-area" : "docente-right-area"}>
-                {/* HEADER */}
-                <header className={esAlumno ? "docente-header-perfil" : "docente-header-perfil"}>
+                <header className="docente-header-perfil">
                     <div className="header-left">
                         <div className="header-text">
                             <h1>Mi Perfil</h1>
@@ -220,18 +209,12 @@ function PantallaMiPerfil() {
                     </div>
                     <div className="header-right">
                         <span className="pill-rol">
-                            {rol === "ALUMNO"
-                                ? "Estudiante"
-                                : rol === "PROFESOR"
-                                    ? "Docente"
-                                    : rol}
+                            {rol === "ALUMNO" ? "Estudiante" : rol === "PROFESOR" ? "Docente" : rol}
                         </span>
                     </div>
                 </header>
 
-                {/* CONTENIDO PRINCIPAL */}
                 <main className="perfil-main">
-                    {/* Tarjeta datos generales */}
                     <section className="perfil-card">
                         <h2>
                             <FontAwesomeIcon icon={faUser} className="icon-section" />
@@ -245,18 +228,13 @@ function PantallaMiPerfil() {
                             <div className="perfil-item">
                                 <span className="label">Correo electrónico</span>
                                 <span className="value">
-                                    <FontAwesomeIcon icon={faEnvelope} className="inline-icon" />{" "}
-                                    {email}
+                                    <FontAwesomeIcon icon={faEnvelope} className="inline-icon" /> {email}
                                 </span>
                             </div>
                             <div className="perfil-item">
                                 <span className="label">Rol</span>
                                 <span className="value value-pill">
-                                    {rol === "ALUMNO"
-                                        ? "Estudiante"
-                                        : rol === "PROFESOR"
-                                            ? "Docente"
-                                            : rol}
+                                    {rol === "ALUMNO" ? "Estudiante" : rol === "PROFESOR" ? "Docente" : rol}
                                 </span>
                             </div>
                             {id && (
@@ -274,14 +252,10 @@ function PantallaMiPerfil() {
                         </div>
                     </section>
 
-                    {/* Datos de ALUMNO */}
                     {esAlumno && (
                         <section className="perfil-card">
                             <h2>
-                                <FontAwesomeIcon
-                                    icon={faGraduationCap}
-                                    className="icon-section"
-                                />
+                                <FontAwesomeIcon icon={faGraduationCap} className="icon-section" />
                                 Datos de estudiante
                             </h2>
 
@@ -294,23 +268,18 @@ function PantallaMiPerfil() {
                                     </span>
                                 </div>
 
-
-
                                 <div className="perfil-item">
                                     <span className="label">Nivel</span>
                                     <span className="value">
                                         {nivelAlumno
-                                            ? nivelAlumno.charAt(0) +
-                                            nivelAlumno.slice(1).toLowerCase()
+                                            ? nivelAlumno.charAt(0) + nivelAlumno.slice(1).toLowerCase()
                                             : "No registrado"}
                                     </span>
                                 </div>
 
                                 <div className="perfil-item">
                                     <span className="label">Grado</span>
-                                    <span className="value">
-                                        {gradoAlumno || "No registrado"}
-                                    </span>
+                                    <span className="value">{gradoAlumno || "No registrado"}</span>
                                 </div>
 
                                 <div className="perfil-item">
@@ -323,9 +292,7 @@ function PantallaMiPerfil() {
 
                                 <div className="perfil-item">
                                     <span className="label">Código de estudiante</span>
-                                    <span className="value">
-                                        {codigoEstudiante || "No registrado"}
-                                    </span>
+                                    <span className="value">{codigoEstudiante || "No registrado"}</span>
                                 </div>
                             </div>
                         </section>
@@ -337,14 +304,10 @@ function PantallaMiPerfil() {
                         </section>
                     )}
 
-                    {/* Datos de DOCENTE */}
                     {esProfesor && (
                         <section className="perfil-card">
                             <h2>
-                                <FontAwesomeIcon
-                                    icon={faChalkboardTeacher}
-                                    className="icon-section"
-                                />
+                                <FontAwesomeIcon icon={faChalkboardTeacher} className="icon-section" />
                                 Datos de docente
                             </h2>
 
@@ -375,13 +338,12 @@ function PantallaMiPerfil() {
                         </section>
                     )}
 
-                    {/* Rol raro / futuro */}
                     {!esAlumno && !esProfesor && (
                         <section className="perfil-card">
                             <h2>Información adicional</h2>
                             <p>
-                                Tu rol actual es: <strong>{rol}</strong>. Aún no hay datos
-                                específicos configurados para este tipo de usuario.
+                                Tu rol actual es: <strong>{rol}</strong>. Aún no hay datos específicos configurados
+                                para este tipo de usuario.
                             </p>
                         </section>
                     )}

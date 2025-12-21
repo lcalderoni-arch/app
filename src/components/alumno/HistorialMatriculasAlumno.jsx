@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
-import axios from "axios";
-import { API_BASE_URL } from "../../config/api";
 
 import "../../styles/Alumno/HistorialMatriculasAlumno.css";
+
+import { api } from "../../api/api";
 
 const estadoLabel = (estado) => {
     switch (estado) {
@@ -17,59 +17,62 @@ const estadoLabel = (estado) => {
     }
 };
 
-// Para colegios: “Año escolar” suena más natural que “ciclo”
 const cicloLabelUI = (ciclo) => {
     if (!ciclo) return "-";
-    // Si usas 2025-II, igual lo mostramos como “Año escolar / Periodo”
     return ciclo;
 };
 
 export default function HistorialMatriculasAlumno() {
-    const token = localStorage.getItem("authToken");
     const [historial, setHistorial] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Filtro por ciclo (Año escolar / Periodo)
     const [cicloSeleccionado, setCicloSeleccionado] = useState("TODOS");
 
     useEffect(() => {
-        if (!token) return;
+        let alive = true;
 
         const fetchHistorial = async () => {
             setLoading(true);
             setError(null);
-            try {
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-                const resp = await axios.get(`${API_BASE_URL}/matriculas/mis-matriculas`, config);
 
-                const data = Array.isArray(resp.data) ? resp.data : [];
-                // Orden: más reciente primero si hay fechas (fallback por id)
-                data.sort((a, b) => {
+            try {
+                // Antes: axios + Bearer token
+                const { data } = await api.get("/matriculas/mis-matriculas");
+
+                const arr = Array.isArray(data) ? data : [];
+
+                arr.sort((a, b) => {
                     const da = a.fechaInicioSeccion ? new Date(a.fechaInicioSeccion) : null;
                     const db = b.fechaInicioSeccion ? new Date(b.fechaInicioSeccion) : null;
                     if (da && db) return db - da;
                     return (b.id || 0) - (a.id || 0);
                 });
 
-                setHistorial(data);
+                if (!alive) return;
+                setHistorial(arr);
             } catch (e) {
                 console.error("Error cargando historial de matrículas:", e);
-                setError("No se pudo cargar tu historial académico.");
+                if (!alive) return;
+                setError(e?.response?.data?.message || "No se pudo cargar tu historial académico.");
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         fetchHistorial();
-    }, [token]);
+
+        return () => {
+            alive = false;
+        };
+    }, []);
 
     const ciclosDisponibles = useMemo(() => {
         const set = new Set();
         historial.forEach((m) => {
             if (m.ciclo) set.add(m.ciclo);
         });
-        // Si no llega ciclo desde backend, solo queda vacío
         return Array.from(set).sort((a, b) => (a > b ? -1 : 1)); // desc
     }, [historial]);
 
@@ -79,7 +82,6 @@ export default function HistorialMatriculasAlumno() {
     }, [historial, cicloSeleccionado]);
 
     const historialAgrupadoPorCiclo = useMemo(() => {
-        // Agrupa por ciclo (si no viene ciclo, caen en “Sin ciclo”)
         const groups = {};
         historialFiltrado.forEach((m) => {
             const key = m.ciclo || "Sin ciclo";
@@ -87,7 +89,6 @@ export default function HistorialMatriculasAlumno() {
             groups[key].push(m);
         });
 
-        // Orden de grupos: ciclo desc, “Sin ciclo” al final
         const keys = Object.keys(groups).sort((a, b) => {
             if (a === "Sin ciclo") return 1;
             if (b === "Sin ciclo") return -1;
@@ -96,8 +97,6 @@ export default function HistorialMatriculasAlumno() {
 
         return keys.map((k) => ({ ciclo: k, items: groups[k] }));
     }, [historialFiltrado]);
-
-    if (!token) return <p>No estás autenticado.</p>;
 
     return (
         <div className="historial-matriculas">
@@ -142,7 +141,7 @@ export default function HistorialMatriculasAlumno() {
                         <div key={g.ciclo} className="historial-grupo">
                             <div className="historial-grupo-title">
                                 <span className="historial-badge">
-                                    {g.ciclo === "Sin ciclo" ? "Año escolar: - " : `Año escolar: ${cicloLabelUI(g.ciclo)}`}
+                                    {g.ciclo === "Sin ciclo" ? "Año escolar: -" : `Año escolar: ${cicloLabelUI(g.ciclo)}`}
                                 </span>
                                 <span className="historial-count">{g.items.length} curso(s)</span>
                             </div>
@@ -169,7 +168,7 @@ export default function HistorialMatriculasAlumno() {
                                                 </td>
                                                 <td>{m.nombreSeccion || "-"}</td>
                                                 <td>
-                                                    <span className={`estado-pill estado-${(m.estado || "").toLowerCase()}`}>
+                                                    <span className={`estado-pill estado-${String(m.estado || "").toLowerCase()}`}>
                                                         {estadoLabel(m.estado)}
                                                     </span>
                                                 </td>
@@ -187,11 +186,10 @@ export default function HistorialMatriculasAlumno() {
                 </div>
             )}
 
-            {/* Mensaje útil si backend aún NO envía ciclo */}
             {historial.length > 0 && ciclosDisponibles.length === 0 && !loading && !error && (
                 <div className="historial-warning">
-                    Nota: tu historial aún no está recibiendo el campo <strong>ciclo</strong> desde el backend.
-                    Se mostrará “-” hasta que lo añadamos en el DTO (te dejo el backend abajo).
+                    Nota: tu historial aún no está recibiendo el campo <strong>ciclo</strong> desde el backend. Se mostrará “-”
+                    hasta que lo añadamos en el DTO.
                 </div>
             )}
         </div>

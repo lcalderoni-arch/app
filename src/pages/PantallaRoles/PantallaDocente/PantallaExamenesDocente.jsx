@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { API_BASE_URL } from "../../../config/api";
+import { api } from "../../../api/api";
+
 import icon from "../../../assets/logo.png";
 import LogoutButton from "../../../components/login/LogoutButton";
 import "../../../styles/RolesStyle/DocenteStyle/ExamenesDocente.css";
@@ -57,14 +57,8 @@ export default function PantallaExamenesDocente() {
                 const token = localStorage.getItem("authToken");
                 if (!token) throw new Error("No estás autenticado.");
 
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
+                const resp = await api.get(`/secciones/${seccionId}`);
 
-                const resp = await axios.get(
-                    `${API_BASE_URL}/secciones/${seccionId}`,
-                    config
-                );
                 setSeccion(resp.data);
             } catch (err) {
                 console.error("Error al cargar sección:", err);
@@ -90,14 +84,8 @@ export default function PantallaExamenesDocente() {
             const token = localStorage.getItem("authToken");
             if (!token) throw new Error("No estás autenticado.");
 
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
+            const resp = await api.get(`/docente/secciones/${seccionId}/examenes`);
 
-            const resp = await axios.get(
-                `${API_BASE_URL}/docente/secciones/${seccionId}/examenes`,
-                config
-            );
 
             setExamenes(resp.data || []);
         } catch (err) {
@@ -128,14 +116,8 @@ export default function PantallaExamenesDocente() {
             const token = localStorage.getItem("authToken");
             if (!token) throw new Error("No estás autenticado.");
 
-            const config = {
-                headers: { Authorization: `Bearer ${token}` },
-            };
+            const resp = await api.get(`/docente/examenes/${examenId}/notas`);
 
-            const resp = await axios.get(
-                `${API_BASE_URL}/docente/examenes/${examenId}/notas`,
-                config
-            );
 
             setNotasData(resp.data || null);
 
@@ -181,8 +163,6 @@ export default function PantallaExamenesDocente() {
             const token = localStorage.getItem("authToken");
             if (!token) throw new Error("No estás autenticado.");
 
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-
             const payload = {
                 titulo: nuevoTitulo.trim(),
                 descripcion: nuevoDescripcion.trim() || null,
@@ -192,11 +172,8 @@ export default function PantallaExamenesDocente() {
                 orden: null,
             };
 
-            await axios.post(
-                `${API_BASE_URL}/docente/secciones/${seccionId}/examenes`,
-                payload,
-                config
-            );
+            await api.post(`/docente/secciones/${seccionId}/examenes`, payload);
+
 
             // Recargar exámenes
             await cargarExamenes();
@@ -238,7 +215,6 @@ export default function PantallaExamenesDocente() {
             const token = localStorage.getItem("authToken");
             if (!token) throw new Error("No estás autenticado.");
 
-            const config = { headers: { Authorization: `Bearer ${token}` } };
 
             const payload = (notasData.alumnos || []).map((fila) => {
                 const raw = notasEditables[fila.alumnoId];
@@ -253,11 +229,7 @@ export default function PantallaExamenesDocente() {
                 };
             });
 
-            const resp = await axios.put(
-                `${API_BASE_URL}/docente/examenes/${examenSeleccionadoId}/notas`,
-                payload,
-                config
-            );
+            const resp = await api.put(`/docente/examenes/${examenSeleccionadoId}/notas`, payload);
 
             setNotasData(resp.data || null);
 

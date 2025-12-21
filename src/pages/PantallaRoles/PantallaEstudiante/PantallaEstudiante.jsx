@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
 
 // Importaciones de tu proyecto
-import LogoutButton from '../../../components/login/LogoutButton';
+import LogoutButton from "../../../components/login/LogoutButton";
 import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
-import { API_BASE_URL } from "../../../config/api";
-
 
 import { registrarEvento } from "../../../services/eventosService";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { api } from "../../../api/api";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faBook,
     faCalendar,
@@ -19,32 +18,34 @@ import {
     faSpinner,
     faChalkboardTeacher,
     faUser,
-    faBell
-} from '@fortawesome/free-solid-svg-icons';
+    faBell,
+} from "@fortawesome/free-solid-svg-icons";
 
 const formatDateLocal = (dateString) => {
     if (!dateString) return "Sin fecha";
-    const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const date = new Date(dateString + "T00:00:00");
+    return date.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
 };
 
 const getDayOfWeek = (dateString) => {
     if (!dateString) return "";
-    const date = new Date(dateString + 'T00:00:00');
-    // Ej: "lunes", "martes", etc.
-    return date.toLocaleDateString('es-ES', { weekday: 'long' });
+    const date = new Date(dateString + "T00:00:00");
+    return date.toLocaleDateString("es-ES", { weekday: "long" });
 };
 
 const obtenerHorario = (turno) => {
     const horarios = {
         MAÑANA: "7:00 AM - 11:30 AM",
         TARDE: "12:00 PM - 4:30 PM",
-        NOCHE: "5:00 PM - 9:30 PM"
+        NOCHE: "5:00 PM - 9:30 PM",
     };
     return horarios[turno] || "Horario no definido";
 };
 
-// Calcula el estado de la matrícula en base a fechas de la sección
 const obtenerEstadoMatricula = (matricula) => {
     const hoy = new Date();
 
@@ -69,72 +70,77 @@ const obtenerEstadoMatricula = (matricula) => {
 };
 
 export default function PantallaEstudiante() {
-    const userName = localStorage.getItem('userName');
-    const userGrado = localStorage.getItem('userGrado');
-    const token = localStorage.getItem('authToken');
+    const userName = localStorage.getItem("userName");
+    const userGrado = localStorage.getItem("userGrado");
     const navigate = useNavigate();
 
     const [cursos, setCursos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Cargar cursos (con apiClient)
     useEffect(() => {
-        const cargarMisCursos = async () => {
-            if (!token) return;
+        let alive = true;
 
+        const cargarMisCursos = async () => {
             setLoading(true);
             setError(null);
 
             try {
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` },
-                };
-
                 // Endpoint de matrículas activas
-                const url = `${API_BASE_URL}/matriculas/mis-matriculas/activas`;
-                const response = await axios.get(url, config);
-
-                setCursos(response.data || []);
+                const { data } = await api.get("/matriculas/mis-matriculas/activas");
+                if (!alive) return;
+                setCursos(data || []);
             } catch (err) {
                 console.error("Error al cargar cursos en dashboard:", err);
-                if (err.response && err.response.status !== 404) {
+                if (!alive) return;
+
+                // Si backend responde 404 por "sin cursos", lo tratamos como lista vacía
+                if (err?.response?.status === 404) {
+                    setCursos([]);
+                    setError(null);
+                } else {
                     setError("No se pudieron cargar tus cursos.");
                 }
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         cargarMisCursos();
-    }, [token]);
 
+        return () => {
+            alive = false;
+        };
+    }, []);
+
+    // Telemetría / evento (no bloquea UX)
     useEffect(() => {
-        registrarEvento("VER_PANTALLA_ESTUDIANTE", {
-            origen: "PantallaEstudiante",
-        });
+        registrarEvento("VER_PANTALLA_ESTUDIANTE", { origen: "PantallaEstudiante" });
     }, []);
 
     return (
-        <div className='student-layout'>
+        <div className="student-layout">
             {/* ========== SIDEBAR IZQUIERDO ========== */}
-            <aside className='student-sidebar'>
-                <div className='sidebar-header'>
+            <aside className="student-sidebar">
+                <div className="sidebar-header">
                     <img className="sidebar-icon" src={icon} alt="Logo Campus" />
-                    <span className='sidebar-role'>Estudiante</span>
+                    <span className="sidebar-role">Estudiante</span>
                 </div>
 
-                <nav className='sidebar-menu'>
+                <nav className="sidebar-menu">
                     <h3>Menú Principal</h3>
                     <ul>
                         <li>
-                            <a href="#cursos" className='active'>
-                                <FontAwesomeIcon icon={faBook} className='icon-text' />
+                            <a href="#cursos" className="active">
+                                <FontAwesomeIcon icon={faBook} className="icon-text" />
                                 Mis Cursos
                             </a>
                         </li>
                         <li>
                             <Link to="/pantalla-alumno/horario">
-                                <FontAwesomeIcon icon={faCalendar} className='icon-text' />
+                                <FontAwesomeIcon icon={faCalendar} className="icon-text" />
                                 Horario
                             </Link>
                         </li>
@@ -153,12 +159,12 @@ export default function PantallaEstudiante() {
                     </ul>
                 </nav>
 
-                <nav className='sidebar-menu'>
+                <nav className="sidebar-menu">
                     <h3>Otros campos</h3>
                     <ul>
                         <li>
                             <Link to="/pantalla-alumno/matricula">
-                                <FontAwesomeIcon icon={faPenToSquare} className='icon-text' />
+                                <FontAwesomeIcon icon={faPenToSquare} className="icon-text" />
                                 Matricúlate Aquí
                             </Link>
                         </li>
@@ -173,23 +179,27 @@ export default function PantallaEstudiante() {
             </aside>
 
             {/* ========== ÁREA DERECHA ========== */}
-            <div className='student-right-area'>
+            <div className="student-right-area">
                 <header className="docente-header">
-                    <div className='header-content'>
-                        <div className='name-header'>
-                            <p>Bienvenido, <strong>{userName}</strong></p>
+                    <div className="header-content">
+                        <div className="name-header">
+                            <p>
+                                Bienvenido, <strong>{userName}</strong>
+                            </p>
                             <h1>Campus Virtual</h1>
                         </div>
-                        <div className='header-right'>
+                        <div className="header-right">
                             <LogoutButton />
                         </div>
                     </div>
                 </header>
 
-                <main className='docente-main'>
-                    <section className='content-section' id="cursos">
+                <main className="docente-main">
+                    <section className="content-section" id="cursos">
                         <h2>Mis Cursos Activos</h2>
-                        <p>Visualiza tus asignaturas del grado: <strong>{userGrado}</strong></p>
+                        <p>
+                            Visualiza tus asignaturas del grado: <strong>{userGrado}</strong>
+                        </p>
 
                         {/* --- LOADING --- */}
                         {loading && (
@@ -201,15 +211,35 @@ export default function PantallaEstudiante() {
 
                         {/* --- ERROR --- */}
                         {error && (
-                            <div style={{ color: "red", background: "#ffebee", padding: "1rem", borderRadius: "5px", marginBottom: "1rem" }}>
+                            <div
+                                style={{
+                                    color: "red",
+                                    background: "#ffebee",
+                                    padding: "1rem",
+                                    borderRadius: "5px",
+                                    marginBottom: "1rem",
+                                }}
+                            >
                                 <p>❌ {error}</p>
                             </div>
                         )}
 
                         {/* --- SIN CURSOS --- */}
                         {!loading && !error && cursos.length === 0 && (
-                            <div style={{ textAlign: "center", padding: "3rem", background: "#f9f9f9", borderRadius: "8px", border: "1px dashed #ccc" }}>
-                                <FontAwesomeIcon icon={faBook} size="3x" style={{ color: "#ccc", marginBottom: "1rem" }} />
+                            <div
+                                style={{
+                                    textAlign: "center",
+                                    padding: "3rem",
+                                    background: "#f9f9f9",
+                                    borderRadius: "8px",
+                                    border: "1px dashed #ccc",
+                                }}
+                            >
+                                <FontAwesomeIcon
+                                    icon={faBook}
+                                    size="3x"
+                                    style={{ color: "#ccc", marginBottom: "1rem" }}
+                                />
                                 <h3>No tienes cursos inscritos actualmente</h3>
                                 <p>Dirígete a la sección de "Matricúlate Aquí" para inscribir tus asignaturas.</p>
                             </div>
@@ -217,57 +247,49 @@ export default function PantallaEstudiante() {
 
                         {/* --- GRID DE CURSOS DINÁMICO --- */}
                         {!loading && !error && cursos.length > 0 && (
-                            <div className='courses-grid'>
+                            <div className="courses-grid">
                                 {cursos.map((matricula) => {
                                     const estado = obtenerEstadoMatricula(matricula);
 
                                     return (
-                                        <div key={matricula.id} className='course-card'>
-                                            <div className='header-card'>
+                                        <div key={matricula.id} className="course-card">
+                                            <div className="header-card">
                                                 <h3>{matricula.tituloCurso}</h3>
 
-                                                <div className='content-grado-student'>
-                                                    <span className='text-nivel'>
-                                                        Cód: {matricula.codigoCurso}
-                                                    </span>
-                                                    <span className='matricula'>
-                                                        {matricula.nombreSeccion}
-                                                    </span>
+                                                <div className="content-grado-student">
+                                                    <span className="text-nivel">Cód: {matricula.codigoCurso}</span>
+                                                    <span className="matricula">{matricula.nombreSeccion}</span>
                                                 </div>
 
-                                                <div className='content-grado-student-two'>
-                                                    <span className='text-nivel'>
-                                                        Grado: {userGrado}
-                                                    </span>
+                                                <div className="content-grado-student-two">
+                                                    <span className="text-nivel">Grado: {userGrado}</span>
                                                 </div>
 
-                                                <div className='information-card'>
+                                                <div className="information-card">
                                                     <span>
                                                         <FontAwesomeIcon
                                                             icon={faChalkboardTeacher}
-                                                            style={{ marginRight: '8px', color: '#555' }}
+                                                            style={{ marginRight: "8px", color: "#555" }}
                                                         />
                                                         Prof. <strong>{matricula.nombreProfesor}</strong>
                                                     </span>
                                                     <span>
-                                                        Correo: <strong>{matricula.correoProfesor || 'No registrado'}</strong>
+                                                        Correo: <strong>{matricula.correoProfesor || "No registrado"}</strong>
                                                     </span>
-                                                    <span className='datos-fecha'>
+                                                    <span className="datos-fecha">
                                                         <strong>{getDayOfWeek(matricula.fechaInicioSeccion)}</strong>
-                                                        <strong> - {matricula.turnoSeccion || 'Turno no definido'}:</strong>{' '}
+                                                        <strong> - {matricula.turnoSeccion || "Turno no definido"}:</strong>{" "}
                                                         {obtenerHorario(matricula.turnoSeccion)} <br />
-                                                        <strong>({matricula.aulaSeccion || 'No asignado'})</strong>
+                                                        <strong>({matricula.aulaSeccion || "No asignado"})</strong>
                                                     </span>
                                                 </div>
                                             </div>
 
-                                            <div className='footer-card'>
-                                                <div className='estado-information'>
-                                                    <span className={`badge-estado ${estado.clase}`}>
-                                                        {estado.texto}
-                                                    </span>
+                                            <div className="footer-card">
+                                                <div className="estado-information">
+                                                    <span className={`badge-estado ${estado.clase}`}>{estado.texto}</span>
                                                 </div>
-                                                <div className='fecha-information'>
+                                                <div className="fecha-information">
                                                     <span>
                                                         Inicio: <strong>{formatDateLocal(matricula.fechaInicioSeccion)}</strong>
                                                     </span>
@@ -275,17 +297,14 @@ export default function PantallaEstudiante() {
                                                         Fin: <strong>{formatDateLocal(matricula.fechaFinSeccion)}</strong>
                                                     </span>
                                                     {Number(matricula.semanaActual) > 0 && (
-                                                        <span className='semana-actual-badge'>
-                                                            Semana {matricula.semanaActual}
-                                                        </span>
+                                                        <span className="semana-actual-badge">Semana {matricula.semanaActual}</span>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            {/* BOTÓN ACTIVO PARA IR A LA SECCIÓN */}
                                             <button
-                                                className='btn-course'
-                                                style={{ justifyContent: 'center', width: '100%', cursor: 'pointer' }}
+                                                className="btn-course"
+                                                style={{ justifyContent: "center", width: "100%", cursor: "pointer" }}
                                                 onClick={() => navigate(`/pantalla-estudiante/seccion/${matricula.seccionId}`)}
                                             >
                                                 Ver contenido
