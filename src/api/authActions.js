@@ -1,15 +1,21 @@
 import { apiAuth } from "./apiAuth";
-import { setAccessToken } from "./api";
 
+/**
+ * Cierra sesión en backend y limpia la sesión local
+ */
 export async function logoutBackend() {
     try {
         await apiAuth.post("/auth/logout");
     } catch (e) {
-        // aunque falle, igual limpiamos sesión local
         console.error("Logout backend error:", e);
     } finally {
-        setAccessToken(null);
-        localStorage.clear();
-        sessionStorage.removeItem("accessToken");
+        // Limpieza segura (NO usar clear)
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userEmail");
+        localStorage.removeItem("userDni");
+        localStorage.removeItem("userNivel");
+        localStorage.removeItem("userGrado");
     }
 }
