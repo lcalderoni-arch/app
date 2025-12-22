@@ -1,6 +1,5 @@
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
-
 import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStore";
 
 let isRefreshing = false;
@@ -22,12 +21,8 @@ export const api = axios.create({
 api.interceptors.request.use(
     (config) => {
         config.headers = config.headers || {};
-
         const token = getAccessToken();
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-
+        if (token) config.headers.Authorization = `Bearer ${token}`;
         return config;
     },
     (err) => Promise.reject(err)
@@ -41,14 +36,21 @@ api.interceptors.response.use(
         const original = error.config;
         if (!original) return Promise.reject(error);
 
-        // Evita loop infinito
+        // Si ya estamos en login / público, no hagas cosas raras
+        const isPublicPath =
+            window.location.pathname === "/" || window.location.pathname === "/nosotros";
+
+        // Evita loop infinito si refresh falla
         if (original.url?.includes("/auth/refresh")) {
-            limpiarSesion();
+            forceLogout("Tu sesión expiró. Inicia sesión nuevamente.");
             return Promise.reject(error);
         }
 
-        // 🔁 Intento de refresh
-        if (error.response.status === 401 && !original._retry) {
+        const status = error.response.status;
+
+        // ✅ IMPORTANTE: intenta refresh tanto en 401 como en 403
+        // (403 a veces lo usa Spring Security cuando el token es inválido o no autorizado)
+        if ((status === 401 || status === 403) && !original._retry && !isPublicPath) {
             original._retry = true;
 
             if (isRefreshing) {
@@ -65,9 +67,7 @@ api.interceptors.response.use(
             try {
                 const refreshResp = await api.post("/auth/refresh", {});
                 const newToken =
-                    refreshResp.data?.token ||
-                    refreshResp.data?.accessToken ||
-                    refreshResp.data?.jwt;
+                    refreshResp.data?.token || refreshResp.data?.accessToken || refreshResp.data?.jwt;
 
                 if (!newToken) throw new Error("Refresh no devolvió token");
 
@@ -78,7 +78,7 @@ api.interceptors.response.use(
                 return api(original);
             } catch (refreshErr) {
                 processQueue(refreshErr, null);
-                limpiarSesion();
+                forceLogout("Tu sesión expiró por seguridad. Vuelve a iniciar sesión.");
                 return Promise.reject(refreshErr);
             } finally {
                 isRefreshing = false;
@@ -88,6 +88,17 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+// 👇 Logout “definitivo” + mensaje
+function forceLogout(message) {
+    limpiarSesion();
+    try {
+        sessionStorage.setItem("logoutReason", message);
+    } catch { }
+    if (window.location.pathname !== "/") {
+        window.location.href = "/";
+    }
+}
 
 // Limpieza centralizada
 function limpiarSesion() {

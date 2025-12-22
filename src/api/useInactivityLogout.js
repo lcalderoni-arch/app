@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { logoutBackend } from "./authActions";
 
-const INACTIVITY_TIME = 35 * 60 * 1000; // 2 minutos (prueba)
+const INACTIVITY_TIME = 35 * 60 * 1000;
 
 export function useInactivityLogout() {
     const timer = useRef(null);
