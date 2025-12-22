@@ -1,6 +1,8 @@
 import axios from "axios";
 import { API_BASE_URL } from "../config/api";
 
+import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStore";
+
 let isRefreshing = false;
 let refreshQueue = [];
 
@@ -21,7 +23,7 @@ api.interceptors.request.use(
     (config) => {
         config.headers = config.headers || {};
 
-        const token = localStorage.getItem("authToken");
+        const token = getAccessToken();
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -69,7 +71,7 @@ api.interceptors.response.use(
 
                 if (!newToken) throw new Error("Refresh no devolvió token");
 
-                localStorage.setItem("authToken", newToken);
+                setAccessToken(newToken);
                 processQueue(null, newToken);
 
                 original.headers.Authorization = `Bearer ${newToken}`;
@@ -89,7 +91,7 @@ api.interceptors.response.use(
 
 // 🔒 Limpieza centralizada
 function limpiarSesion() {
-    localStorage.removeItem("authToken");
+    clearAccessToken();
     localStorage.removeItem("userRole");
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");

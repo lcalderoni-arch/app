@@ -61,17 +61,20 @@ export default function PantallaProgresoDocente() {
                 setLoading(true);
                 setError(null);
 
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
-
                 const resp = await api.get("/docente/progreso");
                 setDataResumen(resp.data || null);
             } catch (err) {
                 console.error("Error al cargar progreso docente:", err);
-                setError(
-                    err.response?.data?.message ||
-                    "No se pudo cargar el progreso del docente."
-                );
+
+                // Si el backend responde 401, lo mostramos claro
+                if (err.response?.status === 401) {
+                    setError("No estás autenticado.");
+                } else {
+                    setError(
+                        err.response?.data?.message ||
+                        "No se pudo cargar el progreso del docente."
+                    );
+                }
             } finally {
                 setLoading(false);
             }
@@ -79,6 +82,7 @@ export default function PantallaProgresoDocente() {
 
         cargarProgreso();
     }, []);
+
 
     const secciones = dataResumen?.secciones || [];
 

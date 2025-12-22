@@ -1,16 +1,13 @@
 import { apiAuth } from "./apiAuth";
+import { clearAccessToken } from "./tokenStore";
 
-/**
- * Cierra sesión en backend y limpia la sesión local
- */
 export async function logoutBackend() {
     try {
         await apiAuth.post("/auth/logout");
     } catch (e) {
         console.error("Logout backend error:", e);
     } finally {
-        // Limpieza segura (NO usar clear)
-        localStorage.removeItem("authToken");
+        clearAccessToken();
         localStorage.removeItem("userRole");
         localStorage.removeItem("userName");
         localStorage.removeItem("userEmail");

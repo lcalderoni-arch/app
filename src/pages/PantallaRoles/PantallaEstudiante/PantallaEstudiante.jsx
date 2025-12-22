@@ -6,6 +6,8 @@ import LogoutButton from "../../../components/login/LogoutButton";
 import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import { registrarEvento } from "../../../services/eventosService";
 import { api } from "../../../api/api";
 
@@ -78,8 +80,11 @@ export default function PantallaEstudiante() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Cargar cursos (con apiClient)
+    const authReady = useAuthReady();
+
     useEffect(() => {
+        if (!authReady) return;
+
         let alive = true;
 
         const cargarMisCursos = async () => {
@@ -87,7 +92,6 @@ export default function PantallaEstudiante() {
             setError(null);
 
             try {
-                // Endpoint de matrículas activas
                 const { data } = await api.get("/matriculas/mis-matriculas/activas");
                 if (!alive) return;
                 setCursos(data || []);
@@ -95,7 +99,6 @@ export default function PantallaEstudiante() {
                 console.error("Error al cargar cursos en dashboard:", err);
                 if (!alive) return;
 
-                // Si backend responde 404 por "sin cursos", lo tratamos como lista vacía
                 if (err?.response?.status === 404) {
                     setCursos([]);
                     setError(null);
@@ -113,7 +116,7 @@ export default function PantallaEstudiante() {
         return () => {
             alive = false;
         };
-    }, []);
+    }, [authReady]);
 
     // Telemetría / evento (no bloquea UX)
     useEffect(() => {

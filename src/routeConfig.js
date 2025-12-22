@@ -42,7 +42,7 @@ import PantallaSeccionDocente from "./pages/PantallaRoles/PantallaDocente/Pantal
 
 import ProtectedRoute from "./security/ProtectedRoute.jsx";
 
-import GuestRoute from "./security/GuestRoute.jsx"; 
+import GuestRoute from "./security/GuestRoute.jsx";
 
 const routeConfig = [
   {
@@ -77,15 +77,16 @@ const routeConfig = [
       {
         path: "cursos",
         element: (
-          <ProtectedRoute roles={["ADMINISTRADOR"]}>
+          <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
             <GestionCursos />
           </ProtectedRoute>
         ),
+
       },
       {
         path: "secciones",
         element: (
-          <ProtectedRoute roles={["ADMINISTRADOR"]}>
+          <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
             <GestionSecciones />
           </ProtectedRoute>
         ),
@@ -93,7 +94,7 @@ const routeConfig = [
       {
         path: "matriculas",
         element: (
-          <ProtectedRoute roles={["ADMINISTRADOR"]}>
+          <ProtectedRoute allowedRoles={["ADMINISTRADOR"]}>
             <GestionMatricula />
           </ProtectedRoute>
         ),

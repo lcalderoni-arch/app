@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 import icon from "../../../assets/logo.png";
-import { API_BASE_URL } from "../../../config/api.js";
+import { useAuthReady } from "../../../api/useAuthReady";
 
 import LogoutButton from "../../../components/login/LogoutButton.jsx";
 import "../../../styles/RolesStyle/DocenteStyle/DocentePageFirst.css";
@@ -36,22 +36,24 @@ export default function PantallaDocente() {
     const [error, setError] = useState(null);
 
     // --- Cargar secciones del profesor ---
+    const authReady = useAuthReady();
+
     useEffect(() => {
+        if (!authReady) return;
+
+        let alive = true;
+
         const cargarSeccionesProfesor = async () => {
             setLoading(true);
             setError(null);
 
             try {
-                if (!userDni) {
-                    throw new Error("No se encontró el DNI del profesor.");
-                }
+                if (!userDni) throw new Error("No se encontró el DNI del profesor.");
 
-                
-                // api ya adjunta Authorization automáticamente
-                const resp = await api.get(
-                    `${API_BASE_URL}/secciones/profesor/dni/${userDni}`
-                );
+                // ✅ Importante: api ya tiene baseURL, aquí SOLO va el path
+                const resp = await api.get(`/secciones/profesor/dni/${userDni}`);
 
+                if (!alive) return;
                 setSecciones(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar secciones:", err);
@@ -62,14 +64,20 @@ export default function PantallaDocente() {
                     err.message ||
                     "No se pudieron cargar las secciones.";
 
+                if (!alive) return;
                 setError(msg);
             } finally {
+                if (!alive) return;
                 setLoading(false);
             }
         };
 
         cargarSeccionesProfesor();
-    }, [userDni]);
+
+        return () => {
+            alive = false;
+        };
+    }, [authReady, userDni]);
 
     // --- Función para obtener horario según turno ---
     const obtenerHorario = (turno) => {

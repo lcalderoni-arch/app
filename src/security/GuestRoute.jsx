@@ -1,13 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { getAuth, getHomeByRole } from "../auth/auth"; // ajusta ruta
+import { isAuthReady } from "../api/authState";
 
 export default function GuestRoute({ children }) {
-    const { token, rol } = getAuth();
+    const [ready, setReady] = useState(isAuthReady());
 
-    if (token && rol) {
-        return <Navigate to={getHomeByRole(rol)} replace />;
-    }
+    useEffect(() => {
+        const handler = () => setReady(isAuthReady());
+        window.addEventListener("auth-ready-changed", handler);
+        return () => window.removeEventListener("auth-ready-changed", handler);
+    }, []);
+
+    if (!ready) return null;
+
+    const role = localStorage.getItem("userRole");
+    if (role === "ADMINISTRADOR") return <Navigate to="/dashboard-admin" replace />;
+    if (role === "ALUMNO") return <Navigate to="/pantalla-estudiante" replace />;
+    if (role === "PROFESOR") return <Navigate to="/pantalla-docente" replace />;
 
     return children;
 }

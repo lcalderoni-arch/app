@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from 'axios';
+
 import { useNavigate } from 'react-router-dom';
+import { setAccessToken } from "../../api/tokenStore";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -38,7 +40,7 @@ export default function LoginForm() {
     const payload = { email, password };
 
     try {
-      const response = await axios.post(url, payload);
+      const response = await axios.post(url, payload, { withCredentials: true });
 
       //  CORREGIDO: Renombrar variables para evitar conflicto
       const {
@@ -51,7 +53,7 @@ export default function LoginForm() {
         gradoAlumno,
       } = response.data;
 
-      localStorage.setItem("authToken", token);
+      setAccessToken(token);
       localStorage.setItem("userName", nombre);
       localStorage.setItem("userRole", rol);
       localStorage.setItem("userEmail", userEmail || "");
