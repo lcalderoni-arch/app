@@ -1,0 +1,22 @@
+{
+    "name": "Campus Virtual Fundación Deportiva",
+    "short_name": "CampusFD",
+    "description": "Plataforma académica para gestión de estudiantes, docentes y administración",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2563eb",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/logo192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/logo512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
