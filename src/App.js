@@ -9,28 +9,29 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
+    // ✅ limpia token legacy (de versiones anteriores)
+    if (localStorage.getItem("authToken")) {
+      localStorage.removeItem("authToken");
+    }
+    if (localStorage.getItem("userRol")) {
+      localStorage.removeItem("userRol");
+    }
+  }, []);
+
+  useEffect(() => {
     const hasSessionHints =
       !!localStorage.getItem("userRole") ||
       !!localStorage.getItem("userName") ||
       !!localStorage.getItem("userEmail");
 
-    const isLoginRoute = location.pathname === "/";
-    const isNosotrosRoute = location.pathname === "/nosotros";
-    const isPublicRoute = isLoginRoute || isNosotrosRoute;
+    const isPublicRoute = location.pathname === "/" || location.pathname === "/nosotros";
 
-    // En rutas públicas:
-    // - si hay hints, intentamos refresh (para redirigir al dashboard sin pedir login)
-    // - si NO hay hints, no hacemos refresh (evita 401 spam) y marcamos listo
     if (isPublicRoute) {
-      if (hasSessionHints) {
-        bootstrapAuth();
-      } else {
-        setAuthReady(true);
-      }
+      if (hasSessionHints) bootstrapAuth();
+      else setAuthReady(true);
       return;
     }
 
-    // En rutas privadas: siempre intentamos refresh (si falla, ProtectedRoute hará su trabajo)
     bootstrapAuth();
   }, [location.pathname]);
 

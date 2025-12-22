@@ -14,5 +14,7 @@ export async function logoutBackend() {
         localStorage.removeItem("userDni");
         localStorage.removeItem("userNivel");
         localStorage.removeItem("userGrado");
+        localStorage.removeItem("authToken"); // legacy
+        localStorage.removeItem("userRol");   // legacy
     }
 }
