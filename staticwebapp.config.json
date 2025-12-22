@@ -1,0 +1,34 @@
+{
+    "routes": [
+        {
+            "route": "/manifest.json",
+            "serve": "/manifest.json",
+            "statusCode": 200
+        },
+        {
+            "route": "/logo192.png",
+            "serve": "/logo192.png",
+            "statusCode": 200
+        },
+        {
+            "route": "/logo512.png",
+            "serve": "/logo512.png",
+            "statusCode": 200
+        }
+    ],
+    "navigationFallback": {
+        "rewrite": "/index.html",
+        "exclude": [
+            "/manifest.json",
+            "/logo192.png",
+            "/logo512.png",
+            "/static/*",
+            "/*.css",
+            "/*.js",
+            "/*.png",
+            "/*.jpg",
+            "/*.svg",
+            "/*.ico"
+        ]
+    }
+}
