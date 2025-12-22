@@ -6,22 +6,22 @@ export async function bootstrapAuth() {
     console.log("🟦 bootstrapAuth: iniciando...");
 
     try {
-        // ✅ Si ya hay token en memoria, no refrescamos
+        // Si ya hay token en memoria, no refrescamos
         const existing = getAccessToken();
         if (existing) {
-            console.log("🟩 bootstrapAuth: token ya existe en memoria, skip refresh");
+            console.log("bootstrapAuth: token ya existe en memoria, skip refresh");
             return;
         }
 
-        console.log("🟦 bootstrapAuth: llamando /auth/refresh ...");
+        console.log("bootstrapAuth: llamando /auth/refresh ...");
         const resp = await api.post("/auth/refresh", {});
 
-        console.log("🟩 bootstrapAuth: refresh OK", resp?.data);
+        console.log("bootstrapAuth: refresh OK", resp?.data);
 
         const token = resp.data?.token || resp.data?.accessToken || resp.data?.jwt;
         if (token) {
             setAccessToken(token);
-            console.log("🟩 bootstrapAuth: token seteado en memoria");
+            console.log("bootstrapAuth: token seteado en memoria");
 
             // UI sync (solo si hay valor real)
             if (resp.data?.nombre) localStorage.setItem("userName", resp.data.nombre);
@@ -31,12 +31,12 @@ export async function bootstrapAuth() {
             if (resp.data?.nivelAlumno) localStorage.setItem("userNivel", resp.data.nivelAlumno);
             if (resp.data?.gradoAlumno) localStorage.setItem("userGrado", resp.data.gradoAlumno);
         } else {
-            console.warn("🟨 bootstrapAuth: refresh respondió sin token");
+            console.warn("bootstrapAuth: refresh respondió sin token");
         }
     } catch (e) {
-        console.log("🟨 bootstrapAuth: refresh falló (normal si no hay sesión)", e?.response?.status);
+        console.log("bootstrapAuth: refresh falló (normal si no hay sesión)", e?.response?.status);
     } finally {
         setAuthReady(true);
-        console.log("✅ bootstrapAuth: authReady = true");
+        console.log("bootstrapAuth: authReady = true");
     }
 }

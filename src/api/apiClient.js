@@ -48,7 +48,7 @@ api.interceptors.response.use(
 
         const status = error.response.status;
 
-        // ✅ IMPORTANTE: intenta refresh tanto en 401 como en 403
+        // IMPORTANTE: intenta refresh tanto en 401 como en 403
         // (403 a veces lo usa Spring Security cuando el token es inválido o no autorizado)
         if ((status === 401 || status === 403) && !original._retry && !isPublicPath) {
             original._retry = true;
@@ -89,7 +89,7 @@ api.interceptors.response.use(
     }
 );
 
-// 👇 Logout “definitivo” + mensaje
+// Logout “definitivo” + mensaje
 function forceLogout(message) {
     limpiarSesion();
     try {

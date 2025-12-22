@@ -4,5 +4,5 @@ import { API_BASE_URL } from "../config/api";
 
 export const apiAuth = axios.create({
     baseURL: API_BASE_URL,
-    withCredentials: true, // ✅ cookies solo aquí
+    withCredentials: true, // cookies solo aquí
 });

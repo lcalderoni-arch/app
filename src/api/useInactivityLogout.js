@@ -11,12 +11,12 @@ export function useInactivityLogout() {
         clearTimeout(timer.current);
 
         timer.current = setTimeout(async () => {
-            console.warn("⏰ Logout por inactividad");
+            console.warn("Logout por inactividad");
 
             try {
                 await logoutBackend();
             } finally {
-                // 🔔 motivo del logout
+                // motivo del logout
                 sessionStorage.setItem("logoutReason", "INACTIVITY");
                 window.location.replace("/");
             }

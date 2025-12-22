@@ -10,10 +10,10 @@ import { useInactivityLogout } from "./api/useInactivityLogout";
 function App() {
   const location = useLocation();
 
-  // ✅ Hook de inactividad (30–45 min)
+  // Hook de inactividad (30–45 min)
   useInactivityLogout();
 
-  // ✅ Limpieza de residuos de versiones anteriores
+  // Limpieza de residuos de versiones anteriores
   useEffect(() => {
     if (localStorage.getItem("authToken")) {
       localStorage.removeItem("authToken");
@@ -23,7 +23,7 @@ function App() {
     }
   }, []);
 
-  // ✅ Bootstrap de autenticación por ruta
+  // Bootstrap de autenticación por ruta
   useEffect(() => {
     const hasSessionHints =
       !!localStorage.getItem("userRole") ||
