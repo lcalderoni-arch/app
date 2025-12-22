@@ -41,7 +41,7 @@ api.interceptors.response.use(
         const original = error.config;
         if (!original) return Promise.reject(error);
 
-        // ❌ Evita loop infinito
+        // Evita loop infinito
         if (original.url?.includes("/auth/refresh")) {
             limpiarSesion();
             return Promise.reject(error);
@@ -89,7 +89,7 @@ api.interceptors.response.use(
     }
 );
 
-// 🔒 Limpieza centralizada
+// Limpieza centralizada
 function limpiarSesion() {
     clearAccessToken();
     localStorage.removeItem("userRole");
