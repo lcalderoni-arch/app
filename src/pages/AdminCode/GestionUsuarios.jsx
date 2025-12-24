@@ -5,6 +5,7 @@ import { api } from "../../api/api"; // ✅ usa tu instancia central (Bearer + r
 import icon from "../../assets/logo.png";
 
 import "../../styles/RolesStyle/AdminStyle/GestionUsuarios.css";
+import { useAuthReady } from "../../api/useAuthReady";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -70,6 +71,8 @@ function GestionUsuarios() {
   const [etlResult, setEtlResult] = React.useState(null);
   const [loadingETL, setLoadingETL] = React.useState(false);
 
+  const authReady = useAuthReady();
+
   // ✅ Cargar usuarios (ya NO usa localStorage authToken, ni axios directo)
   const fetchUsuarios = React.useCallback(async () => {
     setLoading(true);
@@ -92,8 +95,9 @@ function GestionUsuarios() {
   }, []);
 
   React.useEffect(() => {
+    if (!authReady) return;
     fetchUsuarios();
-  }, [fetchUsuarios]);
+  }, [authReady, fetchUsuarios]);
 
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -593,10 +597,10 @@ function GestionUsuarios() {
                         {rol === ""
                           ? "Elige un rol..."
                           : rol === "ALUMNO"
-                          ? "Alumno"
-                          : rol === "PROFESOR"
-                          ? "Profesor"
-                          : "Administrador"}
+                            ? "Alumno"
+                            : rol === "PROFESOR"
+                              ? "Profesor"
+                              : "Administrador"}
                       </span>
                       <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                     </div>
@@ -769,10 +773,10 @@ function GestionUsuarios() {
                             {nivel === ""
                               ? "Elige un nivel..."
                               : nivel === "INICIAL"
-                              ? "Inicial"
-                              : nivel === "PRIMARIA"
-                              ? "Primaria"
-                              : "Secundaria"}
+                                ? "Inicial"
+                                : nivel === "PRIMARIA"
+                                  ? "Primaria"
+                                  : "Secundaria"}
                           </span>
                           <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
                         </div>
@@ -934,10 +938,10 @@ function GestionUsuarios() {
                   {filtroRol === ""
                     ? "Todos los roles"
                     : filtroRol === "ALUMNO"
-                    ? "Alumno"
-                    : filtroRol === "PROFESOR"
-                    ? "Profesor"
-                    : "Administrador"}
+                      ? "Alumno"
+                      : filtroRol === "PROFESOR"
+                        ? "Profesor"
+                        : "Administrador"}
                 </span>
                 <FontAwesomeIcon className="icon-increment" icon={faAngleDown} />
               </div>
@@ -1043,22 +1047,22 @@ function GestionUsuarios() {
                       {user.rol === "ALUMNO" && user.dniAlumno
                         ? user.dniAlumno
                         : user.rol === "PROFESOR" && user.dniProfesor
-                        ? user.dniProfesor
-                        : "-"}
+                          ? user.dniProfesor
+                          : "-"}
                     </td>
                     <td>
                       {user.rol === "ALUMNO" && user.telefonoEmergencia
                         ? user.telefonoEmergencia
                         : user.rol === "PROFESOR" && user.telefono
-                        ? user.telefono
-                        : "-"}
+                          ? user.telefono
+                          : "-"}
                     </td>
                     <td>
                       {user.rol === "ALUMNO" && user.alumno?.nivel && user.alumno?.grado
                         ? `${user.alumno.nivel} - ${user.alumno.grado}`
                         : user.rol === "PROFESOR" && user.profesor?.telefono
-                        ? user.profesor.telefono
-                        : "-"}
+                          ? user.profesor.telefono
+                          : "-"}
                     </td>
                     <td>
                       <button className="btn-edit" onClick={() => handleEdit(user)}>
@@ -1076,8 +1080,8 @@ function GestionUsuarios() {
                     {filtroNombre || filtroRol || filtroEmail || filtroDni
                       ? "No se encontraron usuarios con los filtros aplicados."
                       : error
-                      ? "Error al cargar usuarios."
-                      : "No hay usuarios registrados."}
+                        ? "Error al cargar usuarios."
+                        : "No hay usuarios registrados."}
                   </td>
                 </tr>
               )}

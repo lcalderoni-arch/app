@@ -7,6 +7,8 @@ import icon from "../../assets/logo.png";
 
 import "../../styles/RolesStyle/AdminStyle/GestionMatricula.css";
 
+import { useAuthReady } from "../../api/useAuthReady";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faChalkboard,
@@ -46,6 +48,8 @@ function GestionMatricula() {
     const [cicloActual, setCicloActual] = useState("");
     const [nuevoCiclo, setNuevoCiclo] = useState("");
     const [actualizandoCiclo, setActualizandoCiclo] = useState(false);
+
+    const authReady = useAuthReady();
 
 
     // ================================
@@ -116,9 +120,12 @@ function GestionMatricula() {
     //   EFECTO INICIAL
     // ================================
     useEffect(() => {
+        if (!authReady) return;
+
         cargarConfiguracion();
         cargarEstudiantes();
-    }, [cargarConfiguracion, cargarEstudiantes]);
+    }, [authReady, cargarConfiguracion, cargarEstudiantes]);
+
 
     // ================================
     //   GUARDAR FECHAS DE MATRÍCULA

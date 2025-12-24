@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/StudentStyle/ExamenesAlumno.css";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import LogoutButton from "../../../components/login/LogoutButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,7 +26,11 @@ export default function PantallaExamenesAlumno() {
 
     const userName = localStorage.getItem("userName");
 
+    const authReady = useAuthReady();
+
     useEffect(() => {
+        if (!authReady) return;
+
         let alive = true;
 
         const fetchExamenes = async () => {
@@ -32,15 +38,14 @@ export default function PantallaExamenesAlumno() {
                 setLoading(true);
                 setError(null);
 
-                // Antes: axios + Bearer
                 const { data } = await api.get("/alumno/examenes");
 
                 if (!alive) return;
                 setExamenes(data || []);
             } catch (err) {
                 console.error("Error al cargar exámenes del alumno:", err);
-
                 if (!alive) return;
+
                 setError(
                     err?.response?.data?.message ||
                     "No se pudieron cargar las notas de exámenes."
@@ -56,7 +61,7 @@ export default function PantallaExamenesAlumno() {
         return () => {
             alive = false;
         };
-    }, []);
+    }, [authReady]);
 
     const renderEstadoBadge = (estado) => {
         if (estado === "APROBADO") {

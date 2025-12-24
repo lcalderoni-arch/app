@@ -8,6 +8,8 @@ import LogoutButton from "../../../components/login/LogoutButton";
 
 import "../../../styles/RolesStyle/Progreso/ProgresoDocente.css";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faBook,
@@ -45,6 +47,8 @@ export default function PantallaProgresoDocente() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const authReady = useAuthReady();
+
     const COLORS = [
         "#f87171",
         "#60a5fa",
@@ -80,8 +84,9 @@ export default function PantallaProgresoDocente() {
             }
         };
 
-        cargarProgreso();
-    }, []);
+        if (!authReady) return;
+    cargarProgreso();
+}, [authReady]);
 
 
     const secciones = dataResumen?.secciones || [];

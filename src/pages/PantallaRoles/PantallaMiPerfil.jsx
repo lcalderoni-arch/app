@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import icon from "../../assets/logo.png";
 import HistorialMatriculasAlumno from "../../components/alumno/HistorialMatriculasAlumno.jsx";
 
+import { useAuthReady } from "../../api/useAuthReady";
 import "../../styles/RolesStyle/Perfil/MiPerfil.css";
 
 import { api } from "../../api/api";
@@ -29,9 +30,13 @@ function PantallaMiPerfil() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const authReady = useAuthReady();
+
     const rol = perfil?.rol;
 
     useEffect(() => {
+        if (!authReady) return;
+
         let alive = true;
 
         const fetchPerfil = async () => {
@@ -60,7 +65,7 @@ function PantallaMiPerfil() {
         return () => {
             alive = false;
         };
-    }, []);
+    }, [authReady]);
 
     if (loading) return <p>Cargando datos de tu perfil...</p>;
     if (error) return <p style={{ color: "red" }}>Error: {error}</p>;

@@ -11,7 +11,7 @@ export default function GuestRoute({ children }) {
         return () => window.removeEventListener("auth-ready-changed", handler);
     }, []);
 
-    if (!ready) return null;
+    if (!ready) return <div style={{ padding: 16 }}>Cargando...</div>;
 
     const role = localStorage.getItem("userRole");
     if (role === "ADMINISTRADOR") return <Navigate to="/dashboard-admin" replace />;

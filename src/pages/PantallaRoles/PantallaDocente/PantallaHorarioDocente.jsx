@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { API_BASE_URL } from "../../../config/api.js";
 import icon from "../../../assets/logo.png";
 
 import "../../../styles/RolesStyle/Horario/HorarioSemanal.css";
+
+import { useAuthReady } from "../../../api/useAuthReady";
 
 import LogoutButton from "../../../components/login/LogoutButton.jsx";
 import WeeklyCalendar from "../../../components/WeeklyCalendar.jsx";
@@ -44,15 +45,16 @@ export default function PantallaHorarioDocente() {
 
     const userName = localStorage.getItem("userName");
 
+    const authReady = useAuthReady();
+
     useEffect(() => {
         const fetchHorario = async () => {
             setLoading(true);
             setError(null);
 
             try {
-                // ✅ SIN token manual: api se encarga
-                const url = `${API_BASE_URL}/docente/horario`;
-                const response = await api.get(url);
+                // SIN token manual: api se encarga
+                const response = await api.get("/docente/horario");
 
                 const data = response.data || [];
 
@@ -106,8 +108,9 @@ export default function PantallaHorarioDocente() {
             }
         };
 
+        if (!authReady) return;
         fetchHorario();
-    }, []);
+    }, [authReady]);
 
     const weekLabel = "Secciones asignadas esta semana";
 

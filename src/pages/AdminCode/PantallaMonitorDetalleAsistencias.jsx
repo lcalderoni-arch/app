@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../../api/api"; // ✅ axios centralizado
-import { API_BASE_URL } from "../../config/api";
 import icon from "../../assets/logo.png";
+
+import { useAuthReady } from "../../api/useAuthReady";
 
 import "../../styles/RolesStyle/AdminStyle/GestionDetalleAsistencia.css";
 
@@ -19,18 +20,21 @@ export default function PantallaMonitorDetalleAsistencias() {
     const [guardando, setGuardando] = useState(false);
     const [error, setError] = useState(null);
 
+    const authReady = useAuthReady();
+
     // ==============================
     //   CARGAR ASISTENCIAS
     // ==============================
     useEffect(() => {
+        if (!authReady) return;
+
         const cargarAsistencias = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                const response = await api.get(
-                    `${API_BASE_URL}/asistencias/sesion/${sesionId}`
-                );
+                const response = await api.get(`/asistencias/sesion/${sesionId}`);
+
 
                 setAsistencias(response.data || []);
             } catch (err) {
@@ -45,7 +49,7 @@ export default function PantallaMonitorDetalleAsistencias() {
         };
 
         cargarAsistencias();
-    }, [sesionId]);
+    }, [authReady, sesionId]);
 
     // ==============================
     //   MANEJO DE CAMBIOS
@@ -89,10 +93,7 @@ export default function PantallaMonitorDetalleAsistencias() {
                 })),
             };
 
-            await api.post(
-                `${API_BASE_URL}/asistencias/registrar-sesion`,
-                payload
-            );
+            await api.post("/asistencias/registrar-sesion", payload);
 
             alert("✅ Asistencias guardadas correctamente.");
         } catch (err) {

@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/Horario/HorarioSemanal.css";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import LogoutButton from "../../../components/login/LogoutButton";
 import WeeklyCalendar from "../../../components/WeeklyCalendar.jsx";
 
@@ -40,9 +42,13 @@ export default function PantallaHorarioAlumno() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const authReady = useAuthReady();
+
     const userName = localStorage.getItem("userName");
 
     useEffect(() => {
+        if (!authReady) return;
+
         let alive = true;
 
         const fetchHorario = async () => {
@@ -50,9 +56,7 @@ export default function PantallaHorarioAlumno() {
             setError(null);
 
             try {
-                // Antes: axios + Bearer
                 const { data } = await api.get("/alumno/horario");
-
                 const raw = data || [];
 
                 const mapped = raw.map((sesion, index) => {
@@ -62,8 +66,10 @@ export default function PantallaHorarioAlumno() {
                     if (sesion.diaSemana) {
                         dayIndex = mapDiaSemanaToIndex(sesion.diaSemana);
                     } else if (sesion.fecha) {
-                        const d = new Date(sesion.fecha);
-                        dayIndex = Number.isNaN(d.getTime()) ? 0 : d.getDay();
+                        // ✅ recomendado: parse local para evitar cambios por UTC
+                        const [y, m, d] = String(sesion.fecha).split("-").map(Number);
+                        const localDate = new Date(y, m - 1, d);
+                        dayIndex = Number.isNaN(localDate.getTime()) ? 0 : localDate.getDay();
                     }
 
                     const startTime = sesion.horaInicio || "08:00";
@@ -98,7 +104,7 @@ export default function PantallaHorarioAlumno() {
         return () => {
             alive = false;
         };
-    }, []);
+    }, [authReady]);
 
     const weekLabel = "Horario semanal de clases";
 

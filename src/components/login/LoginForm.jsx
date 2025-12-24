@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from 'axios';
 
 import { useNavigate } from 'react-router-dom';
 import { setAccessToken } from "../../api/tokenStore";
@@ -7,11 +6,11 @@ import { setAccessToken } from "../../api/tokenStore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
+import { api } from "../../api/api";
+
 export default function LoginForm() {
   const emailRef = useRef(null);
   const navigate = useNavigate();
-
-  const API_BASE_URL = "https://fundaciondeportiva-backend-api-2025-gveefdbmgvdggqa8.chilecentral-01.azurewebsites.net/api";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,11 +35,13 @@ export default function LoginForm() {
     setError(null);
     console.log("Enviando datos de login...");
 
-    const url = `${API_BASE_URL}/auth/login`;
     const payload = { email, password };
 
     try {
-      const response = await axios.post(url, payload, { withCredentials: true });
+      const response = await api.post("/auth/login", payload, {
+        withCredentials: true,
+      });
+
 
       //  CORREGIDO: Renombrar variables para evitar conflicto
       const {

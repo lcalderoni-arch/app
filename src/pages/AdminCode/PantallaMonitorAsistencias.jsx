@@ -2,11 +2,12 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { api } from "../../api/api"; // ✅ axios centralizado
-import { API_BASE_URL } from "../../config/api.js";
+import { api } from "../../api/api"; // 
 import icon from "../../assets/logo.png";
 
 import "../../styles/RolesStyle/AdminStyle/GestionAsistencia.css";
+
+import { useAuthReady } from "../../api/useAuthReady";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSquarePlus, faAngleDown } from "@fortawesome/free-solid-svg-icons";
@@ -35,6 +36,8 @@ export default function PantallaMonitorAsistencias() {
     const [isSesionOpen, setIsSesionOpen] = useState(false);
     const sesionSelectRef = useRef(null);
 
+    const authReady = useAuthReady();
+
     const navigate = useNavigate();
 
     const getClaseEstado = (estado) => {
@@ -60,8 +63,7 @@ export default function PantallaMonitorAsistencias() {
             setLoading(true);
             setError(null);
 
-            const url = `${API_BASE_URL}/monitor/asistencias/hoy`;
-            const response = await api.get(url);
+            const response = await api.get("/monitor/asistencias/hoy");
 
             setResumen(response.data || []);
         } catch (err) {
@@ -76,6 +78,8 @@ export default function PantallaMonitorAsistencias() {
     }, []);
 
     useEffect(() => {
+        if (!authReady) return;
+
         cargarMonitor();
 
         const interval = setInterval(() => {
@@ -83,7 +87,7 @@ export default function PantallaMonitorAsistencias() {
         }, 60000);
 
         return () => clearInterval(interval);
-    }, [cargarMonitor]);
+    }, [authReady, cargarMonitor]);
 
     // ==============================
     //   CERRAR DROPDOWNS FUERA
@@ -153,8 +157,7 @@ export default function PantallaMonitorAsistencias() {
                 setLoadingStats(true);
                 setErrorStats(null);
 
-                const url = `${API_BASE_URL}/asistencias/sesion/${sesionDashboardId}`;
-                const response = await api.get(url);
+                const response = await api.get(`/asistencias/sesion/${sesionDashboardId}`);
                 const asistencias = response.data || [];
 
                 const total = asistencias.length;
@@ -298,7 +301,7 @@ export default function PantallaMonitorAsistencias() {
 
                     {!loading && !error && resumen.length === 0 && (
                         <p style={{
-                            padding:"10px 35px",
+                            padding: "10px 35px",
                         }}>No hay sesiones programadas para hoy.</p>
                     )}
 

@@ -5,6 +5,8 @@ import LogoutButton from "../../../components/login/LogoutButton";
 import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import { api } from "../../../api/api";
 
 export default function PantallaAsistenciasAlumno() {
@@ -16,7 +18,11 @@ export default function PantallaAsistenciasAlumno() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const authReady = useAuthReady();
+
     useEffect(() => {
+        if (!authReady || !seccionId) return;
+
         let alive = true;
 
         const cargarAsistencias = async () => {
@@ -34,7 +40,6 @@ export default function PantallaAsistenciasAlumno() {
                 console.error("Error al cargar mis asistencias:", err);
                 if (!alive) return;
 
-                // Si tu backend usa 404 para "sin registros"
                 if (err?.response?.status === 404) {
                     setAsistencias([]);
                     setError(null);
@@ -52,7 +57,7 @@ export default function PantallaAsistenciasAlumno() {
         return () => {
             alive = false;
         };
-    }, [seccionId]);
+    }, [authReady, seccionId]);
 
     const traducirEstado = (estado) => {
         switch (estado) {

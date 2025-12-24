@@ -7,6 +7,8 @@ import icon from "../../assets/logo.png";
 import "../../styles/RolesStyle/AdminStyle/GestionSecciones.css";
 import { formatDateLocal } from "../../utils/dateUtils";
 
+import { useAuthReady } from "../../api/useAuthReady";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faAngleDown,
@@ -62,6 +64,8 @@ function GestionSecciones() {
     const turnoSelectRef = useRef(null);
     const cursoSelectRef = useRef(null);
 
+    const authReady = useAuthReady();
+
     // --- useEffect para cerrar dropdowns al hacer click fuera ---
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -108,8 +112,9 @@ function GestionSecciones() {
     }, []);
 
     useEffect(() => {
+        if (!authReady) return;
         cargarSecciones();
-    }, [cargarSecciones]);
+    }, [authReady, cargarSecciones]);
 
     // --- Cargar cursos disponibles ---
     const cargarCursos = useCallback(async () => {
@@ -126,8 +131,10 @@ function GestionSecciones() {
     }, []);
 
     useEffect(() => {
+        if (!authReady) return;
         cargarCursos();
-    }, [cargarCursos]);
+    }, [authReady, cargarCursos]);
+
 
     // --- Limpiar formulario (y salir de modo edición) ---
     const limpiarFormularioSeccion = () => {

@@ -10,6 +10,7 @@ export async function bootstrapAuth() {
         const existing = getAccessToken();
         if (existing) {
             console.log("bootstrapAuth: token ya existe en memoria, skip refresh");
+            setAuthReady(true); // asegura ready
             return;
         }
 

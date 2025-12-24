@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import icon from "../../../assets/logo.png";
 import LogoutButton from "../../../components/login/LogoutButton";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import "../../../styles/RolesStyle/Progreso/ProgresoAlumno.css";
 
 import { api } from "../../../api/api";
@@ -38,9 +40,13 @@ export default function PantallaProgresoAlumno() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const authReady = useAuthReady();
+
     const COLORS = ["#f87171", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#fb7185", "#4ade80"];
 
     useEffect(() => {
+        if (!authReady) return;
+
         let alive = true;
 
         const cargarProgreso = async () => {
@@ -68,7 +74,8 @@ export default function PantallaProgresoAlumno() {
         return () => {
             alive = false;
         };
-    }, []);
+    }, [authReady]);
+
 
     const cursos = dataResumen?.cursos || [];
 

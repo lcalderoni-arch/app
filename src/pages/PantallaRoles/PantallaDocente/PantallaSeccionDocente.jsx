@@ -9,6 +9,8 @@ import { API_BASE_URL } from "../../../config/api";
 import LogoutButton from "../../../components/login/LogoutButton";
 import { formatDateLocal } from "../../../utils/dateUtils";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
 
 import { api } from "../../../api/api"; // ✅ axios centralizado (Bearer + refresh cookie)
@@ -108,7 +110,7 @@ function RecursoForm({ sesionId, momento, onRecursoCreado }) {
                     permiteEntregas: esTarea ? !!permiteEntregas : false,
                 };
 
-                const resp = await api.post(`${API_BASE_URL}/recursos/crear`, payload);
+                const resp = await api.post("/recursos/crear", payload);
                 onRecursoCreado && onRecursoCreado(resp.data);
             } else {
                 // ✅ Archivos físicos => multipart/form-data
@@ -303,6 +305,8 @@ export default function PantallaSeccionDocente() {
     const [recursoSeleccionado, setRecursoSeleccionado] = useState(null);
     const [showModalRecurso, setShowModalRecurso] = useState(false);
 
+    const authReady = useAuthReady();
+
     const abrirModalRecurso = (recurso) => {
         setRecursoSeleccionado(recurso);
         setShowModalRecurso(true);
@@ -368,7 +372,7 @@ export default function PantallaSeccionDocente() {
         if (!window.confirm("¿Seguro que deseas eliminar este recurso?")) return;
 
         try {
-            await api.delete(`${API_BASE_URL}/recursos/${id}`);
+            await api.delete(`/recursos/${id}`);
             handleRecursoEliminado(id);
             alert("Recurso eliminado.");
         } catch (err) {
@@ -384,7 +388,7 @@ export default function PantallaSeccionDocente() {
             setLoadingEntregas(true);
             setErrorEntregas(null);
 
-            const resp = await api.get(`${API_BASE_URL}/tareas/${recurso.id}/entregas`);
+            const resp = await api.get(`/tareas/${recurso.id}/entregas`);
             setEntregasTarea(resp.data || []);
         } catch (err) {
             console.error("Error al cargar entregas de la tarea:", err);
@@ -411,7 +415,7 @@ export default function PantallaSeccionDocente() {
                 setLoadingSesiones(true);
                 setErrorSesiones(null);
 
-                const resp = await api.get(`${API_BASE_URL}/sesiones/seccion/${seccionId}`);
+                const resp = await api.get(`/sesiones/seccion/${seccionId}`);
                 setSesiones(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar sesiones:", err);
@@ -423,8 +427,9 @@ export default function PantallaSeccionDocente() {
             }
         };
 
-        if (seccionId) cargarSesiones();
-    }, [seccionId]);
+        if (!authReady || !seccionId) return;
+        cargarSesiones();
+    }, [authReady, seccionId]);
 
     // --- Cargar sección si no llegó por state ---
     useEffect(() => {
@@ -435,7 +440,7 @@ export default function PantallaSeccionDocente() {
                 setLoading(true);
                 setError(null);
 
-                const resp = await api.get(`${API_BASE_URL}/secciones/${seccionId}`);
+                const resp = await api.get(`/secciones/${seccionId}`);
                 setSeccion(resp.data);
                 setSemanaSeleccionada(resp.data.semanaActual || 1);
             } catch (err) {
@@ -469,7 +474,7 @@ export default function PantallaSeccionDocente() {
                 setLoadingRecursos(true);
                 setErrorRecursos(null);
 
-                const resp = await api.get(`${API_BASE_URL}/recursos/sesion/${sesionActualId}`);
+                const resp = await api.get(`/recursos/sesion/${sesionActualId}`);
                 setRecursos(resp.data || []);
             } catch (err) {
                 console.error("Error al cargar recursos:", err);

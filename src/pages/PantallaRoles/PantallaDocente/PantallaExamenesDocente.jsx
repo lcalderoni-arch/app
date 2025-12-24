@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../../../api/api";
@@ -6,6 +6,8 @@ import { api } from "../../../api/api";
 import icon from "../../../assets/logo.png";
 import LogoutButton from "../../../components/login/LogoutButton";
 import "../../../styles/RolesStyle/DocenteStyle/ExamenesDocente.css";
+
+import { useAuthReady } from "../../../api/useAuthReady";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -35,6 +37,8 @@ export default function PantallaExamenesDocente() {
     const [notasData, setNotasData] = useState(null);
     const [loadingNotas, setLoadingNotas] = useState(false);
     const [errorNotas, setErrorNotas] = useState(null);
+
+    const authReady = useAuthReady();
 
     // Para edición de notas
     const [notasEditables, setNotasEditables] = useState({});
@@ -70,23 +74,17 @@ export default function PantallaExamenesDocente() {
             }
         };
 
-        if (seccionId) {
-            fetchSeccion();
-        }
-    }, [seccionId]);
+        if (!authReady || !seccionId) return;
+        fetchSeccion();
+    }, [authReady, seccionId]);
 
     // ================= CARGAR EXÁMENES =================
-    const cargarExamenes = async () => {
+    const cargarExamenes = useCallback(async () => {
         try {
             setLoadingExamenes(true);
             setErrorExamenes(null);
 
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
-
             const resp = await api.get(`/docente/secciones/${seccionId}/examenes`);
-
-
             setExamenes(resp.data || []);
         } catch (err) {
             console.error("Error al cargar exámenes:", err);
@@ -96,15 +94,12 @@ export default function PantallaExamenesDocente() {
         } finally {
             setLoadingExamenes(false);
         }
-    };
+    }, [seccionId]);
 
     useEffect(() => {
-        if (seccionId) {
-            cargarExamenes();
-        }
-        // Si tu ESLint se queja por cargarExamenes en deps, puedes desactivar:
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [seccionId]);
+    if (!authReady || !seccionId) return;
+    cargarExamenes();
+}, [authReady, seccionId, cargarExamenes]);
 
     // ================= CARGAR NOTAS DE UN EXAMEN =================
     const cargarNotasExamen = async (examenId) => {
@@ -112,9 +107,6 @@ export default function PantallaExamenesDocente() {
             setExamenSeleccionadoId(examenId);
             setLoadingNotas(true);
             setErrorNotas(null);
-
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
 
             const resp = await api.get(`/docente/examenes/${examenId}/notas`);
 

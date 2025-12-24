@@ -1,6 +1,9 @@
+import { getAccessToken } from "../api/tokenStore";
+
 export const getAuth = () => {
-    const token = localStorage.getItem("authToken");
-    const rol = localStorage.getItem("userRol"); // ej: "ADMINISTRADOR" | "PROFESOR" | "ALUMNO"
+    const token = getAccessToken(); // ✅ token real (memoria/sessionStorage)
+    const rol =
+        localStorage.getItem("userRole") || localStorage.getItem("userRol"); // fallback legacy
     return { token, rol };
 };
 
@@ -10,7 +13,7 @@ export const isLoggedIn = () => {
 };
 
 export const getHomeByRole = (rol) => {
-    switch ((rol || "").toUpperCase()) {
+    switch (String(rol || "").toUpperCase()) {
         case "ADMINISTRADOR":
             return "/dashboard-admin";
         case "PROFESOR":

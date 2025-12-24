@@ -6,26 +6,23 @@ import Nosotros from "./Nosotros";
 export default function NosotrosPage() {
   const location = useLocation();
 
-    // Detectar hash y hacer scroll
+  // Detectar hash y hacer scroll
   useEffect(() => {
     if (location.hash) {
-      const id = location.hash.replace('#', '');
-      setTimeout(() => {
+      const id = location.hash.replace("#", "");
+      requestAnimationFrame(() => {
         const element = document.getElementById(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100); // Pequeño delay para asegurar que el DOM esté listo
+        element?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     } else {
-      // Si no hay hash, scroll al inicio
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [location]);
+  }, [location.hash]);
 
   return (
     <>
       <Header />
-        <Nosotros />
+      <Nosotros />
     </>
   );
 }

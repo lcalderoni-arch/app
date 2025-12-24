@@ -1,7 +1,9 @@
 // src/pages/GestionCursos.jsx
 import React, { useRef, useState, useEffect, useCallback } from "react";
 
-import { API_ENDPOINTS, API_BASE_URL } from "../../config/api.js";
+import { useAuthReady } from "../../api/useAuthReady";
+
+import { API_ENDPOINTS } from "../../config/api.js";
 import { api } from "../../api/api"; // ✅ NUEVO
 import icon from "../../assets/logo.png";
 
@@ -38,6 +40,8 @@ function GestionCursos() {
 
     const API_URL = API_ENDPOINTS.cursos;
 
+    const authReady = useAuthReady();
+
     // --- Cerrar dropdown al hacer click fuera ---
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -72,8 +76,9 @@ function GestionCursos() {
     }, [API_URL]);
 
     useEffect(() => {
+        if (!authReady) return;
         fetchCursos();
-    }, [fetchCursos]);
+    }, [authReady, fetchCursos]);
 
     // --- 2. Eliminar Curso ---
     const handleDelete = async (cursoId, cursoTitulo) => {
@@ -154,8 +159,7 @@ function GestionCursos() {
         try {
             // MODO CREAR
             if (!isEditMode) {
-                const url = `${API_BASE_URL}/cursos`; // este endpoint lo dejas tal cual lo tenías
-                const response = await api.post(url, payload);
+                const response = await api.post("/cursos", payload);
 
                 setCursos((current) => [response.data, ...current]);
                 alert(`Curso "${response.data.titulo}" creado correctamente.`);
@@ -163,8 +167,8 @@ function GestionCursos() {
             }
             // MODO EDITAR
             else if (isEditMode && editingCurso) {
-                const url = `${API_BASE_URL}/cursos/${editingCurso.id}`;
 
+                // Validar si hay cambios ANTES de llamar al backend
                 if (
                     payload.titulo === (editingCurso.titulo || "") &&
                     payload.descripcion === (editingCurso.descripcion || "") &&
@@ -175,7 +179,11 @@ function GestionCursos() {
                     return;
                 }
 
-                const response = await api.put(url, payload);
+                // Llamar al backend SOLO si hubo cambios
+                const response = await api.put(
+                    `/cursos/${editingCurso.id}`,
+                    payload
+                );
 
                 handleCursoActualizadoEnLista(response.data);
                 alert(`Curso "${response.data.titulo}" actualizado correctamente.`);

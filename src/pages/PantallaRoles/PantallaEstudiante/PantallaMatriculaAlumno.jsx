@@ -6,6 +6,8 @@ import icon from "../../../assets/logo.png";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageFirst.css";
 import "../../../styles/RolesStyle/StudentStyle/StudentPageMatricula.css";
 
+import { useAuthReady } from "../../../api/useAuthReady";
+
 import { api } from "../../../api/api";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -46,6 +48,8 @@ export default function PantallaMatriculaAlumno() {
     const [seccionesSeleccionadas, setSeccionesSeleccionadas] = useState([]);
     const [confirmando, setConfirmando] = useState(false);
     const [retirando, setRetirando] = useState(false);
+
+    const authReady = useAuthReady();
 
     // ================================
     //   CARGAR CONFIGURACIÓN MATRÍCULA
@@ -149,10 +153,11 @@ export default function PantallaMatriculaAlumno() {
     //   EFECTO INICIAL
     // ================================
     useEffect(() => {
+        if (!authReady) return;
+
         let alive = true;
 
         const init = async () => {
-            // Ejecutamos en paralelo, pero respetando el "alive"
             try {
                 await Promise.all([
                     cargarConfigMatricula(),
@@ -170,7 +175,13 @@ export default function PantallaMatriculaAlumno() {
         return () => {
             alive = false;
         };
-    }, [cargarConfigMatricula, cargarPerfilAlumno, cargarSeccionesDisponibles, cargarMisMatriculas]);
+    }, [
+        authReady,
+        cargarConfigMatricula,
+        cargarPerfilAlumno,
+        cargarSeccionesDisponibles,
+        cargarMisMatriculas,
+    ]);
 
     // ================================
     //   HELPERS

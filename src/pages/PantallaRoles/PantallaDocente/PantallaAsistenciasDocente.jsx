@@ -6,6 +6,7 @@ import { api } from "../../../api/api";
 
 import LogoutButton from "../../../components/login/LogoutButton";
 import "../../../styles/RolesStyle/DocenteStyle/SeccionDocente.css";
+import { useAuthReady } from "../../../api/useAuthReady";
 
 const opcionesEstado = ["ASISTIO", "FALTA", "TARDANZA", "JUSTIFICADA"];
 
@@ -19,15 +20,16 @@ export default function PantallaAsistenciasDocente() {
     const [guardando, setGuardando] = useState(false);
     const [error, setError] = useState(null);
 
+    const authReady = useAuthReady();
+
     // Cargar asistencias ya registradas (o lista de alumnos)
     useEffect(() => {
+        if (!authReady) return;
+
         const cargarAsistencias = async () => {
             try {
                 setLoading(true);
                 setError(null);
-
-                const token = localStorage.getItem("authToken");
-                if (!token) throw new Error("No estás autenticado.");
 
                 const response = await api.get(`/asistencias/sesion/${sesionId}`);
                 setAsistencias(response.data || []);
@@ -43,7 +45,8 @@ export default function PantallaAsistenciasDocente() {
         };
 
         cargarAsistencias();
-    }, [sesionId]);
+    }, [authReady, sesionId]);
+
 
     const handleCambioEstado = (index, nuevoEstado) => {
         setAsistencias((prev) =>
@@ -73,9 +76,6 @@ export default function PantallaAsistenciasDocente() {
 
             setGuardando(true);
             setError(null);
-
-            const token = localStorage.getItem("authToken");
-            if (!token) throw new Error("No estás autenticado.");
 
             const payload = {
                 sesionId: Number(sesionId),

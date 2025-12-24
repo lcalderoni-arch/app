@@ -1,9 +1,11 @@
 // src/pages/PantallaRoles/PantallaEstudiante/PantallaSeccionEstudiante.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import LogoutButton from "../../../components/login/LogoutButton";
 import { formatDateLocal } from "../../../utils/dateUtils";
+
+import { useAuthReady } from "../../../api/useAuthReady";
 
 import icon from "../../../assets/logo.png";
 import icon2 from "../../../assets/logo2.png";
@@ -73,6 +75,8 @@ export default function PantallaSeccionEstudiante() {
     const [recursoSeleccionado, setRecursoSeleccionado] = useState(null);
     const [showModalRecurso, setShowModalRecurso] = useState(false);
 
+    const authReady = useAuthReady();
+
     const abrirModalRecurso = (recurso) => {
         setRecursoSeleccionado(recurso);
         setShowModalRecurso(true);
@@ -83,8 +87,15 @@ export default function PantallaSeccionEstudiante() {
         setRecursoSeleccionado(null);
     };
 
-    // --- cargar sección + sesiones ---
+    const sesionActualId = useMemo(() => {
+        if (!sesiones || sesiones.length === 0) return null;
+        const index = semanaSeleccionada - 1;
+        return sesiones[index]?.id ?? null;
+    }, [sesiones, semanaSeleccionada]);
+
     useEffect(() => {
+        if (!authReady || !seccionId) return;
+
         let alive = true;
 
         const cargarDatos = async () => {
@@ -108,7 +119,10 @@ export default function PantallaSeccionEstudiante() {
             } catch (err) {
                 console.error("Error al cargar la sección:", err);
                 if (!alive) return;
-                setError(err?.response?.data?.message || "No se pudo cargar la información del curso.");
+                setError(
+                    err?.response?.data?.message ||
+                    "No se pudo cargar la información del curso."
+                );
             } finally {
                 if (!alive) return;
                 setLoading(false);
@@ -120,17 +134,14 @@ export default function PantallaSeccionEstudiante() {
         return () => {
             alive = false;
         };
-    }, [seccionId]);
+    }, [authReady, seccionId]);
 
-    // Sesión actual
-    let sesionActualId = null;
-    if (sesiones && sesiones.length > 0) {
-        const index = semanaSeleccionada - 1;
-        sesionActualId = sesiones[index]?.id || null;
-    }
 
+    // --- cargar sección + sesiones ---
     // Cargar recursos de la sesión actual
     useEffect(() => {
+        if (!authReady) return;
+
         let alive = true;
 
         const cargarRecursos = async () => {
@@ -152,12 +163,14 @@ export default function PantallaSeccionEstudiante() {
             } catch (err) {
                 console.error("Error al cargar recursos:", err);
                 if (!alive) return;
+
                 if (err?.response?.status === 404) {
                     setRecursos([]);
                     setErrorRecursos(null);
                 } else {
                     setErrorRecursos(
-                        err?.response?.data?.message || "No se pudieron cargar los recursos de la sesión."
+                        err?.response?.data?.message ||
+                        "No se pudieron cargar los recursos de la sesión."
                     );
                     setRecursos([]);
                 }
@@ -172,7 +185,7 @@ export default function PantallaSeccionEstudiante() {
         return () => {
             alive = false;
         };
-    }, [sesionActualId]);
+    }, [authReady, sesionActualId]);
 
     const handleClickSemana = (numSemana) => {
         setSemanaSeleccionada(numSemana);

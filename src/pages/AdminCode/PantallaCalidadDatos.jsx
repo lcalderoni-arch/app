@@ -4,11 +4,15 @@ import { API_ENDPOINTS } from "../../config/api";
 import { api } from "../../api/api"; // ✅ axios centralizado (token + refresh cookie)
 import "../../styles/RolesStyle/AdminStyle/PantallaCalidadDatos.css";
 
+import { useAuthReady } from "../../api/useAuthReady";
+
 const PantallaCalidadDatos = () => {
     const [loading, setLoading] = useState(false);
     const [resultado, setResultado] = useState(null);
     const [error, setError] = useState(null);
     const [resumen, setResumen] = useState(null);
+
+    const authReady = useAuthReady();
 
     const fetchResumen = useCallback(async () => {
         try {
@@ -27,8 +31,9 @@ const PantallaCalidadDatos = () => {
     }, []);
 
     useEffect(() => {
+        if (!authReady) return;
         fetchResumen();
-    }, [fetchResumen]);
+    }, [authReady, fetchResumen]);
 
     const ejecutarLimpieza = async () => {
         setLoading(true);
